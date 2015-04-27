@@ -1,0 +1,34 @@
+<html>
+<head>
+ 	<meta name="viewport" content ="width=device-width,initial-scale=1,user-scalable=yes" />
+	<script src="js/jquery.min.js"></script>
+	<script src="js/api.js"></script>
+	<script src="js/d3.min.js"></script>
+	<script src="js/tinycolor.js"></script>
+	<script src="js/colorwheel.js"></script>
+	<script src="js/colorwheel.theme.js"></script>
+	
+	<link rel="stylesheet" href="css/wheel.css">
+	<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+	<div id="colorwheel" class="colorwheel"></div>
+
+	<script> 
+		var waiting = false;
+		var colorWheel = new ColorWheel([{r: 0, g: 0, b: 0}], '#colorwheel'); 
+		colorWheel.colorCallback = function(color){
+			if(!waiting)
+			{
+				waiting = true;
+				callAPI({action:"setColor", color:color}, function(result){
+					waiting = false;
+				},
+				function(error){
+					alert(error);
+				});
+			}	
+		}
+	</script>
+</body>
+</html>

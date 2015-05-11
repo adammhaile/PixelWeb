@@ -15,21 +15,39 @@
 	<div id="colorwheel" class="colorwheel"></div>
 
 	<script> 
-		var waiting = false;
+		var colorWaiting = false;
 		var colorWheel = new ColorWheel(1, '#colorwheel'); 
 		colorWheel.colorCallback = function(color){
 			console.log(color);
-			if(!waiting)
+			if(!colorWaiting)
 			{
-				waiting = true;
+				colorWaiting = true;
 				callAPI({action:"setColor", color:color}, function(result){
-					waiting = false;
+					colorWaiting = false;
 				},
 				function(error){
 					alert(error);
 				});
 			}	
+		};
+		var brightnessWaiting = false;
+		function valueMap( value, in_min , in_max , out_min , out_max ) {
+		  return ( value - in_min ) * ( out_max - out_min ) / ( in_max - in_min ) + out_min;
 		}
+		colorWheel.brightnessCallback = function(level){
+			level = Math.round(valueMap(level, 0.0, 1.0, 0, 255));
+			console.log(level)
+			if(!brightnessWaiting)
+			{
+				brightnessWaiting = true;
+				callAPI({action:"setBrightness", level:level}, function(result){
+					brightnessWaiting = false;
+				},
+				function(error){
+					alert(error);
+				});
+			}
+		};
 	</script>
 </body>
 </html>

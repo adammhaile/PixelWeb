@@ -32,6 +32,7 @@
     };
 
     this.colorCallback = null;
+    this.brightnessCallback = null;
 
     this.options.margin = this.options.markerWidth;
 
@@ -56,7 +57,6 @@
           d = tinycolor(datum).toHsv();
         } else if (typeof datum === 'object') {
           d = tinycolor(datum.colorString).toHsv();
-          console.log(d);
           d.s = 1.0;
           d.name = datum.name;
         }
@@ -139,7 +139,7 @@
     markers.exit().remove();
 
     // Events
-    this.dispatch = d3.dispatch('update', 'updateEnd');
+    this.dispatch = d3.dispatch('update', 'updateEnd', "updateBrightness");
 
     var dragstart = function () {
       self.container.selectAll('.wheel__marker')
@@ -204,12 +204,19 @@
       self.container.attr('data-mode', self.currentMode);
     });
 
+    this.dispatch.on('updateBrightness', function(){
+      var d = data[0];
+      if(self.brightnessCallback){
+        self.brightnessCallback(d.v);
+      }
+    });
+
     this.dispatch.on('update.colorOut', function () {
       var d = data[0];
       var c = {
         h: d.h,
         s: d.s,
-        v: d.v,
+        v: 1,
         a: d.a
       }
       c = tinycolor(c).toHexString();
@@ -324,6 +331,7 @@
         break;
     }
     this.dispatch.update();
+    this.dispatch.updateBrightness();
     this.dispatch.updateEnd();
   };
 

@@ -43,6 +43,7 @@ def initBPM(config):
 
 fillColor = (0,0,0)
 def setColor(req):
+	global fillColor
 	fillColor = colors.hex2rgb(req['color'])
 	bpm.led.fill(fillColor)
 	bpm.led.update()

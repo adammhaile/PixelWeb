@@ -31,7 +31,7 @@ ColorWheel.extend('theme', function (colorWheel, data) {
     .attr('class', 'theme__slider')
     .on('input', function (d) {
       d.v = parseInt(this.value) / 100;
-      colorWheel.dispatch.update();
+      colorWheel.dispatch.updateBrightness();
     })
     .on('change', function () {
       colorWheel.dispatch.updateEnd();
@@ -42,31 +42,22 @@ ColorWheel.extend('theme', function (colorWheel, data) {
     .attr('class', 'theme__color');
 
   colorWheel.dispatch.on('update.theme', function () {
-    // colorWheel.container.selectAll('.theme__swatch').each(function (d, i) {
-    //   switch (colorWheel.currentMode) {
-    //     case ColorWheel.modes.TRIAD:
-    //       this.style.order = this.style.webkitOrder = i % 3;
-    //       break;
-    //     default:
-    //       this.style.order = this.style.webkitOrder = ColorWheel.markerDistance(i);
-    //       break;
-    //   }
-    // });
-
     colorWheel.container.selectAll('.theme__color').each(function (d) {
-      var c = tinycolor({h: d.h, s: d.s, v: d.v});
+      var c = tinycolor({h: d.h, s: d.s, v: 1});
       this.style.backgroundColor = c.toHexString();
     });
 
+    colorWheel.container.selectAll('.theme__value').each(function (d) {
+      var c = tinycolor({h: d.h, s: d.s, v: 1});
+      this.value = colorWheel.options.colorString(c);
+    });
+  });
+
+  colorWheel.dispatch.on('updateBrightness.theme', function () {
     colorWheel.container.selectAll('.theme__slider').each(function (d) {
       var val = parseInt(d.v * 100);
       this.value = val;
       d3.select(this).attr('value', val);
-    });
-
-    colorWheel.container.selectAll('.theme__value').each(function (d) {
-      var c = tinycolor({h: d.h, s: d.s, v: d.v});
-      this.value = colorWheel.options.colorString(c);
     });
   });
 });

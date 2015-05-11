@@ -1,5 +1,5 @@
 from bibliopixel import *
-# from bibliopixel.drivers.visualizer import *
+from bibliopixel.drivers.visualizer import *
 from bibliopixel.drivers.serial_driver import *
 import bibliopixel.colors as colors
 import bibliopixel.gamma as gamma
@@ -18,16 +18,28 @@ def success(data):
 	return {"status" : True, "msg" : "OK", "error_code" : ErrorCode.SUCCESS, "data" : data}
 
 class BPManager(object):
-	def __init__(self, num):
-		#self.driver = DriverVisualizer(num=num, stayTop=True)
-		self.driver = DriverSerial(LEDTYPE.NEOPIXEL, 8*8*6, c_order=ChannelOrder.GRB, gamma=gamma.NEOPIXEL)
-		self.led = LEDStrip(self.driver, threadedUpdate=True)
+	def __init__(self, config):
+		driverTypes = {
+			"DriverVisualizer": DriverVisualizer,
+			"DriverSerial": DriverSerial
+		}
+		driverConfig = config['driver']
+		driverType = driverConfig['type']
+		params = driverConfig['params']
+		self.driver = None
+		try:
+			if driverType in driverTypes:
+				self.driver = driverTypes[driverType](**params)
+
+			self.led = LEDStrip(self.driver, threadedUpdate=True)
+		except Exception, e:
+			raise e
 
 bpm = None
 
-def initBPM(num):
+def initBPM(config):
 	global bpm
-	bpm = BPManager(num)
+	bpm = BPManager(config)
 
 fillColor = (0,0,0)
 def setColor(req):

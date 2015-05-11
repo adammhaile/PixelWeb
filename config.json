@@ -1,0 +1,24 @@
+{
+    "server": {
+        "port": 8080,
+        "host": "0.0.0.0"
+    },
+    "driver": {
+        "type": "DriverVisualizer",
+        "params": {
+            "num": 100,
+            "width": 0,
+            "height": 0,
+            "pixelSize": 15,
+            "stayTop": true
+        }
+    },
+    "driver2": {
+        "type": "DriverSerial",
+        "params": {
+            "num": 384,
+            "type": 3, 
+            "c_order": [1,0,2] 
+        }
+    }
+}

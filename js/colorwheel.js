@@ -56,6 +56,7 @@
           d = tinycolor(datum).toHsv();
         } else if (typeof datum === 'object') {
           d = tinycolor(datum.colorString).toHsv();
+          console.log(d);
           d.s = 1.0;
           d.name = datum.name;
         }

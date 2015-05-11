@@ -16,8 +16,9 @@
 
 	<script> 
 		var waiting = false;
-		var colorWheel = new ColorWheel([{r: 0, g: 0, b: 0}], '#colorwheel'); 
+		var colorWheel = new ColorWheel(1, '#colorwheel'); 
 		colorWheel.colorCallback = function(color){
+			console.log(color);
 			if(!waiting)
 			{
 				waiting = true;

@@ -49,6 +49,23 @@ def api():
 		return fail("Invalid request data.")
 
 
-initBPM(30)
+def loadConfig():
+	error = None
+	try:
+		with open("config.json", mode="r") as f:
+			try:
+				config = json.load(f)
+				return config
+			except ValueError:
+				error = "Error loading config. Try validating your config JSON @ http://jsonlint.com/"
+	except Exception, e:
+		error = e
+	return {"error": error}
 
-run(host='0.0.0.0', port=8080, reloader=False)
+config = loadConfig()
+if "error" in config:
+	print config['error']
+else:
+	initBPM(config)
+	serverConfig  = config['server']
+	run(host=serverConfig['host'], port=serverConfig['port'], reloader=False)

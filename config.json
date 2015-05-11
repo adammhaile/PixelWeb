@@ -18,6 +18,7 @@
         "params": {
             "num": 384,
             "type": 3, 
+            "dev": "",
             "c_order": [1,0,2] 
         }
     }

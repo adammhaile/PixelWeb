@@ -11,7 +11,16 @@
     <link rel="stylesheet" href="css/semantic.min.css">
     <script>
     var _drivers = null;
-    var _controlMap = {};
+    var _driverControlMap = {};
+
+    function saveDriverParams() {
+        var result = {};
+        $.each(_driverControlMap, function(k, $n) {
+            result[k] = $n.val();
+        });
+
+        return result;
+    };
 
     $(document)
         .ready(function() {
@@ -19,89 +28,70 @@
             $('.menu .item')
                 .tab();
 
-            function insert_int($node, params){
-            	return $node._nud({
-            		label: params.label,
-	                placeholder: params.placeholder,
-	                default: params.default,
-	                min: params.min,
-	                max: params.max,
-	                step: params.step
-            	});
+            function insert_int($node, params) {
+                return $node._nud({
+                    label: params.label,
+                    placeholder: params.msg,
+                    default: params.default,
+                    min: params.min,
+                    max: params.max,
+                    step: params.step
+                });
             }
 
-            function insert_str($node, params){
-
+            function insert_str($node, params) {
+                return $node._input({
+                    label: params.label,
+                    placeholder: params.msg,
+                    default: params.default,
+                });
             }
 
-            function insert_combo($node, params){
-            	return $node._dropdown({
-            		label: params.label,
-	                placeholder: params.placeholder,
-	                default: params.default,
-	                data: params.options
-            	});
+            function insert_combo($node, params) {
+                return $node._dropdown({
+                    label: params.label,
+                    placeholder: params.msg,
+                    default: params.default,
+                    data: params.options
+                });
             }
 
             var insertFuncs = {
-            	"int":insert_int,
-            	"str":insert_str,
-            	"combo":insert_combo
-            }
-            function showParams($node, params){
-            	$node.empty();
-            	$.each(params, function(i,v){
-            		$node.append('<div class="ui hidden divider"></div>');
-            		$($node.append('<div id="' + v.id + '"></div>'));
-            		$n = $node.children("#" + v.id);
-            		insertFuncs[v.type]($n, v);
-            	});
+                "int": insert_int,
+                "str": insert_str,
+                "combo": insert_combo
             }
 
-            function driverChanged(id, val){
-            	showParams($("#param_controls"), _drivers[val].params);
+            function showParams($node, params) {
+                $node.empty();
+                $.each(params, function(i, v) {
+                    $node.append('<div class="ui hidden divider"></div>');
+                    $($node.append('<div id="' + v.id + '"></div>'));
+                    $n = $node.children("#" + v.id);
+                    _driverControlMap[v.id] = insertFuncs[v.type]($n, v);
+                });
             }
 
-            $("#driver_selection")._dropdown({
-            	//data: drivers,
-            	label: "Driver",
-            	placeholder: "Select Driver...",
-            	//default: "ws2801",
-            	onChange: driverChanged
+            function driverChanged(id, val) {
+                showParams($("#param_controls"), _drivers[val].params);
+            }
+
+            var d = $("#driver_selection")._dropdown({
+                //data: drivers,
+                label: "Driver",
+                placeholder: "Select Driver...",
+                //default: "serial",
+                onChange: driverChanged
             });
 
-            getDrivers(function(drivers){
-            	_drivers = drivers;
-            	var d = {};
-            	$.each(drivers, function(k,v){
-            		d[k] = v.display;
-            	});
-            	$("#driver_selection")._dropdown().load(d);
+            getDrivers(function(drivers) {
+                _drivers = drivers;
+                var d = {};
+                $.each(drivers, function(k, v) {
+                    d[k] = v.display;
+                });
+                $("#driver_selection")._dropdown().load(d);
             });
-
-            // $("#toggle")._toggle({
-            // 	label: "Use PySPI",
-            // 	default: true
-            // });
-
-            // $("#pixels")._nud({
-            //     label: "# Pixels",
-            //     placeholder: "Enter number pixels",
-            //     default: 1,
-            //     min: 1,
-            //     max: 5,
-            //     step: 1
-            // });
-
-            // $("#test")._nud({
-            //     label: "Hello",
-            //     placeholder: "Enter number",
-            //     default: 1,
-            //     min: -5,
-            //     max: 3,
-            //     step: 1
-            // });
-
         });
     </script>
 </head>
@@ -113,14 +103,8 @@
         <a class="item" data-tab="third">Third</a>
     </div>
     <div class="ui bottom attached active tab segment" data-tab="config">
-    	<div id="driver_selection"></div>
-    	<div id="param_controls"></div>
-<!--     	<div class="ui hidden divider"></div>
-        <div id="toggle"></div>
-        <div class="ui hidden divider"></div>
-        <div id="pixels"></div>
-        <div class="ui hidden divider"></div>
-        <div id="test"></div> -->
+        <div id="driver_selection"></div>
+        <div id="param_controls"></div>
     </div>
     <div class="ui bottom attached tab segment" data-tab="second">
         Second

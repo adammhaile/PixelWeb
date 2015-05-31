@@ -31,7 +31,9 @@ $.fn._dropdown = function(config) {
         if (value != undefined) {
             return $node.dropdown("set selected", value);
         } else {
-            return $node.dropdown("get value");
+            var v = $node.dropdown("get value");
+            if(typeof v == "object") v = null;
+            return v;
         }
     };
 
@@ -74,10 +76,8 @@ $.fn._dropdown = function(config) {
 
         $node.load(config.data);
 
-        if (def) {
-            //cannot be set immediately, do after 5ms
-            setTimeout(function(){$node.setDefault();}, 5);
-        }
+        //cannot be set immediately, do after 5ms
+        setTimeout(function(){$node.setDefault();}, 5);
     }
 
     return $node;
@@ -178,7 +178,7 @@ $.fn._nud = function(config) {
             </div>\
             ';
         html = strReplace(html, "@action", "action");
-        html = strReplace(html, "@default", '<button class="ui icon button" id="@id_undo"><i class="undo icon"></i></button>');
+        html = strReplace(html, "@default", '<button class="ui icon button" tabindex="-1" id="@id_undo"><i class="undo icon"></i></button>');
 
         html = strReplace(html, "@label", config.label);
         html = strReplace(html, "@placeholder", config.placeholder);
@@ -240,4 +240,58 @@ $.fn._toggle = function(config) {
 
     return $node;
 }
+
+$.fn._input = function(config) {
+    var $node = $(this);
+    var id = $node.attr('id');
+
+    $node.val = function(value) {
+        var $input = $node.find("#" + id + "_input");
+        var cfg = $node.data().config;
+
+        if (value != undefined) {
+            return $input.val(value);
+        } else {
+            return $input.val();
+        }
+    };
+
+    $node.undo = function() {
+        var cfg = $node.data().config;
+        $node.val(cfg.default);
+    };
+
+    if (config) {
+        var def = 'default' in config && config.default != null;
+        if (!def) config.default = "";
+        if (!config.placeholder) config.placeholder = "";
+
+        $node.data("config", config);
+
+        var html = '\
+            <div class="ui labeled @action input">\
+                <div class="ui label">@label</div>\
+                <input type="text" style="" id="@id_input" placeholder="@placeholder">\
+                @default\
+            </div>\
+            ';
+        html = strReplace(html, "@action", "action");
+        html = strReplace(html, "@default", '<button class="ui icon button" tabindex="-1" id="@id_undo"><i class="undo icon"></i></button>');
+
+        html = strReplace(html, "@label", config.label);
+        html = strReplace(html, "@placeholder", config.placeholder);
+        html = strReplace(html, "@id", $node.attr('id'));
+
+        $node.html(html);
+        $node.find("#" + id + "_undo").click($node.undo);
+
+        //$node.find("#" + id + "_input").keyup(onKey);
+
+        if (def) {
+            $node.val(config.default);
+        }
+    }
+
+    return $node;
+};
 

@@ -1,0 +1,172 @@
+<html>
+
+<head>
+    <!-- <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes" /> -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery.numeric.min.js"></script>
+    <script src="js/semantic.min.js"></script>
+    <link rel="stylesheet" href="css/semantic.min.css">
+    <script>
+    var drivers = {
+        'lpd8806': 'LPD8806 (SPI)',
+        'serial': 'Serial (AllPixel)',
+        'ws2801': 'WS2801 (SPI)',
+        'visualizer': 'Visualizer'
+    }
+
+    function strReplace(str, find, replace) {
+        return str.replace(new RegExp(find, 'g'), replace);
+    }
+
+    $.fn.dropdownAdd = function(key, value) {
+        $drop = $(this)
+        $.each($drop, function(i, d) {
+            $d = $(d);
+            $menu = $d.children(".menu");
+            $menu.append('<div class="item" data-value="' + key + '">' + value + '</div>');
+        });
+    }
+
+    $.fn.dropdownLoad = function(data) {
+        $drop = $(this)
+        $.each($drop, function(i, d) {
+            $d = $(d);
+            $d.dropdown("restore defaults");
+            $menu = $d.children(".menu");
+            $menu.empty();
+            $.each(data, function(k, v) {
+                $menu.append('<div class="item" data-value="' + k + '">' + v + '</div>');
+            });
+        });
+    };
+
+    $.fn.nud = function(config) {
+        var html = '\
+	        <div class="ui labeled @action input">\
+	            <div class="ui label">@label</div>\
+	            <input type="text" style="" id="@id_input" placeholder="@placeholder">\
+	            @default\
+	        </div>\
+	        <div class="ui icon buttons">\
+	            <div class="ui button" id="@id_minus"><i class="minus icon"></i></div>\
+	            <div class="ui button" id="@id_plus"><i class="plus icon"></i></div>\
+	        </div>\
+	        ';
+
+        $node = $(this);
+        var id = $node.attr('id');
+
+        $node.val = function(value) {
+            $input = $node.find("#" + id + "_input");
+            if (value != undefined) {
+            	if(value != "") value = Math.floor(value);
+                return $input.val(value);
+            } else {
+                var v = $input.val();
+                return v == "" ? null : parseInt(v);
+            }
+        };
+
+        $node.add = function(value) {
+            var v = $node.val();
+            v += value;
+            $node.val(v);
+            return value;
+        };
+
+        $node.up = function() {
+            var cfg = $node.data().config;
+            return $node.add(cfg.step);
+        };
+
+        $node.down = function() {
+            var cfg = $node.data().config;
+            return $node.add(cfg.step * -1);
+        };
+
+        $node.undo = function() {
+            var cfg = $node.data().config;
+            $node.val(cfg.default);
+        };
+
+        if (config) {
+        	var def = 'default' in config && config.default != null;
+        	if(!def) config.default = "";
+            html = strReplace(html, "@action", "action");
+       		html = strReplace(html, "@default", '<button class="ui icon button" id="@id_undo"><i class="undo icon"></i></button>');
+
+            html = strReplace(html, "@label", config.label)
+            html = strReplace(html, "@placeholder", config.placeholder)
+            html = strReplace(html, "@id", $node.attr('id'))
+            
+            if (!('step' in config)) config.step = 1;
+
+            $node.html(html);
+            $node.find("#" + id + "_minus").click($node.down);
+            $node.find("#" + id + "_plus").click($node.up);
+            $node.find("#" + id + "_undo").click($node.undo);
+
+            $node.find("#" + id + "_input").numeric(false);
+
+            if(def) {
+            	$node.val(config.default);
+            	
+            }
+
+            $node.data("config", config)
+        }
+
+        return $node;
+    };
+
+
+
+    $(document)
+        .ready(function() {
+
+            $('.menu .item')
+                .tab();
+
+            $('.ui.dropdown')
+                .dropdown({
+                    // you can use any ui transition
+                    transition: 'drop'
+                });
+
+            $("#selDriver").dropdownLoad(drivers);
+
+            $("#nud").nud({
+                label: "# Pixels",
+                placeholder: "Enter number pixels",
+                //default: 1,
+                step: 1
+            });
+
+        });
+    </script>
+</head>
+
+<body class="inverted">
+    <div class="ui top attached tabular menu">
+        <a class="active item" data-tab="config">Config</a>
+        <a class="item" data-tab="second">Second</a>
+        <a class="item" data-tab="third">Third</a>
+    </div>
+    <div class="ui bottom attached active tab segment" data-tab="config">
+        <div class="ui search selection dropdown" id="selDriver">
+            <i class="dropdown icon"></i>
+            <div class="default text">Select Driver</div>
+            <div class="menu"></div>
+        </div>
+        <div class="ui hidden divider"></div>
+        <div id="nud"></div>
+    </div>
+    <div class="ui bottom attached tab segment" data-tab="second">
+        Second
+    </div>
+    <div class="ui bottom attached tab segment" data-tab="third">
+        Third
+    </div>
+</body>
+
+</html>

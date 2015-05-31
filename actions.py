@@ -23,15 +23,36 @@ class BPManager(object):
 			"DriverVisualizer": DriverVisualizer,
 			"DriverSerial": DriverSerial
 		}
-		driverConfig = config['driver']
-		driverType = driverConfig['type']
-		params = driverConfig['params']
+
+		controllerTypes = {
+			"LEDStrip" : LEDStrip,
+			"LEDMatrix": LEDMatrix
+		}
+
+		try:
+			controllerConfig = config['controller']
+			controllerType = controllerConfig['type']
+			controllerParams = controllerConfig['params']
+
+			driverConfig = config['driver']
+			driverType = driverConfig['type']
+			driverParams = driverConfig['params']
+		except KeyError, e:
+			raise Exception("Error loading config: " + e)
+
+		self.led = None
 		self.driver = None
 		try:
 			if driverType in driverTypes:
-				self.driver = driverTypes[driverType](**params)
+				self.driver = driverTypes[driverType](**driverParams)
+			else:
+				raise Exception("Invalid Driver Type")
 
-			self.led = LEDStrip(self.driver, threadedUpdate=True)
+			controllerParams['driver'] = self.driver
+			if controllerType in controllerTypes:
+				self.led = controllerTypes[controllerType](**controllerParams)
+			else:
+				raise Exception("Invalid Controller Type")
 		except Exception, e:
 			raise e
 

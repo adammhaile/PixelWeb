@@ -3,12 +3,30 @@
         "port": 8080,
         "host": "0.0.0.0"
     },
+    "controllerS": {
+        "type": "LEDStrip",
+        "params": {
+            "threadedUpdate": false
+        }
+    },
+    "controller": {
+        "type": "LEDMatrix",
+        "params": {
+            "width": 0,
+            "height": 0,
+            "coordMap": null,
+            "rotation": 0,
+            "vert_flip": false,
+            "serpentine": true,
+            "threadedUpdate": false
+        }
+    },
     "driver": {
         "type": "DriverVisualizer",
         "params": {
-            "num": 100,
-            "width": 0,
-            "height": 0,
+            "num": 0,
+            "width": 10,
+            "height": 10,
             "pixelSize": 15,
             "stayTop": true
         }

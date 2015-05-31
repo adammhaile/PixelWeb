@@ -6,28 +6,6 @@ function strReplace(str, find, replace) {
     return str.replace(new RegExp(find, 'g'), replace);
 }
 
-$.fn.dropdownAdd = function(key, value) {
-    $drop = $(this)
-    $.each($drop, function(i, d) {
-        $d = $(d);
-        $menu = $d.children(".menu");
-        $menu.append('<div class="item" data-value="' + key + '">' + value + '</div>');
-    });
-}
-
-$.fn.dropdownLoad = function(data) {
-    $drop = $(this)
-    $.each($drop, function(i, d) {
-        $d = $(d);
-        $d.dropdown("restore defaults");
-        $menu = $d.children(".menu");
-        $menu.empty();
-        $.each(data, function(k, v) {
-            $menu.append('<div class="item" data-value="' + k + '">' + v + '</div>');
-        });
-    });
-};
-
 $.fn._dropdown = function(config) {
     var $node = $(this);
     var id = $node.attr('id');
@@ -73,6 +51,7 @@ $.fn._dropdown = function(config) {
         var def = 'default' in config && config.default != null;
         if (!def) config.default = "";
         if(!('data' in config)) config.data = {};
+        if(!config.placeholder) config.placeholder = "Choose...";
 
         $node.data("config", config);
 
@@ -85,6 +64,7 @@ $.fn._dropdown = function(config) {
 
         $node.addClass("ui search selection dropdown");
         $node.html(html);
+        $('<div class="ui label pointing right large">' + config.label + '</div>').insertBefore($node);
 
         $node.dropdown({
             transition: 'drop',
@@ -117,6 +97,8 @@ $.fn._nud = function(config) {
             if(state){
                 //$($node.children(".ui.input")).addClass("error");
                 var msg = "Value must be in range: " + cfg.min + " to " + cfg.max;
+                if(!cfg.max) msg = "Value must be greater than " + (cfg.min-1);
+                if(!cfg.min) msg = "Value must be less than " + (cfg.max+1);
                 $node.find("#" + id + "_err_msg").text(msg);
                 dir = "in";
             }
@@ -125,7 +107,6 @@ $.fn._nud = function(config) {
                 //$($node.children(".ui.input")).removeClass("error");
                 if(!$error.hasClass("hidden")) dir = "out";
             }
-
 
             if(dir != "") $error.transition('scale ' + dir);
         }
@@ -177,9 +158,10 @@ $.fn._nud = function(config) {
     if (config) {
         var def = 'default' in config && config.default != null;
         if (!def) config.default = "";
-        if (!('step' in config)) config.step = 1;
+        if (!config.step) config.step = 1;
         if (!('min' in config)) config.min = null;
         if (!('max' in config)) config.max = null;
+        if (!config.placeholder) config.placeholder = "";
 
         $node.data("config", config);
 

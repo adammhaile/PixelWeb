@@ -42,7 +42,7 @@ $.fn.nud = function(config) {
         </div>\
         ';
 
-    $node = $(this);
+    var $node = $(this);
     var id = $node.attr('id');
 
     $node.val = function(value) {
@@ -54,7 +54,7 @@ $.fn.nud = function(config) {
             $error = $node.find("#" + id + "_error");
             if(state){
                 //$($node.children(".ui.input")).addClass("error");
-                var msg = "Value must be in range: " + cfg.min + " - " + cfg.max;
+                var msg = "Value must be in range: " + cfg.min + " to " + cfg.max;
                 $node.find("#" + id + "_err_msg").text(msg);
                 dir = "in";
             }

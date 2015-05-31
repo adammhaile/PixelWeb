@@ -30,12 +30,21 @@
 
             $("#selDriver").dropdownLoad(drivers);
 
-            $("#nud").nud({
+            $("#pixels").nud({
                 label: "# Pixels",
                 placeholder: "Enter number pixels",
                 default: 1,
                 min: 1,
                 max: 5,
+                step: 1
+            });
+
+            $("#test").nud({
+                label: "Hello",
+                placeholder: "Enter number",
+                //default: 1,
+                min: -5,
+                max: 3,
                 step: 1
             });
 
@@ -56,7 +65,9 @@
             <div class="menu"></div>
         </div>
         <div class="ui hidden divider"></div>
-        <div id="nud"></div>
+        <div id="pixels"></div>
+        <div class="ui hidden divider"></div>
+        <div id="test"></div>
     </div>
     <div class="ui bottom attached tab segment" data-tab="second">
         Second

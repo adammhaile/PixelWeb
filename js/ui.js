@@ -28,25 +28,87 @@ $.fn.dropdownLoad = function(data) {
     });
 };
 
-$.fn.nud = function(config) {
-    var html = '\
-        <div class="ui small error message hidden" id="@id_error"><i class="close icon"></i><p id="@id_err_msg"><p></div>\
-        <div class="ui labeled @action input">\
-            <div class="ui label">@label</div>\
-            <input type="text" style="" id="@id_input" placeholder="@placeholder">\
-            @default\
-        </div>\
-        <div class="ui icon buttons">\
-            <div class="ui button" id="@id_minus"><i class="minus icon"></i></div>\
-            <div class="ui button" id="@id_plus"><i class="plus icon"></i></div>\
-        </div>\
-        ';
+$.fn._dropdown = function(config) {
+    var $node = $(this);
+    var id = $node.attr('id');
 
+    $node.load = function(data) {
+        $drop = $(this)
+        $drop.dropdown("restore defaults");
+        $menu = $drop.children(".menu");
+        $menu.empty();
+        $.each(data, function(k, v) {
+            $menu.append('<div class="item" data-value="' + k + '">' + v + '</div>');
+        });
+    };
+
+    $node.add = function(value, text){
+        var cfg = $node.data().config;
+        cfg.data[value] = text;
+        $node.load(cfg.data);
+    };
+
+    $node.val = function(value) {
+        var cfg = $node.data().config;
+        if (value != undefined) {
+            return $node.dropdown("set selected", value);
+        } else {
+            return $node.dropdown("get value");
+        }
+    };
+
+    $node.setDefault = function() {
+        var cfg = $node.data().config;
+        if(cfg.default) $node.val(cfg.default);
+        else $node.dropdown("restore defaults");
+    };
+
+    function onChange(){
+        var cfg = $node.data().config;
+        if(cfg.onChange)
+            cfg.onChange($node.attr('id'), $node.val());
+    }
+
+    if (config) {
+        var def = 'default' in config && config.default != null;
+        if (!def) config.default = "";
+        if(!('data' in config)) config.data = {};
+
+        $node.data("config", config);
+
+        var html = '\
+            <i class="dropdown icon"></i>\
+            <div class="default text">@placeholder</div>\
+            <div class="menu"></div>\
+        ';
+        html = strReplace(html, "@placeholder", config.placeholder)
+
+        $node.addClass("ui search selection dropdown");
+        $node.html(html);
+
+        $node.dropdown({
+            transition: 'drop',
+            fullTextSearch: true,
+            onChange: onChange
+        });
+
+        $node.load(config.data);
+
+        if (def) {
+            //cannot be set immediately, do after 5ms
+            setTimeout(function(){$node.setDefault();}, 5);
+        }
+    }
+
+    return $node;
+}
+
+$.fn._nud = function(config) {
     var $node = $(this);
     var id = $node.attr('id');
 
     $node.val = function(value) {
-        $input = $node.find("#" + id + "_input");
+        var $input = $node.find("#" + id + "_input");
         var cfg = $node.data().config;
 
         function rangeError(state) {
@@ -119,14 +181,26 @@ $.fn.nud = function(config) {
         if (!('min' in config)) config.min = null;
         if (!('max' in config)) config.max = null;
 
-        $node.data("config", config)
+        $node.data("config", config);
 
+        var html = '\
+            <div class="ui small error message hidden" id="@id_error"><i class="close icon"></i><p id="@id_err_msg"><p></div>\
+            <div class="ui labeled @action input">\
+                <div class="ui label">@label</div>\
+                <input type="text" style="" id="@id_input" placeholder="@placeholder">\
+                @default\
+            </div>\
+            <div class="ui icon buttons">\
+                <div class="ui button" id="@id_minus"><i class="minus icon"></i></div>\
+                <div class="ui button" id="@id_plus"><i class="plus icon"></i></div>\
+            </div>\
+            ';
         html = strReplace(html, "@action", "action");
         html = strReplace(html, "@default", '<button class="ui icon button" id="@id_undo"><i class="undo icon"></i></button>');
 
-        html = strReplace(html, "@label", config.label)
-        html = strReplace(html, "@placeholder", config.placeholder)
-        html = strReplace(html, "@id", $node.attr('id'))
+        html = strReplace(html, "@label", config.label);
+        html = strReplace(html, "@placeholder", config.placeholder);
+        html = strReplace(html, "@id", $node.attr('id'));
 
         $node.html(html);
         $node.find("#" + id + "_minus").click($node.down);
@@ -148,4 +222,40 @@ $.fn.nud = function(config) {
 
     return $node;
 };
+
+$.fn._toggle = function(config) {
+    var $node = $(this);
+    var id = $node.attr('id');
+
+    $node.val = function(value){
+        if(value != undefined){
+            return $node.checkbox(value ? "check" : "uncheck");
+        }
+        else{
+            return $node.checkbox("is checked");
+        }
+    };
+
+    if (config) {
+        var def = 'default' in config && config.default != null;
+        if (!def) config.default = false;
+
+        $node.data("config", config);
+
+        $node.addClass("ui toggle checkbox");
+        var html = '\
+            <label>@label</label>\
+            <input type="checkbox">\
+            ';
+        html = strReplace(html, "@label", config.label);
+
+        $node.html(html);
+
+        $node.checkbox();
+
+        $node.val(config.default);
+    }
+
+    return $node;
+}
 

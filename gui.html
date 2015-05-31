@@ -22,15 +22,19 @@
             $('.menu .item')
                 .tab();
 
-            $('.ui.dropdown')
-                .dropdown({
-                    // you can use any ui transition
-                    transition: 'drop'
-                });
+            $("#selDriver")._dropdown({
+            	data: drivers,
+            	placeholder: "Select Driver...",
+            	//default: "ws2801",
+            	onChange: null//function(id, val){ console.log(id + ": " + val);}
+            });
 
-            $("#selDriver").dropdownLoad(drivers);
+            $("#toggle")._toggle({
+            	label: "Use PySPI",
+            	default: true
+            });
 
-            $("#pixels").nud({
+            $("#pixels")._nud({
                 label: "# Pixels",
                 placeholder: "Enter number pixels",
                 default: 1,
@@ -39,10 +43,10 @@
                 step: 1
             });
 
-            $("#test").nud({
+            $("#test")._nud({
                 label: "Hello",
                 placeholder: "Enter number",
-                //default: 1,
+                default: 1,
                 min: -5,
                 max: 3,
                 step: 1
@@ -59,11 +63,10 @@
         <a class="item" data-tab="third">Third</a>
     </div>
     <div class="ui bottom attached active tab segment" data-tab="config">
-        <div class="ui search selection dropdown" id="selDriver">
-            <i class="dropdown icon"></i>
-            <div class="default text">Select Driver</div>
-            <div class="menu"></div>
-        </div>
+    	<div class="ui label pointing right large">Driver</div>
+    	<div id="selDriver"></div>
+    	<div class="ui hidden divider"></div>
+        <div id="toggle"></div>
         <div class="ui hidden divider"></div>
         <div id="pixels"></div>
         <div class="ui hidden divider"></div>

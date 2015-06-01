@@ -5,7 +5,8 @@ function insert_int($node, params) {
         default: params.default,
         min: params.min,
         max: params.max,
-        step: params.step
+        step: params.step,
+        help: params.help
     });
 }
 
@@ -14,6 +15,7 @@ function insert_str($node, params) {
         label: params.label,
         placeholder: params.msg,
         default: params.default,
+        help: params.help
     });
 }
 
@@ -23,7 +25,8 @@ function insert_combo($node, params) {
         placeholder: params.msg,
         default: params.default,
         data: params.options,
-        data_map: params.options_map
+        data_map: params.options_map,
+        help: params.help
     });
 }
 
@@ -31,6 +34,7 @@ function insert_bool($node, params) {
     return $node._toggle({
         label: params.label,
         default: params.default,
+        help: params.help
     });
 }
 

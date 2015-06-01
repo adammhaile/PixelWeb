@@ -105,12 +105,14 @@ function getDrivers(callback) {
                 "label": "# Pixels",
                 "type": "int",
                 "default": 1,
-                "min": 1
+                "min": 1,
+                "help":"Total pixels to control."
             }, {
                 "id": "dev",
                 "label": "Device Path",
                 "type": "str",
                 "default": "/dev/spidev0.0",
+                "help": "File path to system SPI device. Default is valid on Raspberry Pi."
             }, {
                 "id": "c_order",
                 "label": "Channel Order",
@@ -131,7 +133,8 @@ function getDrivers(callback) {
                     [2, 0, 1],
                     [2, 1, 0]
                 ],
-                "default": 0
+                "default": 0,
+                "help":"This should be obvious."
             }, {
                 "id": "SPISpeed",
                 "label": "SPI Speed (MHz)",
@@ -140,11 +143,13 @@ function getDrivers(callback) {
                 "min": 1,
                 "max": 30,
                 //"advanced": true
+                "help":"Clock speed for SPI bus."
             }, {
             	"id":"use_py_spi",
             	"label":"Use PySPI",
             	"type":"bool",
             	"default":true,
+                "help":"Use the python-spidev package for SPI faster access. Must be installed. Uses direct file access if false."
             }]
         }
     }

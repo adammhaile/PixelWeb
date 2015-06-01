@@ -6,6 +6,13 @@ function strReplace(str, find, replace) {
     return str.replace(new RegExp(find, 'g'), replace);
 }
 
+$.fn.addToolTip = function(text){
+    var $node = $(this);
+    $node.attr("data-content",text);
+    $node.attr("data-variation","wide inverted");
+    $node.attr("data-position", "top left");
+    $node.popup({delay:{show:100, hide:0}, duration:100});
+}
 
 $.fn._dropdown = function(config) {
     var $node = $(this);
@@ -81,9 +88,7 @@ $.fn._dropdown = function(config) {
         html = strReplace(html, "@placeholder", config.placeholder);
         html = strReplace(html, "@label", config.label)
 
-        //$node.addClass("ui search selection dropdown");
         $node.html(html);
-        //$('<div class="ui label pointing right large">' + config.label + '</div>').insertBefore($node);
 
         $node.children(".dropdown").dropdown({
             transition: 'drop',
@@ -92,6 +97,8 @@ $.fn._dropdown = function(config) {
         });
 
         $node.load(config.data);
+
+        $node.addToolTip(config.help);
 
         //cannot be set immediately, do after 5ms
         setTimeout(function(){$node.setDefault();}, 5);
@@ -214,6 +221,8 @@ $.fn._nud = function(config) {
             $(this).transition('scale out');
           });
 
+        $node.addToolTip(config.help);
+
         if (def) {
             $node.val(config.default);
         }
@@ -238,10 +247,12 @@ $.fn._toggle = function(config) {
     if (config) {
         var def = 'default' in config && config.default != null;
         if (!def) config.default = false;
+        if(!(config.help)) config.help = "";
 
         $node.data("config", config);
 
         $node.addClass("ui toggle checkbox");
+        
         var html = '\
             <label>@label</label>\
             <input type="checkbox">\
@@ -251,6 +262,7 @@ $.fn._toggle = function(config) {
         $node.html(html);
 
         $node.checkbox();
+        $node.addToolTip(config.help);
 
         $node.val(config.default);
     }
@@ -302,7 +314,7 @@ $.fn._input = function(config) {
         $node.html(html);
         $node.find("#" + id + "_undo").click($node.undo);
 
-        //$node.find("#" + id + "_input").keyup(onKey);
+        $node.addToolTip(config.help);
 
         if (def) {
             $node.val(config.default);

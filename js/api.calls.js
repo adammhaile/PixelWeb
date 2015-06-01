@@ -20,7 +20,7 @@ function getDrivers(callback) {
                     10: "LPD1886",
                     11: "P98131"
                 },
-                "default": null,
+                "default": 0
             }, {
                 "id": "num",
                 "label": "# Pixels",
@@ -33,14 +33,123 @@ function getDrivers(callback) {
                 "type": "str",
                 "default": "",
             }, {
+                "id": "c_order",
+                "label": "Channel Order",
+                "type": "combo",
+                "options": {
+                    0: "RGB",
+                    1: "RBG",
+                    2: "GRB",
+                    3: "GBR",
+                    4: "BRG",
+                    5: "BGR"
+                },
+                "options_map": [
+                    [0, 1, 2],
+                    [0, 2, 1],
+                    [1, 0, 2],
+                    [1, 2, 0],
+                    [2, 0, 1],
+                    [2, 1, 0]
+                ],
+                "default": 0
+            }, {
                 "id": "SPISpeed",
                 "label": "SPI Speed (MHz)",
                 "type": "int",
                 "default": 2,
                 "min": 1,
                 "max": 24,
-            }, ]
+                "advanced": true
+            }, {
+            	"id":"gamma",
+            	"label":"Gamma",
+            	"type":"combo",
+            	"default":null,
+            	"options":{
+
+            	},
+            	"options_map":[
+
+            	]
+            },{
+                "id": "restart_timeout",
+                "label": "Restart Timeout",
+                "type": "int",
+                "default": 3,
+                "min": 1,
+                "advanced": true
+            },{
+                "id": "deviceID",
+                "label": "Device ID",
+                "type": "int",
+                "default": null,
+                "min": 0,
+                "max": 255,
+                "msg": "AllPixel ID",
+                "advanced": true
+            },{
+                "id": "hardwareID",
+                "label": "Hardware ID",
+                "type": "str",
+                "default": "1D50:60AB",
+                "advanced": true
+            },]
+        },
+        //(self, num, c_order = ChannelOrder.RGB, use_py_spi = True, 
+        //dev="/dev/spidev0.0", SPISpeed = 2):
+        "lpd8806": {
+            "display": "LPD8806 (SPI)",
+            "params": [{
+                "id": "num",
+                "label": "# Pixels",
+                "type": "int",
+                "default": 1,
+                "min": 1
+            }, {
+                "id": "dev",
+                "label": "Device Path",
+                "type": "str",
+                "default": "/dev/spidev0.0",
+            }, {
+                "id": "c_order",
+                "label": "Channel Order",
+                "type": "combo",
+                "options": {
+                    0: "RGB",
+                    1: "RBG",
+                    2: "GRB",
+                    3: "GBR",
+                    4: "BRG",
+                    5: "BGR"
+                },
+                "options_map": [
+                    [0, 1, 2],
+                    [0, 2, 1],
+                    [1, 0, 2],
+                    [1, 2, 0],
+                    [2, 0, 1],
+                    [2, 1, 0]
+                ],
+                "default": 0
+            }, {
+                "id": "SPISpeed",
+                "label": "SPI Speed (MHz)",
+                "type": "int",
+                "default": 2,
+                "min": 1,
+                "max": 30,
+                //"advanced": true
+            }, {
+            	"id":"use_py_spi",
+            	"label":"Use PySPI",
+            	"type":"bool",
+            	"default":true,
+            }]
         }
     }
     if (callback) callback(drivers);
 }
+
+//def __init__(self, type, num, dev="", c_order = ChannelOrder.RGB, SPISpeed = 2, 
+//gamma = None, restart_timeout = 3, deviceID = None, hardwareID = "1D50:60AB"):

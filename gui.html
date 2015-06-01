@@ -8,7 +8,10 @@
     <script src="js/ui.js"></script>
     <script src="js/api.js"></script>
     <script src="js/api.calls.js"></script>
+    <script src="js/main.js"></script>
+
     <link rel="stylesheet" href="css/semantic.min.css">
+    <link rel="stylesheet" href="css/ui.css">
     <script>
     var _drivers = null;
     var _driverControlMap = {};
@@ -28,70 +31,17 @@
             $('.menu .item')
                 .tab();
 
-            function insert_int($node, params) {
-                return $node._nud({
-                    label: params.label,
-                    placeholder: params.msg,
-                    default: params.default,
-                    min: params.min,
-                    max: params.max,
-                    step: params.step
-                });
-            }
-
-            function insert_str($node, params) {
-                return $node._input({
-                    label: params.label,
-                    placeholder: params.msg,
-                    default: params.default,
-                });
-            }
-
-            function insert_combo($node, params) {
-                return $node._dropdown({
-                    label: params.label,
-                    placeholder: params.msg,
-                    default: params.default,
-                    data: params.options
-                });
-            }
-
-            var insertFuncs = {
-                "int": insert_int,
-                "str": insert_str,
-                "combo": insert_combo
-            }
-
-            function showParams($node, params) {
-                $node.empty();
-                $.each(params, function(i, v) {
-                    $node.append('<div class="ui hidden divider"></div>');
-                    $($node.append('<div id="' + v.id + '"></div>'));
-                    $n = $node.children("#" + v.id);
-                    _driverControlMap[v.id] = insertFuncs[v.type]($n, v);
-                });
-            }
-
-            function driverChanged(id, val) {
-                showParams($("#param_controls"), _drivers[val].params);
-            }
-
-            var d = $("#driver_selection")._dropdown({
-                //data: drivers,
-                label: "Driver",
-                placeholder: "Select Driver...",
-                //default: "serial",
-                onChange: driverChanged
-            });
-
             getDrivers(function(drivers) {
                 _drivers = drivers;
-                var d = {};
-                $.each(drivers, function(k, v) {
-                    d[k] = v.display;
+                $("#driver_selection").param_loader({
+                	data:drivers,
+                	label:"Driver",
+                	placeholder: "Select Driver...",
+                	default: "lpd8806"
                 });
-                $("#driver_selection")._dropdown().load(d);
             });
+
+            $('.ui.accordion').accordion({exclusive:false});
         });
     </script>
 </head>
@@ -104,7 +54,6 @@
     </div>
     <div class="ui bottom attached active tab segment" data-tab="config">
         <div id="driver_selection"></div>
-        <div id="param_controls"></div>
     </div>
     <div class="ui bottom attached tab segment" data-tab="second">
         Second

@@ -11,9 +11,8 @@ $.fn._dropdown = function(config) {
     var id = $node.attr('id');
 
     $node.load = function(data) {
-        $drop = $(this)
-        $drop.dropdown("restore defaults");
-        $menu = $drop.children(".menu");
+        $node.dropdown("restore defaults");
+        $menu = $node.find(".menu");
         $menu.empty();
         $.each(data, function(k, v) {
             $menu.append('<div class="item" data-value="' + k + '">' + v + '</div>');
@@ -28,25 +27,29 @@ $.fn._dropdown = function(config) {
 
     $node.val = function(value) {
         var cfg = $node.data().config;
-        if (value != undefined) {
-            return $node.dropdown("set selected", value);
+        if (value != null) {
+            return $node.children(".dropdown").dropdown("set selected", value);
         } else {
-            var v = $node.dropdown("get value");
+            var v = $node.children(".dropdown").dropdown("get value");
             if(typeof v == "object") v = null;
+            if(cfg.data_map) {
+                v = cfg.data_map[v];
+                if(!v) v = null;
+            }
             return v;
         }
     };
 
     $node.setDefault = function() {
         var cfg = $node.data().config;
-        if(cfg.default) $node.val(cfg.default);
+        if(cfg.default != null) $node.val(cfg.default);
         else $node.dropdown("restore defaults");
     };
 
     function onChange(){
         var cfg = $node.data().config;
         if(cfg.onChange)
-            cfg.onChange($node.attr('id'), $node.val());
+            cfg.onChange($node.val(), $node.attr('id'));
     }
 
     if (config) {
@@ -58,17 +61,21 @@ $.fn._dropdown = function(config) {
         $node.data("config", config);
 
         var html = '\
-            <i class="dropdown icon"></i>\
-            <div class="default text">@placeholder</div>\
-            <div class="menu"></div>\
+            <div class="ui label pointing right large">@label</div>\
+            <div class="ui search selection dropdown">\
+                <i class="dropdown icon"></i>\
+                <div class="default text">@placeholder</div>\
+                <div class="menu"></div>\
+            </div>\
         ';
-        html = strReplace(html, "@placeholder", config.placeholder)
+        html = strReplace(html, "@placeholder", config.placeholder);
+        html = strReplace(html, "@label", config.label)
 
-        $node.addClass("ui search selection dropdown");
+        //$node.addClass("ui search selection dropdown");
         $node.html(html);
-        $('<div class="ui label pointing right large">' + config.label + '</div>').insertBefore($node);
+        //$('<div class="ui label pointing right large">' + config.label + '</div>').insertBefore($node);
 
-        $node.dropdown({
+        $node.children(".dropdown").dropdown({
             transition: 'drop',
             fullTextSearch: true,
             onChange: onChange

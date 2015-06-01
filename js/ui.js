@@ -6,6 +6,7 @@ function strReplace(str, find, replace) {
     return str.replace(new RegExp(find, 'g'), replace);
 }
 
+
 $.fn._dropdown = function(config) {
     var $node = $(this);
     var id = $node.attr('id');
@@ -28,6 +29,15 @@ $.fn._dropdown = function(config) {
     $node.val = function(value) {
         var cfg = $node.data().config;
         if (value != null) {
+            if(cfg.data_map) {
+                var val = JSON.stringify(value);
+                $.each(cfg.data_map, function(i,v){
+                    if(val == JSON.stringify(v)) {
+                        value = i;
+                        return false;
+                    }
+                })
+            }
             return $node.children(".dropdown").dropdown("set selected", value);
         } else {
             var v = $node.children(".dropdown").dropdown("get value");

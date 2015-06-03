@@ -9,7 +9,7 @@ function strReplace(str, find, replace) {
 $.fn.addToolTip = function(text){
     var $node = $(this);
     $node.attr("data-content",text);
-    $node.attr("data-variation","wide inverted");
+    $node.attr("data-variation","wide inverted large");
     $node.attr("data-position", "top left");
     $node.popup({delay:{show:100, hide:0}, duration:100});
 }

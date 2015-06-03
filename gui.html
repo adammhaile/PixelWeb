@@ -42,6 +42,15 @@
             });
 
             $('.ui.accordion').accordion({exclusive:false});
+
+            $("#startDriver").click(function(){
+            	var config = $("#driver_selection").param_loader().val();
+            	console.log(config);
+            	config.action = "startDriver";
+            	callAPI(config, function(result){
+            		console.log(result);
+            	});
+            });
         });
     </script>
 </head>
@@ -49,18 +58,20 @@
 <body class="inverted">
     <div class="ui top attached tabular menu">
         <a class="active item" data-tab="config">Config</a>
-        <a class="item" data-tab="second">Second</a>
-        <a class="item" data-tab="third">Third</a>
+<!--         <a class="item" data-tab="second">Second</a>
+        <a class="item" data-tab="third">Third</a> -->
     </div>
     <div class="ui bottom attached active tab segment" data-tab="config">
         <div id="driver_selection"></div>
+        <div class="ui hidden divider short"></div>
+        <div class="ui button green" id="startDriver">Start Driver</div>
     </div>
-    <div class="ui bottom attached tab segment" data-tab="second">
+<!--     <div class="ui bottom attached tab segment" data-tab="second">
         Second
     </div>
     <div class="ui bottom attached tab segment" data-tab="third">
         Third
-    </div>
+    </div> -->
 </body>
 
 </html>

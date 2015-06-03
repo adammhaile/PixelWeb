@@ -6,7 +6,7 @@ from actions import *
 
 @route('/')
 def home():
-	return static_file("index.html", root='')
+	return static_file("gui.html", root='')
 
 @route('/js/<filename:path>')
 def send_js(filename):
@@ -62,10 +62,14 @@ def loadConfig():
 		error = e
 	return {"error": error}
 
+loadModules()
+
 config = loadConfig()
 if "error" in config:
 	print config['error']
 else:
-	initBPM(config)
+	#initBPM(config)
 	serverConfig  = config['server']
 	run(host=serverConfig['host'], port=serverConfig['port'], reloader=False)
+
+

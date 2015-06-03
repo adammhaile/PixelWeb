@@ -123,7 +123,7 @@ $.fn.param_loader = function(config) {
             $.each(cfg.control_map, function(k,v){
                 results[k] = v.val();
             });
-            return results;
+            return {id:$node.children("#" + id + "_combo")._dropdown().val(), config: results};
         }
         else{
             var cfg = $node.data().config;

@@ -1,5 +1,7 @@
+import traceback, sys
+
 from bibliopixel import *
-from bibliopixel.drivers.visualizer import *
+import bibliopixel.drivers.visualizer as driver_visualizer
 from bibliopixel.drivers.serial_driver import *
 import bibliopixel.colors as colors
 import bibliopixel.gamma as gamma
@@ -19,6 +21,7 @@ def success(data):
 
 class BPManager(object):
 	def __init__(self, config):
+
 		driverTypes = {
 			"DriverVisualizer": DriverVisualizer,
 			"DriverSerial": DriverSerial
@@ -79,7 +82,50 @@ def setBrightness(req):
 		return fail(msg = e.message)
 	return success(None)
 
+moduleList = [
+	driver_visualizer
+]
+
+_driverClasses = {}
+_driverList = {}
+_loadedDriver = None
+
+def loadDriverDef(config):
+	_driverClasses[config['id']] = config['class']
+	c = {"display":config['display'], "params":config['params']}
+	_driverList[config['id']] = c
+
+loadFuncs = {
+	"driver" : loadDriverDef
+}
+
+def loadModules():
+	for m in moduleList:
+		if hasattr(m, 'MANIFEST'):
+			for ref in m.MANIFEST:
+				if ref['type'] in loadFuncs:
+					loadFuncs[ref['type']](ref)
+
+
+def getDrivers(req):
+	return success(_driverList)
+
+def startDriver(req):
+	driver = req['id']
+	config = req['config']
+	global _loadedDriver
+	try:
+		if _loadedDriver:
+			_loadedDriver.cleanup()
+		_loadedDriver = _driverClasses[driver](**config)
+		return success(None)
+	except Exception, e:
+		return fail(traceback.format_exc(), error=ErrorCode.GENERAL_ERROR, data=None)
+
+
 actions = {
 	'setColor' : [setColor, ['color']],
 	'setBrightness' : [setBrightness, ['level']],
+	'getDrivers' : [getDrivers, []],
+	'startDriver': [startDriver, []]
 }

@@ -64,14 +64,14 @@ $.fn.param_loader = function(config) {
             <div class="active title" id="@id_basic_title">\
                 <i class="dropdown icon"></i> Basic\
             </div>\
-            <div class="active content" id="@id_basic_content"></div>\
+            <div class="active content ui list" id="@id_basic_content"></div>\
         ';
 
         var adv_html = '\
             <div class="active title" id="@id_advanced_title">\
                 <i class="dropdown icon"></i> Advanced\
             </div>\
-            <div class="content" id="@id_advanced_content"></div>\
+            <div class="content ui list" id="@id_advanced_content"></div>\
         ';
 
         basic_html = strReplace(basic_html, "@id", id)
@@ -83,6 +83,7 @@ $.fn.param_loader = function(config) {
         $.each(params, function(i, v) {
             $c = $('<div id="' + v.id + '"></div>');
             $c.addClass("ui_input");
+            $c.addClass("item");
             if (v.advanced) adv_controls.push($c);
             else basic_controls.push($c);
             cfg.control_map[v.id] = insertFuncs[v.type]($c, v);
@@ -116,6 +117,7 @@ $.fn.param_loader = function(config) {
         showParams($("#" + id + "_params"), cfg.data[val].params);
     }
 
+    //TODO - setter should take new id/config format
     $node.val = function(value){
         if(value == null){
             var cfg = $node.data().config;
@@ -127,11 +129,14 @@ $.fn.param_loader = function(config) {
         }
         else{
             var cfg = $node.data().config;
-            $.each(value, function(k,v){
-                if(k in cfg.control_map){
-                    cfg.control_map[k].val(v);
-                }
-            });
+            $node.children("#" + id + "_combo")._dropdown().val(value.id)
+            if(value.config){
+                $.each(value.config, function(k,v){
+                    if(k in cfg.control_map){
+                        cfg.control_map[k].val(v);
+                    }
+                });
+            }
         }
     };
 

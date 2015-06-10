@@ -14,16 +14,10 @@
     <link rel="stylesheet" href="css/ui.css">
     <script>
     var _drivers = null;
-    var _driverControlMap = {};
+    var $driver = null;
 
-    function saveDriverParams() {
-        var result = {};
-        $.each(_driverControlMap, function(k, $n) {
-            result[k] = $n.val();
-        });
-
-        return result;
-    };
+    var _controllers = null;
+    var $controller = null;
 
     $(document)
         .ready(function() {
@@ -33,21 +27,31 @@
 
             getDrivers(function(drivers) {
                 _drivers = drivers;
-                $("#driver_selection").param_loader({
+                $driver = $("#driver").param_loader({
                 	data:drivers,
                 	label:"Driver",
                 	placeholder: "Select Driver...",
-                    default: "lpd8806"
+                    default: "visualizer"
+                });
+            });
+
+            getControllers(function(controllers) {
+                _controllers = controllers;
+                $controller = $("#controller").param_loader({
+                	data:controllers,
+                	label:"Controller",
+                	placeholder: "Select Controller...",
+                    default: "matrix"
                 });
             });
 
             $('.ui.accordion').accordion({exclusive:false});
 
-            $("#startDriver").click(function(){
-            	var config = $("#driver_selection").param_loader().val();
-            	console.log(config);
-            	config.action = "startDriver";
-            	callAPI(config, function(result){
+            $("#start").click(function(){
+            	var driver = $driver.val();
+                var cont = $controller.val();
+
+            	callAPI({action: "startConfig", "driver": driver, "controller": cont}, function(result){
             		console.log(result);
             	});
             });
@@ -62,9 +66,11 @@
         <a class="item" data-tab="third">Third</a> -->
     </div>
     <div class="ui bottom attached active tab segment" data-tab="config">
-        <div id="driver_selection"></div>
+        <div id="driver"></div>
         <div class="ui hidden divider short"></div>
-        <div class="ui button green" id="startDriver">Start Driver</div>
+        <div id="controller"></div>
+        <div class="ui hidden divider short"></div>
+        <div class="ui button green" id="start">Start Driver</div>
     </div>
 <!--     <div class="ui bottom attached tab segment" data-tab="second">
         Second

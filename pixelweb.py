@@ -62,13 +62,11 @@ def loadConfig():
 		error = e
 	return {"error": error}
 
-loadModules()
-
 config = loadConfig()
 if "error" in config:
 	print config['error']
 else:
-	#initBPM(config)
+	initBPM()
 	serverConfig  = config['server']
 	run(host=serverConfig['host'], port=serverConfig['port'], reloader=False)
 

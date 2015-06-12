@@ -49,18 +49,18 @@ def load_module(path):
 
 def load_folder(dir):
     sys.path.append(dir)
-    mods = {}
+    mods = []
 
-    for p in glob.glob(dir + "/*/"):
-        base = p.replace("\\", "").replace("/", "")
-        base = base.replace(dir.replace("\\", "").replace("/", ""), "")
-        package = load_package(dir, base) 
-        if package:
-            hash, pack = package
-            mods[hash] = pack
+    # for p in glob.glob(dir + "/*/"):
+    #     base = p.replace("\\", "").replace("/", "")
+    #     base = base.replace(dir.replace("\\", "").replace("/", ""), "")
+    #     package = load_package(dir, base) 
+    #     if package:
+    #         hash, pack = package
+    #         mods[hash] = pack
 
     for m in glob.glob(dir + "/*.py"):
         hash, mod = load_module(m) 
-        mods[hash] = mod
+        mods.append(mod)
 
     return mods

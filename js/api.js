@@ -7,7 +7,7 @@ var ErrorCode = {
   GENERAL_ERROR: 1,
 };
 
-var ___printAPIOutput = true;
+var ___printAPIOutput = false;
 var doTimeout = null;
 
 

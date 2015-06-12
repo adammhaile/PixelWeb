@@ -13,3 +13,11 @@ function getControllers(callback) {
         }
     });
 }
+
+function getAnims(callback) {
+    callAPI({"action": "getAnims"}, function(result) {
+        if (result.status) {
+            if (callback) callback(result.data);
+        }
+    });
+}

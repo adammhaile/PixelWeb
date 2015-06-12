@@ -50,6 +50,7 @@ var _divider = '<div class="ui hidden divider short"></div>';
 $.fn.param_loader = function(config) {
     var $node = $(this);
     var id = $node.attr('id');
+    var _onChanged = null;
 
     function showParams($n, params) {
         var cfg = $node.data().config;
@@ -115,6 +116,7 @@ $.fn.param_loader = function(config) {
     function optionChanged(val) {
         var cfg = $node.data().config;
         showParams($("#" + id + "_params"), cfg.data[val].params);
+        if(_onChanged) _onChanged(val);
     }
 
     //TODO - setter should take new id/config format
@@ -150,6 +152,7 @@ $.fn.param_loader = function(config) {
                     ');
 
         var options = {};
+        if(!config.data) config.data = {};
         $.each(config.data, function(k, v) {
             options[k] = v.display;
         });
@@ -161,6 +164,8 @@ $.fn.param_loader = function(config) {
             default: config.default,
             onChange: optionChanged
         });
+
+        _onChanged = config.onChange;
     }
 
     return $node;

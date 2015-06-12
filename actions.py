@@ -4,15 +4,13 @@ import traceback, sys
 import bibliopixel.log as log
 log.setLogLevel(log.DEBUG)
 
-from static_objects import *
-
 from bpmanager import *
 bpm = None
 
 def initBPM():
 	global bpm
 	bpm = BPManager()
-	bpm.loadModules(moduleList)
+	bpm.loadModules()
 
 fillColor = (0,0,0)
 def setColor(req):
@@ -38,11 +36,24 @@ def getDrivers(req):
 def getControllers(req):
 	return success(bpm.controllers)
 
+def getAnims(req):
+	return success(bpm.anims)
+
 def startConfig(req):
 	try:
 		result = bpm.startConfig(req['driver'], req['controller'])
 		if result.status:
-			success()
+			return success()
+		else:
+			return result
+	except Exception, e:
+		return fail(traceback.format_exc(), error=ErrorCode.GENERAL_ERROR, data=None)
+
+def startAnim(req):
+	try:
+		result = bpm.startAnim(req['config'])
+		if result.status:
+			return success()
 		else:
 			return result
 	except Exception, e:
@@ -54,5 +65,7 @@ actions = {
 	'setBrightness' : [setBrightness, ['level']],
 	'getDrivers' : [getDrivers, []],
 	'getControllers' : [getControllers, []],
-	'startConfig': [startConfig, ['driver', 'controller']]
+	'getAnims' : [getAnims, []],
+	'startConfig': [startConfig, ['driver', 'controller']],
+	'startAnim': [startAnim, ['config']]
 }

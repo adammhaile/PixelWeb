@@ -19,6 +19,9 @@
     var _controllers = null;
     var $controller = null;
 
+    var _anims = null;
+    var $anims = null;
+
     $(document)
         .ready(function() {
 
@@ -35,13 +38,31 @@
                 });
             });
 
+            function loadAnimOptions(data){
+                $anims = $("#anims").param_loader({
+                    data: data,
+                    label:"Animation",
+                    placeholder: "Select Animation...",
+                    // default: "matrix"
+                });
+            }
+            getAnims(function(anims) {
+                _anims = anims;
+                loadAnimOptions(null);
+            });
+
+            function filterAnims(val){
+                loadAnimOptions(_anims[val]);
+            }
+
             getControllers(function(controllers) {
                 _controllers = controllers;
                 $controller = $("#controller").param_loader({
-                	data:controllers,
-                	label:"Controller",
-                	placeholder: "Select Controller...",
-                    default: "matrix"
+                    data:controllers,
+                    label:"Controller",
+                    placeholder: "Select Controller...",
+                    default: "strip",
+                    onChange: filterAnims
                 });
             });
 
@@ -69,6 +90,8 @@
         <div id="driver"></div>
         <div class="ui hidden divider short"></div>
         <div id="controller"></div>
+        <div class="ui hidden divider short"></div>
+        <div id="anims"></div>
         <div class="ui hidden divider short"></div>
         <div class="ui button green" id="start">Start Driver</div>
     </div>

@@ -103,8 +103,6 @@ class BPManager:
 
 		self._animCfg = config
 		config.config.led = self.led
-		print self._animClasses[config.id]
-		print config
 		self.anim = self._animClasses[config.id](**(config.config))
 
 		self.anim.run(threaded = True)

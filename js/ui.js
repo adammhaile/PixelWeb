@@ -324,3 +324,59 @@ $.fn._input = function(config) {
     return $node;
 };
 
+$.fn._color = function(config) {
+    var $node = $(this);
+    var id = $node.attr('id');
+
+    $node.val = function(value){
+        if(value != undefined){
+            var c = "rgb(" + value[0] + "," + value[1] + "," + value[2] + ")";
+            return $($node.children("#" + id + "_color")[0]).spectrum("set", c);
+        }
+        else{
+            var c = $($node.children("#" + id + "_color")[0]).spectrum("get");
+            c = c.toRgb();
+            return [c.r, c.g, c.b]
+        }
+    };
+
+    function onChange(color){
+        var cfg = $node.data().config;
+        if(cfg.onChange) cfg.onChange(color);
+    }
+
+    if (config) {
+        var def = 'default' in config && config.default != null;
+        if (!def) config.default = [0,0,0];
+        if(!(config.help)) config.help = "";
+
+        $node.data("config", config);
+
+        $node.addClass("ui labeled input");
+        
+        var html = '\
+                <div class="ui label">@label</div>\
+                <input type="text" id="@id_color">\
+            ';
+        html = strReplace(html, "@label", config.label);
+        html = strReplace(html, "@id", id);
+
+        $node.html(html);
+
+        $($node.children("#" + id + "_color")[0]).spectrum({
+            // color: "#f00"
+            preferredFormat: "rgb",
+            // showInitial: true,
+            showInput: true,
+            showButtons: false,
+            change: onChange,
+            // flat: true,
+        });
+        $node.addToolTip(config.help);
+
+        $node.val(config.default);
+    }
+
+    return $node;
+}
+

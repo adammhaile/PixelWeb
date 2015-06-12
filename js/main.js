@@ -38,11 +38,20 @@ function insert_bool($node, params) {
     });
 }
 
+function insert_color($node, params) {
+    return $node._color({
+        label: params.label,
+        default: params.default,
+        help: params.help
+    });
+}
+
 var insertFuncs = {
     "int": insert_int,
     "str": insert_str,
     "combo": insert_combo,
     "bool": insert_bool,
+    "color": insert_color
 }
 
 var _divider = '<div class="ui hidden divider short"></div>';

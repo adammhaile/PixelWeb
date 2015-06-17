@@ -53,3 +53,23 @@ function pushMaxUniqueQ(array, val, max) {
   if (array.indexOf(val) >= 0) return;
   pushMaxQ(array, val, max);
 }
+
+function _def(obj, def){
+  return typeof obj !== 'undefined' ? obj : def;
+}
+
+function range(stop,start,step){
+    start = _def(start, 0);
+    step = _def(step, 1);
+    stop -= step;
+
+    var arr = [],
+    c = stop - start + 1;
+    while ( c-- ) {
+        arr[c] = stop--
+    }
+    return arr;
+}
+
+function _min(array){return Math.min.apply(null, array);}
+function _max(array){return Math.max.apply(null, array);}

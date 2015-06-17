@@ -70,8 +70,7 @@ $.fn._dropdown = function(config) {
     }
 
     if (config) {
-        var def = 'default' in config && config.default != null;
-        if (!def) config.default = "";
+        if(!('default' in config)) config.default = "";
         if(!('data' in config)) config.data = {};
         if(!config.placeholder) config.placeholder = "Choose...";
 

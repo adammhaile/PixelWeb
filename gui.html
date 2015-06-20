@@ -16,79 +16,106 @@
     <script src="js/main.js"></script>
     <script src="js/bp.js"></script>
     <script>
-    // var _drivers = null;
-    // var $driver = null;
+    var _drivers = null;
+    var driverPickers = [];
 
-    // var _controllers = null;
-    // var $controller = null;
+    var _controllers = null;
+    var $controller = null;
 
-    // var _anims = null;
-    // var $anims = null;
+    var _anims = null;
+    var $anims = null;
 
-    // $(document)
-    //     .ready(function() {
+    function addDriverChooser(params) {
+        var id = "driver_" + driverPickers.length;
+        $("#driver").append('<div id="' + id + '"></div>');
+        $("#driver").append('<div class="ui hidden divider short"></div>');
+        var $d = $("#driver").children("#" + id);
+        console.log($d);
+        $d = $d.param_loader({
+            data: _drivers,
+            label: "Driver",
+            placeholder: "Select Driver...",
+            default: "visualizer"
+        });
+        if (params) {
+            $d.val(params);
+        }
 
-    //         $('.menu .item')
-    //             .tab();
+        driverPickers.push($d);
+    }
 
-    //         getDrivers(function(drivers) {
-    //             _drivers = drivers;
-    //             $driver = $("#driver").param_loader({
-    //                 data: drivers,
-    //                 label: "Driver",
-    //                 placeholder: "Select Driver...",
-    //                 default: "visualizer"
-    //             });
-    //         });
+    function loadAnimOptions(data) {
+        $anims = $("#anims").param_loader({
+            data: data,
+            label: "Animation",
+            placeholder: "Select Animation...",
+            // default: "matrix"
+        });
+    }
 
-    //         function loadAnimOptions(data) {
-    //             $anims = $("#anims").param_loader({
-    //                 data: data,
-    //                 label: "Animation",
-    //                 placeholder: "Select Animation...",
-    //                 // default: "matrix"
-    //             });
-    //         }
+    function filterAnims(val) {
+        loadAnimOptions(_anims[val]);
+    }
 
-    //         function filterAnims(val) {
-    //             loadAnimOptions(_anims[val]);
-    //         }
+    function getCurrentConfig() {
+        var drivers = [];
+        $.each(driverPickers, function(i, d) {
+            drivers.push(d.val());
+        });
+        var cont = $controller.val();
 
-    //         getAnims(function(anims) {
-    //             _anims = anims;
-    //             loadAnimOptions(null);
-    //             getControllers(function(controllers) {
-    //                 _controllers = controllers;
-    //                 $controller = $("#controller").param_loader({
-    //                     data: controllers,
-    //                     label: "Controller",
-    //                     placeholder: "Select Controller...",
-    //                     default: "strip",
-    //                     onChange: filterAnims
-    //                 });
+        return {
+            drivers: drivers,
+            controller: cont
+        };
+    }
+
+    $(document)
+        .ready(function() {
+
+            $('.menu .item')
+                .tab();
+
+            getDrivers(function(drivers) {
+                _drivers = drivers;
+                addDriverChooser();
+            });
+
+            getAnims(function(anims) {
+                _anims = anims;
+                loadAnimOptions(null);
+                getControllers(function(controllers) {
+                    _controllers = controllers;
+                    $controller = $("#controller").param_loader({
+                        data: controllers,
+                        label: "Controller",
+                        placeholder: "Select Controller...",
+                        default: "strip",
+                        onChange: filterAnims
+                    });
 
 
-    //             });
-    //         });
+                });
+            });
 
 
-    //         $('.ui.accordion').accordion({
-    //             exclusive: false
-    //         });
+            $('.ui.accordion').accordion({
+                exclusive: false
+            });
 
-    //         $("#start").click(function() {
-    //             var driver = $driver.val();
-    //             var cont = $controller.val();
+            $("#start").click(function() {
 
-    //             callAPI({
-    //                 action: "startConfig",
-    //                 "driver": driver,
-    //                 "controller": cont
-    //             }, function(result) {
-    //                 console.log(result);
-    //             });
-    //         });
-    //     });
+                var config = getCurrentConfig();
+                console.log(config);
+                // callAPI({
+                //     action: "startConfig",
+                //     "driver": driver,
+                //     "controller": cont
+                // }, function(result) {
+                //     console.log(result);
+                // });
+            });
+        });
     </script>
 </head>
 

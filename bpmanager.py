@@ -5,7 +5,7 @@ import loader
 
 class BPManager:
 	def __init__(self):
-		self.driver = None
+		self.driver = []
 		self._driverCfg = None
 		self.led = None
 		self._ledCfg = None
@@ -62,16 +62,21 @@ class BPManager:
 
 	def startConfig(self, driverConfig, ledConfig):
 		self.stopConfig();
-		driverConfig = d(driverConfig)
 		ledConfig = d(ledConfig)
 
-		if not driverConfig.id in self._driverClasses:
-			return fail("Invalid Driver")
-		elif not ledConfig.id in self._contClasses:
+		for drv in driverConfig:
+			drv = d(drv)
+			if not drv.id in self._driverClasses:
+				return fail("Invalid Driver")
+		
+		if not ledConfig.id in self._contClasses:
 			return fail("Invalid Controller")
 
 		self._driverCfg = driverConfig
-		self.driver = self._driverClasses[driverConfig.id](**(driverConfig.config))
+		self.driver = []
+		for drv in driverConfig:
+			drv = d(drv)
+			self.driver.append(self._driverClasses[drv.id](**(drv.config)))
 		self._ledCfg = ledConfig
 		cfg = ledConfig.config
 		cfg['driver'] = self.driver
@@ -79,9 +84,10 @@ class BPManager:
 		return success()
 
 	def stopConfig(self):
-		if self.driver:
-			self.driver.cleanup()
-			self.driver = None
+		if len(self.driver) > 0:
+			for drv in self.driver:
+				drv.cleanup()
+			self.driver = []
 			self._driverCfg = None
 		if self.led:
 			self.led.cleanup()

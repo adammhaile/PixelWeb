@@ -70,6 +70,11 @@
         };
     }
 
+    function getAnimConfig() {
+        var config = $anims.val();
+        return config;
+    }
+
     $(document)
         .ready(function() {
 
@@ -103,17 +108,23 @@
                 exclusive: false
             });
 
-            $("#start").click(function() {
+            $("#startDriver").click(function() {
 
                 var config = getCurrentConfig();
                 console.log(config);
-                // callAPI({
-                //     action: "startConfig",
-                //     "driver": driver,
-                //     "controller": cont
-                // }, function(result) {
-                //     console.log(result);
-                // });
+                config.action = "startConfig"
+                callAPI(config, function(result) {
+                    console.log(result);
+                });
+            });
+
+            $("#startAnim").click(function() {
+
+                var config = getAnimConfig();
+                console.log(config);
+                callAPI({action: "startAnim", config:config}, function(result) {
+                    console.log(result);
+                });
             });
         });
     </script>
@@ -121,23 +132,23 @@
 
 <body class="inverted">
     <div class="ui top attached tabular menu">
-        <a class="active item" data-tab="config">Config</a>
-        <!--         <a class="item" data-tab="second">Second</a>
-        <a class="item" data-tab="third">Third</a> -->
+        <a class="active item" data-tab="config_tab">Config</a>
+        <a class="item" data-tab="anim_tab">Animation</a>
+        <!--<a class="item" data-tab="third">Third</a> -->
     </div>
-    <div class="ui bottom attached active tab segment" data-tab="config">
+    <div class="ui bottom attached active tab segment" data-tab="config_tab">
         <div id="driver"></div>
         <div class="ui hidden divider short"></div>
         <div id="controller"></div>
         <div class="ui hidden divider short"></div>
+        <div class="ui button green" id="startDriver">Start</div>
+    </div>
+    <div class="ui bottom attached tab segment" data-tab="anim_tab">
         <div id="anims"></div>
         <div class="ui hidden divider short"></div>
-        <div class="ui button green" id="start">Start Driver</div>
+        <div class="ui button green" id="startAnim">Start Animation</div>
     </div>
-    <!--     <div class="ui bottom attached tab segment" data-tab="second">
-        Second
-    </div>
-    <div class="ui bottom attached tab segment" data-tab="third">
+    <!--<div class="ui bottom attached tab segment" data-tab="third">
         Third
     </div> -->
 </body>

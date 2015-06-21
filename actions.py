@@ -41,7 +41,7 @@ def getAnims(req):
 
 def startConfig(req):
 	try:
-		result = bpm.startConfig(req['driver'], req['controller'])
+		result = bpm.startConfig(req['drivers'], req['controller'])
 		if result.status:
 			return success()
 		else:
@@ -66,6 +66,6 @@ actions = {
 	'getDrivers' : [getDrivers, []],
 	'getControllers' : [getControllers, []],
 	'getAnims' : [getAnims, []],
-	'startConfig': [startConfig, ['driver', 'controller']],
+	'startConfig': [startConfig, ['drivers', 'controller']],
 	'startAnim': [startAnim, ['config']]
 }

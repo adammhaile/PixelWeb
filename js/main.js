@@ -61,9 +61,10 @@ $.fn.param_loader = function(config) {
     var id = $node.attr('id');
     var _onChanged = null;
 
-    function showParams($n, params) {
+    function showParams($n, params, run) {
         var cfg = $node.data().config;
         cfg.control_map = {};
+        cfg.run_map = {};
         $n.empty();
 
         $n.append(_divider);
@@ -71,24 +72,33 @@ $.fn.param_loader = function(config) {
         var $accordion = $n.children("#" + id + "_view");
 
         var basic_html = '\
-            <div class="active title" id="@id_basic_title">\
+            <div class="title" id="@id_basic_title">\
                 <i class="dropdown icon"></i> Basic\
             </div>\
             <div class="active content ui list" id="@id_basic_content"></div>\
         ';
 
         var adv_html = '\
-            <div class="active title" id="@id_advanced_title">\
+            <div class="title" id="@id_advanced_title">\
                 <i class="dropdown icon"></i> Advanced\
             </div>\
             <div class="content ui list" id="@id_advanced_content"></div>\
         ';
 
+        var run_html = '\
+            <div class="title" id="@id_run_title">\
+                <i class="dropdown icon"></i> Run Parameters\
+            </div>\
+            <div class="active content ui list" id="@id_run_content"></div>\
+        ';
+
         basic_html = strReplace(basic_html, "@id", id)
         adv_html = strReplace(adv_html, "@id", id)
+        run_html = strReplace(run_html, "@id", id)
 
         var basic_controls = [];
         var adv_controls = [];
+        var run_controls = [];
 
         $.each(params, function(i, v) {
             $c = $('<div id="' + v.id + '"></div>');
@@ -117,6 +127,22 @@ $.fn.param_loader = function(config) {
             });
         }
 
+        if(run){
+            $.each(run, function(i, v) {
+                $c = $('<div id="' + v.id + '"></div>');
+                $c.addClass("ui_input");
+                $c.addClass("item");
+                run_controls.push($c);
+                cfg.run_map[v.id] = insertFuncs[v.type]($c, v);
+            });
+            $accordion.append(run_html);
+            $run = $accordion.children("#" + id + "_run_content");
+            $.each(run_controls, function(i, $c) {
+                //$adv.append($(_divider));
+                $run.append($c);
+            });
+        }
+
         $n.children('#' + id + "_view").accordion({
             exclusive: false
         });
@@ -124,7 +150,7 @@ $.fn.param_loader = function(config) {
 
     function optionChanged(val) {
         var cfg = $node.data().config;
-        showParams($("#" + id + "_params"), cfg.data[val].params);
+        showParams($("#" + id + "_params"), cfg.data[val].params, cfg.run);
         if(_onChanged) _onChanged(val);
     }
 
@@ -132,11 +158,15 @@ $.fn.param_loader = function(config) {
     $node.val = function(value){
         if(value == null){
             var cfg = $node.data().config;
-            var results = {};
+            var config = {};
             $.each(cfg.control_map, function(k,v){
-                results[k] = v.val();
+                config[k] = v.val();
             });
-            return {id:$node.children("#" + id + "_combo")._dropdown().val(), config: results};
+            var run = {};
+            $.each(cfg.run_map, function(k,v){
+                run[k] = v.val();
+            });
+            return {id:$node.children("#" + id + "_combo")._dropdown().val(), config: config, run: run};
         }
         else{
             var cfg = $node.data().config;
@@ -148,11 +178,19 @@ $.fn.param_loader = function(config) {
                     }
                 });
             }
+            if(value.run){
+                $.each(value.run, function(k,v){
+                    if(k in cfg.run_map){
+                        cfg.run_map[k].val(v);
+                    }
+                });
+            }
         }
     };
 
     if (config) {
         config.control_map = {};
+        config.run_map = {};
         $node.data("config", config);
 
         $node.empty();

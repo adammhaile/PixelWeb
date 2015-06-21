@@ -23,6 +23,7 @@
     var $controller = null;
 
     var _anims = null;
+    var _animRun = null;
     var $anims = null;
 
     function addDriverChooser(params) {
@@ -44,17 +45,17 @@
         driverPickers.push($d);
     }
 
-    function loadAnimOptions(data) {
+    function loadAnimOptions(data, run) {
         $anims = $("#anims").param_loader({
             data: data,
+            run: run,
             label: "Animation",
             placeholder: "Select Animation...",
-            // default: "matrix"
         });
     }
 
     function filterAnims(val) {
-        loadAnimOptions(_anims[val]);
+        loadAnimOptions(_anims[val], _animRun);
     }
 
     function getCurrentConfig() {
@@ -87,7 +88,8 @@
             });
 
             getAnims(function(anims) {
-                _anims = anims;
+                _anims = anims.anims;
+                _animRun = anims.run;
                 loadAnimOptions(null);
                 getControllers(function(controllers) {
                     _controllers = controllers;
@@ -119,9 +121,15 @@
             });
 
             $("#startAnim").click(function() {
-
                 var params = getAnimConfig();
-                callAPI({action: "startAnim", config:params, run:{fps:20}}, function(result) {
+                callAPI({action: "startAnim", config:{id:params.id, config: params.config}, run:params.run}, function(result) {
+                    console.log(result);
+                });
+            });
+
+            $("#stopAnim").click(function() {
+                var params = getAnimConfig();
+                callAPI({action: "stopAnim"}, function(result) {
                     console.log(result);
                 });
             });
@@ -145,7 +153,8 @@
     <div class="ui bottom attached tab segment" data-tab="anim_tab">
         <div id="anims"></div>
         <div class="ui hidden divider short"></div>
-        <div class="ui button green" id="startAnim">Start Animation</div>
+        <div class="ui button green" id="startAnim">Start</div>
+        <div class="ui button red" id="stopAnim">Stop</div>
     </div>
     <!--<div class="ui bottom attached tab segment" data-tab="third">
         Third

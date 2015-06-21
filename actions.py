@@ -37,7 +37,7 @@ def getControllers(req):
 	return success(bpm.controllers)
 
 def getAnims(req):
-	return success(bpm.anims)
+	return success({"anims":bpm.anims, "run":bpm.animRunParams})
 
 def startConfig(req):
 	try:
@@ -59,6 +59,13 @@ def startAnim(req):
 	except Exception, e:
 		return fail(traceback.format_exc(), error=ErrorCode.GENERAL_ERROR, data=None)
 
+def stopAnim(req):
+	try:
+		bpm.stopAnim()
+		return success()
+	except Exception, e:
+		return fail(traceback.format_exc(), error=ErrorCode.GENERAL_ERROR, data=None)
+
 
 actions = {
 	'setColor' : [setColor, ['color']],
@@ -67,5 +74,6 @@ actions = {
 	'getControllers' : [getControllers, []],
 	'getAnims' : [getAnims, []],
 	'startConfig': [startConfig, ['drivers', 'controller']],
-	'startAnim': [startAnim, ['config', 'run']]
+	'startAnim': [startAnim, ['config', 'run']],
+	'stopAnim': [stopAnim, []]
 }

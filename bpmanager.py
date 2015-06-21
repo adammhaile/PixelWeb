@@ -1,4 +1,5 @@
 from bibliopixel import *
+from bibliopixel.animation import BaseAnimation
 from util import *
 from static_objects import *
 import loader
@@ -20,6 +21,8 @@ class BPManager:
 
 		self.anims = {}
 		self._animClasses = {}
+
+		self.animRunParams = BaseAnimation.RUN_PARAMS
 
 		self.__loadFuncs = {
 			"driver" : self.__loadDriverDef,

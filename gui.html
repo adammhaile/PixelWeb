@@ -120,9 +120,8 @@
 
             $("#startAnim").click(function() {
 
-                var config = getAnimConfig();
-                console.log(config);
-                callAPI({action: "startAnim", config:config}, function(result) {
+                var params = getAnimConfig();
+                callAPI({action: "startAnim", config:params, run:{fps:20}}, function(result) {
                     console.log(result);
                 });
             });

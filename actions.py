@@ -51,7 +51,7 @@ def startConfig(req):
 
 def startAnim(req):
 	try:
-		result = bpm.startAnim(req['config'])
+		result = bpm.startAnim(req['config'], req['run'])
 		if result.status:
 			return success()
 		else:
@@ -67,5 +67,5 @@ actions = {
 	'getControllers' : [getControllers, []],
 	'getAnims' : [getAnims, []],
 	'startConfig': [startConfig, ['drivers', 'controller']],
-	'startAnim': [startAnim, ['config']]
+	'startAnim': [startAnim, ['config', 'run']]
 }

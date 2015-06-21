@@ -100,9 +100,10 @@ class BPManager:
 			self.anim = None
 			self._animCfg = None
 
-	def startAnim(self, config):
+	def startAnim(self, config, run):
 		self.stopAnim()
 		config = d(config)
+		run = d(run)
 		
 		if not config.id in self._animClasses:
 			return fail("Invalid Animation")
@@ -111,7 +112,8 @@ class BPManager:
 		config.config.led = self.led
 		self.anim = self._animClasses[config.id](**(config.config))
 
-		self.anim.run(threaded = True)
+		run.threaded = True
+		self.anim.run(**(run))
 
 		return success()
 

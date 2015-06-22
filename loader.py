@@ -37,6 +37,10 @@ def load_module(path):
 
             hash = md5.new(path).hexdigest() + "_" + code_file
             return  (base, imp.load_source(base, path, fin))
+        except Exception, e:
+            print "Error loading {}".format(path)
+            print e
+            return (None, None)
         finally:
             try: fin.close()
             except: pass
@@ -61,6 +65,7 @@ def load_folder(dir):
 
     for m in glob.glob(dir + "/*.py"):
         hash, mod = load_module(m) 
-        mods.append(mod)
+        if mod:
+            mods.append(mod)
 
     return mods

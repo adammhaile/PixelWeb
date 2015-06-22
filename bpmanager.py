@@ -32,6 +32,8 @@ class BPManager:
 
 		}
 
+		config.initConfig()
+
 	def __loadDriverDef(self, config):
 		config = d(config)
 		self._driverClasses[config.id] = config['class']
@@ -55,7 +57,8 @@ class BPManager:
 
 	def loadModules(self):
 		mods = moduleList
-		anims = loader.load_folder("C:/GitHub/BiblioPixelAnimations/strip/")
+		anims = loader.load_folder("C:/GitHub/BiblioPixelAnimations/matrix/")
+		anims.extend(loader.load_folder("C:/GitHub/BiblioPixelAnimations/strip/"))
 		mods.extend(anims)
 		for m in mods:
 			if hasattr(m, 'MANIFEST'):

@@ -166,7 +166,9 @@ $.fn.param_loader = function(config) {
             $.each(cfg.run_map, function(k,v){
                 run[k] = v.val();
             });
-            return {id:$node.children("#" + id + "_combo")._dropdown().val(), config: config, run: run};
+            var result = {id:$node.children("#" + id + "_combo")._dropdown().val(), config: config};
+            if(Object.keys(run).length > 0) result.run = run
+            return result;
         }
         else{
             var cfg = $node.data().config;

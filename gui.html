@@ -26,20 +26,23 @@
     var _animRun = null;
     var $anims = null;
 
+    function clearDriverChoosers(){
+        $("#driver").empty();
+        driverPickers = [];
+    }
     function addDriverChooser(params) {
         var id = "driver_" + driverPickers.length;
         $("#driver").append('<div id="' + id + '"></div>');
         $("#driver").append('<div class="ui hidden divider short"></div>');
         var $d = $("#driver").children("#" + id);
-        console.log($d);
         $d = $d.param_loader({
             data: _drivers,
             label: "Driver",
             placeholder: "Select Driver...",
-            default: "visualizer"
+            // default: "visualizer"
         });
         if (params) {
-            $d.val(params);
+            setTimeout(function(){$d.val(params);}, 5);
         }
 
         driverPickers.push($d);
@@ -84,27 +87,37 @@
 
             getDrivers(function(drivers) {
                 _drivers = drivers;
+                clearDriverChoosers();
                 addDriverChooser();
-            });
+                getAnims(function(anims) {
+                    _anims = anims.anims;
+                    _animRun = anims.run;
+                    loadAnimOptions(null);
+                    getControllers(function(controllers) {
+                        _controllers = controllers;
+                        $controller = $("#controller").param_loader({
+                            data: controllers,
+                            label: "Controller",
+                            placeholder: "Select Controller...",
+                            // default: "strip",
+                            onChange: filterAnims
+                        });
 
-            getAnims(function(anims) {
-                _anims = anims.anims;
-                _animRun = anims.run;
-                loadAnimOptions(null);
-                getControllers(function(controllers) {
-                    _controllers = controllers;
-                    $controller = $("#controller").param_loader({
-                        data: controllers,
-                        label: "Controller",
-                        placeholder: "Select Controller...",
-                        default: "strip",
-                        onChange: filterAnims
+                        getConfig(function(config) {
+                            console.log(config);
+                            if(config.driver){
+                                clearDriverChoosers();
+                                $.each(config.driver, function(i,d){
+                                    addDriverChooser(d);
+                                });
+                            }
+                            if(config.controller){
+                                $controller.val(config.controller);
+                            }
+                        });
                     });
-
-
                 });
             });
-
 
             $('.ui.accordion').accordion({
                 exclusive: false
@@ -122,14 +135,23 @@
 
             $("#startAnim").click(function() {
                 var params = getAnimConfig();
-                callAPI({action: "startAnim", config:{id:params.id, config: params.config}, run:params.run}, function(result) {
+                callAPI({
+                    action: "startAnim",
+                    config: {
+                        id: params.id,
+                        config: params.config
+                    },
+                    run: params.run
+                }, function(result) {
                     console.log(result);
                 });
             });
 
             $("#stopAnim").click(function() {
                 var params = getAnimConfig();
-                callAPI({action: "stopAnim"}, function(result) {
+                callAPI({
+                    action: "stopAnim"
+                }, function(result) {
                     console.log(result);
                 });
             });

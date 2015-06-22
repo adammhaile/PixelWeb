@@ -1,13 +1,29 @@
-import loader
-import sys
-mods = loader.load_folder("G:/Misc/")
-#import package.thing
-#package.thing.do()
-print mods
-for m in mods:
-	m = mods[m]
-	if hasattr(m, 'MANIFEST'):
-		print m.MANIFEST
+from bibliopixel import *
+from bibliopixel.drivers.visualizer import *
+from matrix_animations import *
+import time
 
-# mod = loader.load_module("C:/GitHub/BPTest/b.py")
-# print mod.thing(1,3)
+driver = DriverVisualizer(width=10, height=10, stayTop = True)
+
+led = LEDMatrix(driver, threadedUpdate=False)
+
+index = 0
+anims = []
+def callback(anim):
+	global index
+	print anim
+	a = anims[index]
+	index += 1
+	if index >= len(anims):
+		index = 0
+	a.run(fps=30, max_steps=60, callback=callback, threaded = True)
+
+
+anims.append(Bloom(led))
+anims.append(MatrixRain(led))
+
+callback(None)
+#anim.run(fps=30, max_steps=15, callback=callback)
+
+while True:
+	time.sleep(1)

@@ -3,6 +3,7 @@ from bibliopixel.animation import BaseAnimation
 from util import *
 from static_objects import *
 import loader
+import config
 
 class BPManager:
 	def __init__(self):
@@ -75,6 +76,9 @@ class BPManager:
 		if not ledConfig.id in self._contClasses:
 			return fail("Invalid Controller")
 
+		config.writeConfig("current_setup", "driver", driverConfig)
+		config.writeConfig("current_setup", "controller", ledConfig)
+
 		self._driverCfg = driverConfig
 		self.driver = []
 		for drv in driverConfig:
@@ -85,6 +89,12 @@ class BPManager:
 		cfg['driver'] = self.driver
 		self.led = self._contClasses[ledConfig.id](**(cfg))
 		return success()
+
+	def getConfig(self):
+		setup = d(config.readConfig("current_setup"))
+		if not ("driver" in setup): setup.driver = None 
+		if not ("controller" in setup): setup.controller = None
+		return setup
 
 	def stopConfig(self):
 		if len(self.driver) > 0:

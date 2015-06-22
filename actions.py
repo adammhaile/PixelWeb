@@ -66,6 +66,12 @@ def stopAnim(req):
 	except Exception, e:
 		return fail(traceback.format_exc(), error=ErrorCode.GENERAL_ERROR, data=None)
 
+def getConfig(req):
+	try:
+		return success(bpm.getConfig())
+	except Exception, e:
+		return fail(traceback.format_exc(), error=ErrorCode.GENERAL_ERROR, data=None)
+
 
 actions = {
 	'setColor' : [setColor, ['color']],
@@ -75,5 +81,6 @@ actions = {
 	'getAnims' : [getAnims, []],
 	'startConfig': [startConfig, ['drivers', 'controller']],
 	'startAnim': [startAnim, ['config', 'run']],
-	'stopAnim': [stopAnim, []]
+	'stopAnim': [stopAnim, []],
+	'getConfig': [getConfig, []]
 }

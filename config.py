@@ -3,7 +3,6 @@ from util import d
 import os
 
 __home = os.path.expanduser("~").replace('\\', '/') + "/PixelWeb/config/"
-print __home
 
 def initConfig():
     try:
@@ -25,7 +24,7 @@ def readConfig(file, key = None, path=__home):
     return data
 
 def writeConfig(file, key, data, path=__home):
-    base = readConfig(file)
+    base = readConfig(file, path=path)
     base[key] = data
     with open(path + "/" + file + ".json", "w") as fp:
         json.dump(base, fp, indent=4, sort_keys=True)

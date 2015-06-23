@@ -14,3 +14,5 @@ function getAnims(callback) { _get("getAnims", callback); }
 
 function getConfig(callback) { _get("getConfig", callback); }
 
+function getServerConfig(callback) { _get("getServerConfig", callback); }
+

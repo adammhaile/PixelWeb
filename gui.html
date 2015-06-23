@@ -26,10 +26,13 @@
     var _animRun = null;
     var $anims = null;
 
-    function clearDriverChoosers(){
+    var $server_config = null;
+
+    function clearDriverChoosers() {
         $("#driver").empty();
         driverPickers = [];
     }
+
     function addDriverChooser(params) {
         var id = "driver_" + driverPickers.length;
         $("#driver").append('<div id="' + id + '"></div>');
@@ -42,7 +45,9 @@
             // default: "visualizer"
         });
         if (params) {
-            setTimeout(function(){$d.val(params);}, 5);
+            setTimeout(function() {
+                $d.val(params);
+            }, 5);
         }
 
         driverPickers.push($d);
@@ -105,17 +110,28 @@
 
                         getConfig(function(config) {
                             console.log(config);
-                            if(config.driver){
+                            if (config.driver) {
                                 clearDriverChoosers();
-                                $.each(config.driver, function(i,d){
+                                $.each(config.driver, function(i, d) {
                                     addDriverChooser(d);
                                 });
                             }
-                            if(config.controller){
+                            if (config.controller) {
                                 $controller.val(config.controller);
                             }
                         });
                     });
+                });
+            });
+
+            getServerConfig(function(srv) {
+                console.log(srv);
+                $server_config = $("#server_config").param_loader({
+                    data: [srv],
+                    label: "",
+                    placeholder: "",
+                    disable_option: true,
+                    default: "server_config"
                 });
             });
 
@@ -163,7 +179,7 @@
     <div class="ui top attached tabular menu">
         <a class="active item" data-tab="config_tab">Config</a>
         <a class="item" data-tab="anim_tab">Animation</a>
-        <!--<a class="item" data-tab="third">Third</a> -->
+        <a class="item" data-tab="server_tab">Server Config</a>
     </div>
     <div class="ui bottom attached active tab segment" data-tab="config_tab">
         <div id="driver"></div>
@@ -178,9 +194,9 @@
         <div class="ui button green" id="startAnim">Start</div>
         <div class="ui button red" id="stopAnim">Stop</div>
     </div>
-    <!--<div class="ui bottom attached tab segment" data-tab="third">
-        Third
-    </div> -->
+    <div class="ui bottom attached tab segment" data-tab="server_tab">
+        <div id="server_config"></div>
+    </div>
 </body>
 
 </html>

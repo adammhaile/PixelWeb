@@ -41,37 +41,28 @@ def getAnims(req):
 	return success({"anims":bpm.anims, "run":bpm.animRunParams})
 
 def startConfig(req):
-	try:
-		result = bpm.startConfig(req['drivers'], req['controller'])
-		if result.status:
-			return success()
-		else:
-			return result
-	except Exception, e:
-		return fail(traceback.format_exc(), error=ErrorCode.GENERAL_ERROR, data=None)
+	result = bpm.startConfig(req['drivers'], req['controller'])
+	if result.status:
+		return success()
+	else:
+		return result
 
 def startAnim(req):
-	try:
-		result = bpm.startAnim(req['config'], req['run'])
-		if result.status:
-			return success()
-		else:
-			return result
-	except Exception, e:
-		return fail(traceback.format_exc(), error=ErrorCode.GENERAL_ERROR, data=None)
+	result = bpm.startAnim(req['config'], req['run'])
+	if result.status:
+		return success()
+	else:
+		return result
 
 def stopAnim(req):
-	try:
-		bpm.stopAnim()
-		return success()
-	except Exception, e:
-		return fail(traceback.format_exc(), error=ErrorCode.GENERAL_ERROR, data=None)
+	bpm.stopAnim()
+	return success()
 
 def getConfig(req):
-	try:
-		return success(bpm.getConfig())
-	except Exception, e:
-		return fail(traceback.format_exc(), error=ErrorCode.GENERAL_ERROR, data=None)
+	return success(bpm.getConfig())
+
+def getServerConfig(req):
+	return success(config.BASE_SERVER_CONFIG)
 
 
 actions = {
@@ -83,5 +74,6 @@ actions = {
 	'startConfig': [startConfig, ['drivers', 'controller']],
 	'startAnim': [startAnim, ['config', 'run']],
 	'stopAnim': [stopAnim, []],
-	'getConfig': [getConfig, []]
+	'getConfig': [getConfig, []],
+	'getServerConfig': [getServerConfig, []]
 }

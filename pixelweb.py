@@ -28,27 +28,30 @@ def postonly():
 
 @route('/api', method='POST')
 def api():
-	req = request.json
-	if req and'action' in req:
-		if req['action'] in actions:
-			action = actions[req['action']]
-			params = action[1][:]
-			valid = True
-			missing = []
-			for p in params:
-				if not p in req:
-					valid = False
-					missing.append(p)
+	try:
+		req = request.json
+		if req and'action' in req:
+			if req['action'] in actions:
+				action = actions[req['action']]
+				params = action[1][:]
+				valid = True
+				missing = []
+				for p in params:
+					if not p in req:
+						valid = False
+						missing.append(p)
 
-			if not valid:
-				return fail("Missing parameters.", data=missing)
-			
-			return action[0](req)
+				if not valid:
+					return fail("Missing parameters.", data=missing)
+				
+				return action[0](req)
 
+			else:
+				return fail("Invalid action.")
 		else:
-			return fail("Invalid action.")
-	else:
-		return fail("Invalid request data.")
+			return fail("Invalid request data.")
+	except Exception, e:
+		return fail(traceback.format_exc(), error=ErrorCode.GENERAL_ERROR, data=None)
 
 
 server = config.readServerConfig()

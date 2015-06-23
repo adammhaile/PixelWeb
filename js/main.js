@@ -213,11 +213,12 @@ $.fn.param_loader = function(config) {
             default: config.default,
             onChange: optionChanged
         });
-
-        if(config.no_combo){
-            $node.children("#" + id + "_combo").hide();
-        }
         
+        if(config.disable_option){
+            $node.children("#" + id + "_combo").hide();
+            //setTimeout(function(){$node.children("#" + id + "_combo").hide();}, 5);
+        }
+
         _onChanged = config.onChange;
     }
 

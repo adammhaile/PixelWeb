@@ -11,6 +11,7 @@ def initBPM():
 	global bpm
 	bpm = BPManager()
 	bpm.loadModules()
+	bpm.loadAnimations()
 
 fillColor = (0,0,0)
 def setColor(req):

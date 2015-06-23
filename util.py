@@ -9,6 +9,10 @@ class d(dict):
         		for i in range(len(self.__dict__[k])):
         			if isinstance(self.__dict__[k][i], dict):
         				self.__dict__[k][i] = d(self.__dict__[k][i])
+    def upgrade(self, a):
+        for k,v in a.items():
+            if not k in self:
+                self[k] = v
         
 class ErrorCode:
 	SUCCESS = 0

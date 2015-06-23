@@ -214,6 +214,10 @@ $.fn.param_loader = function(config) {
             onChange: optionChanged
         });
 
+        if(config.no_combo){
+            $node.children("#" + id + "_combo").hide();
+        }
+        
         _onChanged = config.onChange;
     }
 

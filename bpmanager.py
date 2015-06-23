@@ -4,6 +4,7 @@ from util import *
 from static_objects import *
 import loader
 import config
+import status
 
 class BPManager:
 	def __init__(self):
@@ -57,15 +58,22 @@ class BPManager:
 
 	def loadModules(self):
 		mods = moduleList
-		anims = loader.load_folder("C:/GitHub/BiblioPixelAnimations/matrix/")
-		anims.extend(loader.load_folder("C:/GitHub/BiblioPixelAnimations/strip/"))
-		mods.extend(anims)
 		for m in mods:
 			if hasattr(m, 'MANIFEST'):
 				for ref in m.MANIFEST:
 					ref = d(ref)
 					if ref.type in self.__loadFuncs:
 						self.__loadFuncs[ref.type](ref)
+
+	def loadAnimations(self):
+		anims = loader.load_folder("C:/GitHub/BiblioPixelAnimations/matrix/")
+		anims.extend(loader.load_folder("C:/GitHub/BiblioPixelAnimations/strip/"))
+		for a in anims:
+			if hasattr(a, 'MANIFEST'):
+				status.pushStatus("Loading: {}".format(a.__file__))
+				for ref in a.MANIFEST:
+					ref = d(ref)
+					self.__loadAnimDef(ref)
 
 	def startConfig(self, driverConfig, ledConfig):
 		self.stopConfig();
@@ -79,8 +87,8 @@ class BPManager:
 		if not ledConfig.id in self._contClasses:
 			return fail("Invalid Controller")
 
-		config.writeConfig("current_setup", "driver", driverConfig)
-		config.writeConfig("current_setup", "controller", ledConfig)
+		config.writeConfig("current_setup", driverConfig, "driver")
+		config.writeConfig("current_setup", ledConfig, "controller")
 
 		self._driverCfg = driverConfig
 		self.driver = []
@@ -100,6 +108,7 @@ class BPManager:
 		return setup
 
 	def stopConfig(self):
+		self.stopAnim()
 		if len(self.driver) > 0:
 			for drv in self.driver:
 				drv.cleanup()

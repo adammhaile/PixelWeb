@@ -4,6 +4,8 @@ import json
 from bottle import *
 from actions import *
 
+import config
+
 @route('/')
 def home():
 	return static_file("gui.html", root='')
@@ -49,25 +51,11 @@ def api():
 		return fail("Invalid request data.")
 
 
-def loadConfig():
-	error = None
-	try:
-		with open("config.json", mode="r") as f:
-			try:
-				config = json.load(f)
-				return config
-			except ValueError:
-				error = "Error loading config. Try validating your config JSON @ http://jsonlint.com/"
-	except Exception, e:
-		error = e
-	return {"error": error}
+server = config.readServerConfig()
+print server
+config.writeServerConfig(server)
 
-config = loadConfig()
-if "error" in config:
-	print config['error']
-else:
-	initBPM()
-	serverConfig  = config['server']
-	run(host=serverConfig['host'], port=serverConfig['port'], reloader=False)
+initBPM()
+run(host=server['host'], port=server['port'], reloader=False)
 
 

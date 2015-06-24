@@ -19,6 +19,15 @@ function insert_str($node, params) {
     });
 }
 
+function insert_str_multi($node, params) {
+    return $node._input_multi({
+        label: params.label,
+        placeholder: params.msg,
+        default: params.default,
+        help: params.help
+    });
+}
+
 function insert_combo($node, params) {
     return $node._dropdown({
         label: params.label,
@@ -51,7 +60,8 @@ var insertFuncs = {
     "str": insert_str,
     "combo": insert_combo,
     "bool": insert_bool,
-    "color": insert_color
+    "color": insert_color,
+    "str_multi": insert_str_multi
 }
 
 var _divider = '<div class="ui hidden divider short"></div>';
@@ -166,7 +176,9 @@ $.fn.param_loader = function(config) {
             $.each(cfg.run_map, function(k,v){
                 run[k] = v.val();
             });
-            var result = {id:$node.children("#" + id + "_combo")._dropdown().val(), config: config};
+            var idval = $node.children("#" + id + "_combo")._dropdown().val();
+            if(cfg.disable_option) idval = cfg.data[0].id;
+            var result = {id:idval, config: config};
             if(Object.keys(run).length > 0) result.run = run
             return result;
         }
@@ -213,7 +225,7 @@ $.fn.param_loader = function(config) {
             default: config.default,
             onChange: optionChanged
         });
-        
+
         if(config.disable_option){
             $node.children("#" + id + "_combo").hide();
             //setTimeout(function(){$node.children("#" + id + "_combo").hide();}, 5);

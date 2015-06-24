@@ -25,6 +25,12 @@ BASE_SERVER_CONFIG = d({
                 "type": "bool",
                 "default": False,
                 "help":"Load default configuration on application start."
+            },{
+                "id": "anim_dirs",
+                "label": "Animation Directories",
+                "type": "str_multi",
+                "default": None,
+                "help":"Directions from which to load animations."
             },]
         });
 
@@ -70,7 +76,7 @@ def readServerConfig():
         data = paramsToDict(BASE_SERVER_CONFIG.params)
     elif len(data.keys()) != len(base.keys()):
         data.upgrade(base)
-    return data
+    return d(data)
 
 def writeServerConfig(data):
     writeConfig("config", data)

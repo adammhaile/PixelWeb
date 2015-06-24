@@ -300,12 +300,10 @@ $.fn._input = function(config) {
             <div class="ui labeled @action input">\
                 <div class="ui label">@label</div>\
                 <input type="text" style="" id="@id_input" placeholder="@placeholder">\
-                @default\
+                <button class="ui icon button" tabindex="-1" id="@id_undo"><i class="undo icon"></i></button>\
             </div>\
             ';
         html = strReplace(html, "@action", "action");
-        html = strReplace(html, "@default", '<button class="ui icon button" tabindex="-1" id="@id_undo"><i class="undo icon"></i></button>');
-
         html = strReplace(html, "@label", config.label);
         html = strReplace(html, "@placeholder", config.placeholder);
         html = strReplace(html, "@id", $node.attr('id'));
@@ -316,6 +314,103 @@ $.fn._input = function(config) {
         $node.addToolTip(config.help);
 
         if (def) {
+            $node.val(config.default);
+        }
+    }
+
+    return $node;
+};
+
+$.fn._input_multi = function(config) {
+    var $node = $(this);
+    var id = $node.attr('id');
+    var _divider = '<div class="ui hidden divider tiny"></div>';
+    $node.val = function(value) {
+        var $input = $node.find("#" + id + "_input");
+        var cfg = $node.data().config;
+
+        if (value != undefined) {
+            $.each(cfg.inputs, function(i,input){
+                input.remove();
+            });
+            cfg.inputs = [];
+            $.each(value, function(i,val){
+                $node.add(val);
+            });
+        } else {
+            var result = [];
+            $.each(cfg.inputs, function(i,v){
+                result.push(v.find("#" + id + "_input")[0].value);
+            });
+            return result;
+        }
+    };
+
+    $node.add = function(value) {
+        if(!value) value = "";
+        var cfg = $node.data().config;
+        var html = '\
+            <div class="ui action input multi_input" id="@id_@guid">\
+                <input type="text" class="multi_input_text" id="@id_input" placeholder="@placeholder">\
+                <button class="ui icon button" tabindex="-1" id="@id_input_multi_remove"><i class="minus icon"></i></button>\
+            </div>\
+            ';
+
+        html = strReplace(html, "@placeholder", config.placeholder);
+        html = strReplace(html, "@id", $node.attr('id'));
+        var _guid = guid();
+        html = strReplace(html, "@guid", _guid);
+        $input = $(html);
+        $node.append($input);
+        cfg.inputs.push($input);
+
+        $remove = $input.find("#" + id + "_input_multi_remove");
+        $remove.click(function(){
+            var index = -1;
+            $.each(cfg.inputs, function(i, v){
+                if(v.attr("id") == id + "_" + _guid)
+                    index = i;
+            });
+
+            if (index >= 0) {
+                console.log(index);
+                cfg.inputs[index].remove();
+                cfg.inputs.splice( index, 1 );
+            } 
+            console.log(cfg.inputs);
+        });
+
+        $input.find("#" + id + "_input")[0].value = value;
+    };
+
+    if (config) {
+        console.log(config);
+        if(!config.default) config.default = [""]
+        if (!config.placeholder) config.placeholder = "";
+        config.inputs = [];
+
+        $node.data("config", config);
+
+        var html = '\
+            <div class="ui labeled @action input">\
+                <div class="ui label">@label</div>\
+                <button class="ui icon button" tabindex="-1" id="@id_input_multi_add"><i class="plus icon"></i></button>\
+            </div>\
+            ';
+        html = strReplace(html, "@action", "action");
+        html = strReplace(html, "@label", config.label);
+        html = strReplace(html, "@placeholder", config.placeholder);
+        html = strReplace(html, "@id", $node.attr('id'));
+
+        //<input type="text" style="" id="@id_input" placeholder="@placeholder">\
+
+        $node.html(html);
+        $node.find("#" + id + "_input_multi_add").click(function(){$node.add();});
+
+        $node.addToolTip(config.help);
+
+        if (config.default) {
+            console.log(config.default);
             $node.val(config.default);
         }
     }

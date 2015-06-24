@@ -1,3 +1,12 @@
 .ui_input {
 	margin-bottom: 0.4em;
 }
+
+.multi_input {
+  margin-top: 0.4em;
+  width: 100%;
+}
+
+.multi_input_text {
+	width: 100%;
+}

@@ -5,6 +5,7 @@ from bottle import *
 from actions import *
 
 import config
+import status
 
 @route('/')
 def home():
@@ -29,7 +30,7 @@ def postonly():
 @route('/api', method='POST')
 def api():
 	try:
-		req = request.json
+		req = d(request.json)
 		if req and'action' in req:
 			if req['action'] in actions:
 				action = actions[req['action']]
@@ -55,10 +56,9 @@ def api():
 
 
 server = config.readServerConfig()
-print server
 config.writeServerConfig(server)
 
 initBPM()
-run(host=server['host'], port=server['port'], reloader=False)
+run(host=server.host, port=server.port, reloader=False)
 
 

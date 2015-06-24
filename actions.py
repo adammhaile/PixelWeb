@@ -1,5 +1,6 @@
 from util import *
 import traceback, sys
+import status
 
 import bibliopixel.log as log
 log.setLogLevel(log.DEBUG)
@@ -62,7 +63,17 @@ def getConfig(req):
 	return success(bpm.getConfig())
 
 def getServerConfig(req):
-	return success(config.BASE_SERVER_CONFIG)
+	return success({
+		"setup":config.BASE_SERVER_CONFIG, 
+		"config":{
+			"id": "server_config", 
+			"config": config.readServerConfig()
+			}
+		})
+
+def saveServerConfig(req):
+	config.writeServerConfig(req["config"])
+	return success()
 
 
 actions = {
@@ -75,5 +86,6 @@ actions = {
 	'startAnim': [startAnim, ['config', 'run']],
 	'stopAnim': [stopAnim, []],
 	'getConfig': [getConfig, []],
-	'getServerConfig': [getServerConfig, []]
+	'getServerConfig': [getServerConfig, []],
+	'saveServerConfig': [saveServerConfig, ["config"]]
 }

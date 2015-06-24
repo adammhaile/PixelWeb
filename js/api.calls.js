@@ -16,3 +16,11 @@ function getConfig(callback) { _get("getConfig", callback); }
 
 function getServerConfig(callback) { _get("getServerConfig", callback); }
 
+function saveServerConfig(config, callback) {
+    callAPI({action: "saveServerConfig", config: config}, function(result) {
+        if (result.status) {
+            if (callback) callback(result.data);
+        }
+    });
+}
+

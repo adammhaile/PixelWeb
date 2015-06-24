@@ -127,12 +127,14 @@
             getServerConfig(function(srv) {
                 console.log(srv);
                 $server_config = $("#server_config").param_loader({
-                    data: [srv],
+                    data: [srv.setup],
                     label: "",
                     placeholder: "",
                     disable_option: true,
                     default: "server_config"
                 });
+
+                setTimeout(function(){$server_config.val(srv.config);}, 5);
             });
 
             $('.ui.accordion').accordion({
@@ -171,6 +173,14 @@
                     console.log(result);
                 });
             });
+
+            $("#saveServerConfig").click(function() {
+                var config = $server_config.val();
+                saveServerConfig(config.config, function(result){
+                    console.log(result);
+                    alert("Save Complete! Please restart server.")
+                });
+            });
         });
     </script>
 </head>
@@ -196,6 +206,7 @@
     </div>
     <div class="ui bottom attached tab segment" data-tab="server_tab">
         <div id="server_config"></div>
+        <div class="ui button green" id="saveServerConfig">Save</div>
     </div>
 </body>
 

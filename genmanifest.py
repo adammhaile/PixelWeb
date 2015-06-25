@@ -5,8 +5,9 @@ from bibliopixel.animation import *
 import matrix_animations as ma
 import loader
 from util import d
-import config
-import os
+# import config
+import os, sys
+import json
 
 def animationPredicate(obj):
     if not inspect.isclass(obj): return False
@@ -58,23 +59,52 @@ def getControllerType(cls):
     if issubclass(cls, BaseCircleAnim): return "circle"
     return ""
 
-outpath = os.path.dirname(os.path.abspath(__file__))
-mods = loader.load_folder("C:/GitHub/BiblioPixelAnimations/strip/")
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print "Must supply a file to process!"
+    else:
+        files = sys.argv[1:]
+        cwd = os.getcwdu()
+        for f in files:
+            if not os.path.isabs(f):
+                f = os.path.join(cwd, f)
+            if not os.path.exists(f):
+                print "File does not exist! - {}".format(f)
+                continue
+            print "Loading: {}".format(f)
+            mod = loader.load_module(f)[1]
+            if hasattr(mod, "MANIFEST"):
+                print "Module already contains manifest. Skipping..."
+                continue
 
-for m in mods:
-    results = []
-    for c in loadClasses(m):
-        params = loadParams(c.cls)
-        manifest = {
-            "id":c.name,
-            "class":c.name,
-            "type": "animation",
-            "display": c.name,
-            "controller": getControllerType(c.cls),
-            "params": params
-        }
-        results.append(manifest)
-    if len(results) > 0:    
-        config.writeConfig("manifest", m.__file__, results, path=outpath)
+            results = []
+            clist = loadClasses(mod)
+            for c in clist:
+                params = loadParams(c.cls)
+                manifest = {
+                    "id": c.name,
+                    "class": "##" + c.name,
+                    "type": "animation",
+                    "display": c.name,
+                    "desc": None,
+                    "controller": getControllerType(c.cls),
+                    "params": params
+                }
+                results.append(manifest)
+            if len(results) > 0:    
+                manifest = json.dumps(results, indent=4, sort_keys=True)
+                for c in clist:
+                    manifest = manifest.replace('"##' + c.name + '"', c.name)
+                manifest = manifest.replace(": null", ": None")
+                manifest = manifest.replace(": false", ": False")
+                manifest = manifest.replace(": true", ": True")
+                manifest = "\n\n\nMANIFEST = " + manifest
+                with open(f, "a") as fp:
+                    print "Writing manifest..."
+                    fp.write(manifest)
+            else:
+                print "No valid animations to parse..."
+
+        print "\nComplete! Please fill in the rest of the manifest manually."
 
 

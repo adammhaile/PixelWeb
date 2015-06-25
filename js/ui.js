@@ -11,7 +11,7 @@ $.fn.addToolTip = function(text){
     $node.attr("data-content",text);
     $node.attr("data-variation","wide inverted large");
     $node.attr("data-position", "top left");
-    $node.popup({delay:{show:100, hide:0}, duration:100});
+    $node.popup({delay:{show:200, hide:0}, duration:100});
 }
 
 $.fn._dropdown = function(config) {
@@ -23,7 +23,22 @@ $.fn._dropdown = function(config) {
         $menu = $node.find(".menu");
         $menu.empty();
         $.each(data, function(k, v) {
-            $menu.append('<div class="item" data-value="' + k + '">' + v + '</div>');
+            var name = "";
+            var desc = null;
+            if(typeof(v) == "object"){
+                name = v.name;
+                desc = v.desc;
+            }
+            else{
+                name = v;
+            }
+
+            $item = $('<div class="item" data-value="' + k + '">' + name + '</div>');
+            $menu.append($item);
+            if(desc){
+                console.log(desc);
+                $item.addToolTip(desc);
+            }
         });
     };
 

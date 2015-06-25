@@ -77,67 +77,87 @@ $.fn.param_loader = function(config) {
         cfg.run_map = {};
         $n.empty();
 
-        $n.append(_divider);
+        //$n.append(_divider);
         $n.append('<div class="ui styled accordion" id="' + id + '_view"></div>');
         var $accordion = $n.children("#" + id + "_view");
 
-        var basic_html = '\
-            <div class="title" id="@id_basic_title">\
-                <i class="dropdown icon"></i> Basic\
+
+
+        var _html = '\
+            <div class="title" id="@id_@group_title">\
+                <i class="dropdown icon"></i> @group\
             </div>\
-            <div class="active content ui list" id="@id_basic_content"></div>\
+            <div class="active content ui list" id="@id_@group_content"></div>\
         ';
 
-        var adv_html = '\
-            <div class="title" id="@id_advanced_title">\
-                <i class="dropdown icon"></i> Advanced\
-            </div>\
-            <div class="content ui list" id="@id_advanced_content"></div>\
-        ';
+        // var adv_html = '\
+        //     <div class="title" id="@id_advanced_title">\
+        //         <i class="dropdown icon"></i> Advanced\
+        //     </div>\
+        //     <div class="content ui list" id="@id_advanced_content"></div>\
+        // ';
 
-        var run_html = '\
-            <div class="title" id="@id_run_title">\
-                <i class="dropdown icon"></i> Run Parameters\
-            </div>\
-            <div class="active content ui list" id="@id_run_content"></div>\
-        ';
+        // var run_html = '\
+        //     <div class="title" id="@id_run_title">\
+        //         <i class="dropdown icon"></i> Run Parameters\
+        //     </div>\
+        //     <div class="active content ui list" id="@id_run_content"></div>\
+        // ';
 
-        basic_html = strReplace(basic_html, "@id", id)
-        adv_html = strReplace(adv_html, "@id", id)
-        run_html = strReplace(run_html, "@id", id)
+        // basic_html = strReplace(basic_html, "@id", id)
+        // adv_html = strReplace(adv_html, "@id", id)
+        // run_html = strReplace(run_html, "@id", id)
 
-        var basic_controls = [];
-        var adv_controls = [];
-        var run_controls = [];
+        var paramMap = {"Basic":[]};
 
         $.each(params, function(i, v) {
             $c = $('<div id="' + v.id + '"></div>');
             $c.addClass("ui_input");
             $c.addClass("item");
-            if (v.advanced) adv_controls.push($c);
-            else basic_controls.push($c);
+            if(!v.group)
+                v.group = "Basic";
+            if(!(v.group in paramMap)) paramMap[v.group] = []
+            paramMap[v.group].push($c);
             cfg.control_map[v.id] = insertFuncs[v.type]($c, v);
         });
 
-        var adv = adv_controls.length > 0;
-
-        $accordion.append(basic_html);
-        $basic = $accordion.children("#" + id + "_basic_content");
-        $.each(basic_controls, function(i, $c) {
-            //$basic.append($(_divider));
-            $basic.append($c);
+        $.each(paramMap, function(k,v){
+            var html = strReplace(_html, "@id", id)
+            html = strReplace(html, "@group", k)
+            $accordion.append(html);
+            $section = $accordion.children("#" + id + "_" + k + "_content");
+            $.each(v, function(i, p){
+                $section.append(p);
+            });
         });
 
-        if (adv) {
-            $accordion.append(adv_html);
-            $adv = $accordion.children("#" + id + "_advanced_content");
-            $.each(adv_controls, function(i, $c) {
-                //$adv.append($(_divider));
-                $adv.append($c);
-            });
-        }
+        // var adv = adv_controls.length > 0;
+
+        // $accordion.append(basic_html);
+        // $basic = $accordion.children("#" + id + "_basic_content");
+        // $.each(basic_controls, function(i, $c) {
+        //     //$basic.append($(_divider));
+        //     $basic.append($c);
+        // });
+
+        // if (adv) {
+        //     $accordion.append(adv_html);
+        //     $adv = $accordion.children("#" + id + "_advanced_content");
+        //     $.each(adv_controls, function(i, $c) {
+        //         //$adv.append($(_divider));
+        //         $adv.append($c);
+        //     });
+        // }
 
         if(run){
+            var run_html = '\
+                <div class="title" id="@id_run_title">\
+                    <i class="dropdown icon"></i> Run Parameters\
+                </div>\
+                <div class="active content ui list" id="@id_run_content"></div>\
+            ';
+            run_html = strReplace(run_html, "@id", id)
+            var run_controls = [];
             $.each(run, function(i, v) {
                 $c = $('<div id="' + v.id + '"></div>');
                 $c.addClass("ui_input");
@@ -161,6 +181,15 @@ $.fn.param_loader = function(config) {
     function optionChanged(val) {
         var cfg = $node.data().config;
         showParams($("#" + id + "_params"), cfg.data[val].params, cfg.run);
+        $desc = $node.children("#" + id + "_desc");
+        if(cfg.data[val].desc){
+            $desc.html('<p>'+ cfg.data[val].desc + '</p>');
+            $desc.show();
+        }
+        else{
+            $desc.empty();
+            $desc.hide();
+        }
         if(_onChanged) _onChanged(val);
     }
 
@@ -209,13 +238,15 @@ $.fn.param_loader = function(config) {
 
         $node.empty();
         $node.append('<div id="' + id + '_combo"></div>\
-                      <div id="' + id + '_params"></div>\
+                      <div class="ui inverted segment" id="' + id + '_desc"></div>\
+                      <div id="' + id + '_params" class="params_box"></div>\
                     ');
 
+        $node.children("#" + id + "_desc").hide();
         var options = {};
         if(!config.data) config.data = {};
         $.each(config.data, function(k, v) {
-            options[k] = v.display;
+            options[k] = {name: v.display, desc: v.desc};
         });
 
         $node.children("#" + id + "_combo")._dropdown({

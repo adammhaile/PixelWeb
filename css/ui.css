@@ -10,3 +10,16 @@
 .multi_input_text {
 	width: 100%;
 }
+
+.ui.styled.accordion {
+  width: 100%;
+}
+
+.ui.segment {
+	margin-top:0.5rem;
+	margin-bottom:0;
+}
+
+.params_box {
+	margin-top: 0.5rem;
+}

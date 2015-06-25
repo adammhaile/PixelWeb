@@ -4,6 +4,7 @@ import os.path
 import imp
 import traceback
 import glob
+import status
 
 def load_package(path, base):
     try:
@@ -38,8 +39,8 @@ def load_module(path):
             hash = md5.new(path).hexdigest() + "_" + code_file
             return  (base, imp.load_source(base, path, fin))
         except Exception, e:
-            print "Error loading {}".format(path)
-            print e
+            status.pushError("Error loading {}".format(path))
+            status.pushError(e)
             return (None, None)
         finally:
             try: fin.close()
@@ -54,6 +55,7 @@ def load_module(path):
 def load_folder(dir):
     sys.path.append(dir)
     mods = []
+    status.pushStatus("Scanning: {}".format(dir))
 
     # for p in glob.glob(dir + "/*/"):
     #     base = p.replace("\\", "").replace("/", "")

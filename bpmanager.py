@@ -38,19 +38,22 @@ class BPManager:
 	def __loadDriverDef(self, config):
 		config = d(config)
 		self._driverClasses[config.id] = config['class']
-		c = {"display":config.display, "params":config.params}
+		if "desc" not in config: config.desc = ""
+		c = {"display":config.display, "desc":config.desc, "params":config.params}
 		self.drivers[config.id] = c
 
 	def __loadControllerDef(self, config):
 		config = d(config)
 		self._contClasses[config.id] = config['class']
-		c = {"display":config.display, "params":config.params}
+		if "desc" not in config: config.desc = ""
+		c = {"display":config.display, "desc":config.desc, "params":config.params}
 		self.controllers[config.id] = c
 
 	def __loadAnimDef(self, config):
 		config = d(config)
 		self._animClasses[config.id] = config['class']
-		c = {"display":config.display, "params":config.params}
+		if "desc" not in config: config.desc = ""
+		c = {"display":config.display, "desc":config.desc, "params":config.params}
 		cont = config.controller
 		if not cont in self.anims:
 			self.anims[cont] = {}
@@ -66,8 +69,10 @@ class BPManager:
 						self.__loadFuncs[ref.type](ref)
 
 	def loadAnimations(self):
-		anims = loader.load_folder("C:/GitHub/BiblioPixelAnimations/matrix/")
-		anims.extend(loader.load_folder("C:/GitHub/BiblioPixelAnimations/strip/"))
+		anims = []
+		anim_dirs = config.readServerConfig().anim_dirs
+		for dir in anim_dirs:
+			anims.extend(loader.load_folder(dir))
 		for a in anims:
 			if hasattr(a, 'MANIFEST'):
 				status.pushStatus("Loading: {}".format(a.__file__))

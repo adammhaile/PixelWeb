@@ -16,6 +16,9 @@
     <script src="js/main.js"></script>
     <script src="js/bp.js"></script>
     <script>
+
+    var _curConfig = null;
+
     var _drivers = null;
     var driverPickers = [];
 
@@ -84,6 +87,21 @@
         return config;
     }
 
+    function displayCurConfig(){
+        if (_curConfig.driver) {
+            clearDriverChoosers();
+            $.each(_curConfig.driver, function(i, d) {
+                addDriverChooser(d);
+            });
+            // $.each(_curConfig.driver, function(i, d){
+            //     driverPickers[i].val(d);
+            // });
+        }
+        if (_curConfig.controller) {
+            $controller.val(_curConfig.controller);
+        }
+    }
+
     $(document)
         .ready(function() {
 
@@ -109,20 +127,13 @@
                         });
 
                         getConfig(function(config) {
-                            console.log(config);
-                            if (config.driver) {
-                                clearDriverChoosers();
-                                $.each(config.driver, function(i, d) {
-                                    addDriverChooser(d);
-                                });
-                            }
-                            if (config.controller) {
-                                $controller.val(config.controller);
-                            }
+                            _curConfig = config;
                         });
                     });
                 });
             });
+
+            setTimeout(displayCurConfig, 1000);
 
             getServerConfig(function(srv) {
                 console.log(srv);

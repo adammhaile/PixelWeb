@@ -81,32 +81,12 @@ $.fn.param_loader = function(config) {
         $n.append('<div class="ui styled accordion" id="' + id + '_view"></div>');
         var $accordion = $n.children("#" + id + "_view");
 
-
-
         var _html = '\
             <div class="title" id="@id_@group_title">\
                 <i class="dropdown icon"></i> @group\
             </div>\
             <div class="active content ui list" id="@id_@group_content"></div>\
         ';
-
-        // var adv_html = '\
-        //     <div class="title" id="@id_advanced_title">\
-        //         <i class="dropdown icon"></i> Advanced\
-        //     </div>\
-        //     <div class="content ui list" id="@id_advanced_content"></div>\
-        // ';
-
-        // var run_html = '\
-        //     <div class="title" id="@id_run_title">\
-        //         <i class="dropdown icon"></i> Run Parameters\
-        //     </div>\
-        //     <div class="active content ui list" id="@id_run_content"></div>\
-        // ';
-
-        // basic_html = strReplace(basic_html, "@id", id)
-        // adv_html = strReplace(adv_html, "@id", id)
-        // run_html = strReplace(run_html, "@id", id)
 
         var paramMap = {"Basic":[]};
 
@@ -130,24 +110,6 @@ $.fn.param_loader = function(config) {
                 $section.append(p);
             });
         });
-
-        // var adv = adv_controls.length > 0;
-
-        // $accordion.append(basic_html);
-        // $basic = $accordion.children("#" + id + "_basic_content");
-        // $.each(basic_controls, function(i, $c) {
-        //     //$basic.append($(_divider));
-        //     $basic.append($c);
-        // });
-
-        // if (adv) {
-        //     $accordion.append(adv_html);
-        //     $adv = $accordion.children("#" + id + "_advanced_content");
-        //     $.each(adv_controls, function(i, $c) {
-        //         //$adv.append($(_divider));
-        //         $adv.append($c);
-        //     });
-        // }
 
         if(run){
             var run_html = '\
@@ -214,20 +176,23 @@ $.fn.param_loader = function(config) {
         else{
             var cfg = $node.data().config;
             $node.children("#" + id + "_combo")._dropdown().val(value.id)
-            if(value.config){
-                $.each(value.config, function(k,v){
-                    if(k in cfg.control_map){
-                        cfg.control_map[k].val(v);
-                    }
-                });
+            function setParams(){
+                if(value.config){
+                    $.each(value.config, function(k,v){
+                        if(k in cfg.control_map){
+                            cfg.control_map[k].val(v);
+                        }
+                    });
+                }
+                if(value.run){
+                    $.each(value.run, function(k,v){
+                        if(k in cfg.run_map){
+                            cfg.run_map[k].val(v);
+                        }
+                    });
+                }
             }
-            if(value.run){
-                $.each(value.run, function(k,v){
-                    if(k in cfg.run_map){
-                        cfg.run_map[k].val(v);
-                    }
-                });
-            }
+            setTimeout(setParams, 0);
         }
     };
 

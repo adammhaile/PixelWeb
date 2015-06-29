@@ -30,7 +30,8 @@ BASE_SERVER_CONFIG = d({
                 "label": "Animation Directories",
                 "type": "str_multi",
                 "default": None,
-                "help":"Directions from which to load animations."
+                "help":"Directions from which to load animations.",
+                "replace": {"\\":"/"}
             },]
         });
 
@@ -45,12 +46,12 @@ def readConfig(file, key = None, path=__home):
     data = {}
     try:
         with open(path + "/" + file + ".json", "r") as fp:
-            data = json.load(fp, encoding='utf-8')    
+            data = json.load(fp, encoding='utf-8')
             if key:
                 data = data[key]
     except Exception, e:
         pass
-        
+
     return d(data)
 
 def writeConfig(file, data, key = None, path=__home):
@@ -80,6 +81,3 @@ def readServerConfig():
 
 def writeServerConfig(data):
     writeConfig("config", data)
-
-
-

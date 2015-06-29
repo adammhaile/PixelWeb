@@ -36,7 +36,6 @@ $.fn._dropdown = function(config) {
             $item = $('<div class="item" data-value="' + k + '">' + name + '</div>');
             $menu.append($item);
             if(desc){
-                console.log(desc);
                 $item.addToolTip(desc);
             }
         });
@@ -266,7 +265,7 @@ $.fn._toggle = function(config) {
         $node.data("config", config);
 
         $node.addClass("ui toggle checkbox");
-        
+
         var html = '\
             <label>@label</label>\
             <input type="checkbox">\
@@ -282,6 +281,17 @@ $.fn._toggle = function(config) {
     }
 
     return $node;
+}
+
+$.fn._textReplacer = function(rep) {
+    var $node = $(this);
+    $node.keyup(function(){
+        var val = $node.val();
+        $.each(rep, function(k, v){
+            val = val.replace(k, v);
+        });
+        $node.val(val);
+    });
 }
 
 $.fn._input = function(config) {
@@ -325,7 +335,9 @@ $.fn._input = function(config) {
 
         $node.html(html);
         $node.find("#" + id + "_undo").click($node.undo);
-
+        if(config.replace){
+            $node.find("#" + id + "_input")._textReplacer(config.replace);
+        }
         $node.addToolTip(config.help);
 
         if (def) {
@@ -391,11 +403,14 @@ $.fn._input_multi = function(config) {
                 console.log(index);
                 cfg.inputs[index].remove();
                 cfg.inputs.splice( index, 1 );
-            } 
+            }
             console.log(cfg.inputs);
         });
 
         $input.find("#" + id + "_input")[0].value = value;
+        if(cfg.replace){
+            $($input.find("#" + id + "_input")[0])._textReplacer(cfg.replace);
+        }
     };
 
     if (config) {
@@ -462,7 +477,7 @@ $.fn._color = function(config) {
         $node.data("config", config);
 
         $node.addClass("ui labeled input");
-        
+
         var html = '\
                 <div class="ui label">@label</div>\
                 <input type="text" id="@id_color">\
@@ -488,4 +503,3 @@ $.fn._color = function(config) {
 
     return $node;
 }
-

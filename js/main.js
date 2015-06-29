@@ -15,7 +15,8 @@ function insert_str($node, params) {
         label: params.label,
         placeholder: params.msg,
         default: params.default,
-        help: params.help
+        help: params.help,
+        replace: params.replace
     });
 }
 
@@ -24,7 +25,8 @@ function insert_str_multi($node, params) {
         label: params.label,
         placeholder: params.msg,
         default: params.default,
-        help: params.help
+        help: params.help,
+        replace: params.replace
     });
 }
 

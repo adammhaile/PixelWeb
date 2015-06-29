@@ -29,7 +29,7 @@ BASE_SERVER_CONFIG = d({
                 "id": "anim_dirs",
                 "label": "Animation Directories",
                 "type": "str_multi",
-                "default": None,
+                "default": [],
                 "help":"Directions from which to load animations.",
                 "replace": {"\\":"/"}
             },]
@@ -38,6 +38,7 @@ BASE_SERVER_CONFIG = d({
 def initConfig():
     try:
         if not os.path.exists(__home):
+            print "Creating {}".format(__home)
             os.makedirs(__home)
     except:
         print "Failed to initialize PixelWeb config!"

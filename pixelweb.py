@@ -44,7 +44,7 @@ def api():
 
 				if not valid:
 					return fail("Missing parameters.", data=missing)
-				
+
 				return action[0](req)
 
 			else:
@@ -55,10 +55,9 @@ def api():
 		return fail(traceback.format_exc(), error=ErrorCode.GENERAL_ERROR, data=None)
 
 
+config.initConfig()
 server = config.readServerConfig()
 config.writeServerConfig(server)
 
 initBPM()
 run(host=server.host, port=server.port, reloader=False)
-
-

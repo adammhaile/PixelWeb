@@ -285,13 +285,16 @@ $.fn._toggle = function(config) {
 
 $.fn._textReplacer = function(rep) {
     var $node = $(this);
-    $node.keyup(function(){
+    function replace() {
         var val = $node.val();
         $.each(rep, function(k, v){
             val = val.replace(k, v);
         });
         $node.val(val);
-    });
+    }
+    $node.keyup(replace);
+    $node.change(replace);
+    $node.focusout(replace);
 }
 
 $.fn._input = function(config) {

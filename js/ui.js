@@ -13,16 +13,29 @@ $.fn.addToolTip = function(text){
 $.fn._numeric = function(){
     var $node = $(this);
     $node.data("last", $node.val());
-    function replace() {
-        var val = $node.val();
-        if(!val.match("^-?[0-9]*$")){
-            $node.val($node.data("last"))
+    $node.data("selected", false);
+    var _selected = false;
+    function replace(event) {
+        console.log($node.data("selected"));
+        if(!$node.data("selected")){
+            console.log("replace");
+            var val = $node.val();
+            console.log(val);
+            if(!val.match("^-?[0-9]*$")){
+                $node.val($node.data("last"))
+            }
+            else{
+                $node.data("last", $node.val());
+            }
         }
-        else{
-            $node.data("last", $node.val());
-        }
+        $node.data("selected", false);
     }
-    $node.keyup(replace);
+    // $node.select(function(event){
+    //     $node.data("selected", true);
+    //     console.log("select");
+    // });
+    $node.keypress(replace);
+
     // $node.focusout(replace);
 }
 
@@ -253,7 +266,7 @@ $.fn._nud = function(config) {
         }
 
         $node.find("#" + id + "_input")._numeric();
-        $node.find("#" + id + "_input").keyup(onKey);
+        //$node.find("#" + id + "_input").keyup(onKey);
     }
 
     return $node;
@@ -303,13 +316,13 @@ $.fn._textReplacer = function(rep) {
     function replace() {
         var val = $node.val();
         $.each(rep, function(k, v){
-            val = val.replace(k, v);
+            val = val.split(k).join(v);
         });
         $node.val(val);
     }
-    $node.keyup(replace);
+    //$node.keyup(replace);
     $node.change(replace);
-    $node.focusout(replace);
+    //$node.focusout(replace);
 }
 
 $.fn._input = function(config) {

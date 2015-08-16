@@ -181,8 +181,6 @@ $.fn._nud = function(config) {
         if (value != undefined) {
             rangeError(false);
             if (value != "") value = Math.floor(value);
-            console.log(cfg.min);
-            console.log(value);
             if(!isNU(cfg.max) && value > cfg.max) {
                 value = cfg.max;
                 rangeError(true);
@@ -416,7 +414,7 @@ $.fn._input_multi = function(config) {
         if(!value) value = "";
         var cfg = $node.data().config;
         var html = '\
-            <div class="ui action input multi_input" id="@id_@guid">\
+            <div class="ui action fluid input multi_input" id="@id_@guid">\
                 <input type="text" class="multi_input_text" id="@id_input" placeholder="@placeholder">\
                 <button class="ui icon button" tabindex="-1" id="@id_input_multi_remove"><i class="minus icon"></i></button>\
             </div>\

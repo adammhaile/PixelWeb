@@ -2,6 +2,11 @@ function strReplace(str, find, replace) {
     return str.replace(new RegExp(find, 'g'), replace);
 }
 
+function isNU(val){
+    return val === undefined || val === null;
+}
+
+
 $.fn.addToolTip = function(text){
     var $node = $(this);
     $node.attr("data-content",text);
@@ -44,7 +49,7 @@ $.fn._dropdown = function(config) {
     var id = $node.attr('id');
 
     $node.load = function(data) {
-        $node.dropdown("restore defaults");
+        // $node.dropdown("restore defaults");
         $menu = $node.find(".menu");
         $menu.empty();
         $.each(data, function(k, v) {
@@ -159,8 +164,8 @@ $.fn._nud = function(config) {
             if(state){
                 //$($node.children(".ui.input")).addClass("error");
                 var msg = "Value must be in range: " + cfg.min + " to " + cfg.max;
-                if(!cfg.max) msg = "Value must be greater than " + (cfg.min-1);
-                if(!cfg.min) msg = "Value must be less than " + (cfg.max+1);
+                if(isNU(cfg.max)) msg = "Value must be >= " + (cfg.min);
+                if(isNU(cfg.min)) msg = "Value must be <= " + (cfg.max);
                 $node.find("#" + id + "_err_msg").text(msg);
                 dir = "in";
             }
@@ -176,11 +181,14 @@ $.fn._nud = function(config) {
         if (value != undefined) {
             rangeError(false);
             if (value != "") value = Math.floor(value);
-            if(cfg.max && value > cfg.max) {
+            console.log(cfg.min);
+            console.log(value);
+            if(!isNU(cfg.max) && value > cfg.max) {
                 value = cfg.max;
                 rangeError(true);
             }
-            if(cfg.min && value < cfg.min) {
+            else if(!isNU(cfg.min) && value < cfg.min) {
+                console.log("range!");
                 value = cfg.min;
                 rangeError(true);
             }
@@ -229,14 +237,14 @@ $.fn._nud = function(config) {
 
         var html = '\
             <div class="ui small error message hidden" id="@id_error"><i class="close icon"></i><p id="@id_err_msg"><p></div>\
-            <div class="ui labeled @action input">\
-                <div class="ui label">@label</div>\
-                <input type="text" style="" id="@id_input" placeholder="@placeholder">\
-                @default\
-            </div>\
-            <div class="ui icon buttons">\
-                <div class="ui button" id="@id_minus"><i class="minus icon"></i></div>\
-                <div class="ui button" id="@id_plus"><i class="plus icon"></i></div>\
+            <div>\
+                <div class="ui labeled @action input">\
+                    <div class="ui label">@label</div>\
+                    <input type="text" style="" id="@id_input" placeholder="@placeholder">\
+                    @default\
+                </div>\
+                <button class="ui compact circular icon button" id="@id_minus"><i class="minus icon"></i></button>\
+                <button class="ui compact circular icon button" id="@id_plus"><i class="plus icon"></i></button>\
             </div>\
             ';
         html = strReplace(html, "@action", "action");

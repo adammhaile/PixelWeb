@@ -30,7 +30,7 @@ BASE_SERVER_CONFIG = d({
                 "label": "Animation Directories",
                 "type": "str_multi",
                 "default": [],
-                "help":"Directions from which to load animations.",
+                "help":"Directories from which to load animations.",
                 "replace": {"\\":"/"}
             },]
         });

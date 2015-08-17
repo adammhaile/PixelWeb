@@ -234,3 +234,31 @@ $.fn.param_loader = function(config) {
 
     return $node;
 }
+
+
+function genFeedItem(item){
+    var html = "\
+    <div class='event'>\
+        <div class='content'>\
+          <div class='summary'>\
+             @summary\
+          </div>\
+          <div class='date'>\
+            @date\
+          </div>\
+        </div>\
+    </div>\
+    ";
+
+    html = strReplace(html, "@date", item.timestamp);
+    html = strReplace(html, "@summary", item.msg);
+    return html;
+}
+
+function buildFeed(items){
+    var html = '';
+    $.each(items, function(i, v){
+        html += genFeedItem(v);
+    })
+    return html;
+}

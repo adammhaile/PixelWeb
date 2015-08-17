@@ -107,6 +107,18 @@
         $("#BPError").modal({blurring:true}).modal('show');
     }
 
+    function showStatusFeed(){
+        getStatus(function(result){
+            console.log(result);
+            var html = buildFeed(result);
+            console.log(html);
+            $("#statusFeed").html(html);
+            $("#statusFeedModal").modal({blurring:true}).modal('show');
+
+        });
+
+    }
+
     function setLoading(id, state){
         if(state || state === undefined){
             $(id).addClass('loading');
@@ -277,14 +289,15 @@
         </div>
     </div>
 
-    <div class="ui basic Large modal" id="BPError">
+    <div class="ui Large modal" id="statusFeedModal">
         <div class="header">PixelWeb Status</div>
-        <div class="image content">
-            <img class="image"><i class="huge red warning sign icon"></i></img>
-            <p class="" id="bpErrorMsg"></p>
+        <div class="content">
+            <!-- <img class="image"><i class="huge red warning sign icon"></i></img> -->
+            <div class="ui feed" id="statusFeed">
+            </div>
         </div>
         <div class="actions">
-            <div class="ui approve button">OK</div>
+            <div class="ui button">OK</div>
         </div>
     </div>
 </body>

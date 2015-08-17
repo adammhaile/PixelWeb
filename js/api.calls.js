@@ -24,3 +24,6 @@ function saveServerConfig(config, callback) {
     });
 }
 
+function getStatus(callback) {_get("getStatus", callback);}
+
+function getErrors(callback) {_get("getErrors", callback);}

@@ -102,12 +102,28 @@
         }
     }
 
+    function showBPError(msg){
+        $("#bpErrorMsg").html(msg);
+        $("#BPError").modal({blurring:true}).modal('show');
+    }
+
+    function setLoading(id, state){
+        if(state || state === undefined){
+            $(id).addClass('loading');
+        }
+        else {
+            $(id).removeClass('loading');
+        }
+    }
+
     $(document)
         .ready(function() {
 
+            $("#loadDimmer").dimmer('show');
             $('.menu .item')
                 .tab();
 
+            setLoading("body");
             getDrivers(function(drivers) {
                 _drivers = drivers;
                 clearDriverChoosers();
@@ -128,6 +144,9 @@
 
                         getConfig(function(config) {
                             _curConfig = config;
+                            setLoading("body", false);
+
+                            setTimeout(function(){$("#loadDimmer").dimmer('hide');}, 1000);
                         });
                     });
                 });
@@ -154,15 +173,24 @@
 
             $("#startDriver").click(function() {
 
+                setLoading("#startDriver");
                 var config = getCurrentConfig();
                 console.log(config);
                 config.action = "startConfig"
                 callAPI(config, function(result) {
                     console.log(result);
+                    if(result.status){
+
+                    }
+                    else {
+                        showBPError(result.msg);
+                    }
+                    setLoading("#startDriver", false);
                 });
             });
 
             $("#startAnim").click(function() {
+                setLoading("#startAnim");
                 var params = getAnimConfig();
                 callAPI({
                     action: "startAnim",
@@ -173,15 +201,30 @@
                     run: params.run
                 }, function(result) {
                     console.log(result);
+                    if(result.status){
+
+                    }
+                    else {
+                        showBPError(result.msg);
+                    }
+                    setLoading("#startAnim", false);
                 });
             });
 
             $("#stopAnim").click(function() {
+                setLoading("#stopAnim");
                 var params = getAnimConfig();
                 callAPI({
                     action: "stopAnim"
                 }, function(result) {
                     console.log(result);
+                    if(result.status){
+
+                    }
+                    else {
+                        showBPError(result.msg);
+                    }
+                    setLoading("#stopAnim", false);
                 });
             });
 
@@ -196,28 +239,53 @@
     </script>
 </head>
 
-<body class="inverted">
+<body class="ui blurring">
+    <div class="ui dimmer" id="loadDimmer">
+        <div class="ui large text loader">Loading</div>
+    </div>
     <div class="ui top attached tabular menu">
         <a class="active item" data-tab="config_tab">Config</a>
         <a class="item" data-tab="anim_tab">Animation</a>
         <a class="item" data-tab="server_tab">Server Config</a>
     </div>
-    <div class="ui bottom attached active tab segment" data-tab="config_tab">
+    <div class="ui bottom attached active tab segment" data-tab="config_tab" id="tabConfig">
         <div id="driver"></div>
         <div class="ui hidden divider short"></div>
         <div id="controller"></div>
         <div class="ui hidden divider short"></div>
         <div class="ui button green" id="startDriver">Start</div>
     </div>
-    <div class="ui bottom attached tab segment" data-tab="anim_tab">
+    <div class="ui bottom attached tab segment" data-tab="anim_tab" id="tabAnim">
         <div id="anims"></div>
         <div class="ui hidden divider short"></div>
         <div class="ui button green" id="startAnim">Start</div>
         <div class="ui button red" id="stopAnim">Stop</div>
     </div>
-    <div class="ui bottom attached tab segment" data-tab="server_tab">
+    <div class="ui bottom attached tab segment" data-tab="server_tab" id="tabServer">
         <div id="server_config"></div>
         <div class="ui button green" id="saveServerConfig">Save</div>
+    </div>
+
+    <div class="ui basic small modal" id="BPError">
+        <div class="header">BiblioPixel Error</div>
+        <div class="image content">
+            <img class="image"><i class="huge red warning sign icon"></i></img>
+            <p class="" id="bpErrorMsg"></p>
+        </div>
+        <div class="actions">
+            <div class="ui approve button">OK</div>
+        </div>
+    </div>
+
+    <div class="ui basic Large modal" id="BPError">
+        <div class="header">PixelWeb Status</div>
+        <div class="image content">
+            <img class="image"><i class="huge red warning sign icon"></i></img>
+            <p class="" id="bpErrorMsg"></p>
+        </div>
+        <div class="actions">
+            <div class="ui approve button">OK</div>
+        </div>
     </div>
 </body>
 

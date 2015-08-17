@@ -28,7 +28,7 @@ def setBrightness(req):
 		bpm.led.fill(fillColor)
 		bpm.led.update()
 	except Exception, e:
-		return fail(msg = e.message)
+		return fail(traceback.format_exc(), error=ErrorCode.BP_ERROR, data=None)
 	return success(None)
 
 
@@ -42,18 +42,26 @@ def getAnims(req):
 	return success({"anims":bpm.anims, "run":bpm.animRunParams})
 
 def startConfig(req):
-	result = bpm.startConfig(req['drivers'], req['controller'])
-	if result.status:
-		return success()
-	else:
-		return result
+	try:
+		status.pushStatus("Starting Config")
+		result = bpm.startConfig(req['drivers'], req['controller'])
+		if result.status:
+			return success()
+		else:
+			return result
+	except:
+		return fail(traceback.format_exc(), error=ErrorCode.BP_ERROR, data=None)
 
 def startAnim(req):
-	result = bpm.startAnim(req['config'], req['run'])
-	if result.status:
-		return success()
-	else:
-		return result
+	try:
+		status.pushStatus("Starting Animation")
+		result = bpm.startAnim(req['config'], req['run'])
+		if result.status:
+			return success()
+		else:
+			return result
+	except:
+		return fail(traceback.format_exc(), error=ErrorCode.BP_ERROR, data=None)
 
 def stopAnim(req):
 	bpm.stopAnim()
@@ -64,9 +72,9 @@ def getConfig(req):
 
 def getServerConfig(req):
 	return success({
-		"setup":config.BASE_SERVER_CONFIG, 
+		"setup":config.BASE_SERVER_CONFIG,
 		"config":{
-			"id": "server_config", 
+			"id": "server_config",
 			"config": config.readServerConfig()
 			}
 		})
@@ -74,6 +82,12 @@ def getServerConfig(req):
 def saveServerConfig(req):
 	config.writeServerConfig(req["config"])
 	return success()
+
+def getStatus(req):
+	return success(data=status.dumpStatus())
+
+def getErrors(req):
+	return success(data=status.dumpErrors())
 
 
 actions = {
@@ -87,5 +101,7 @@ actions = {
 	'stopAnim': [stopAnim, []],
 	'getConfig': [getConfig, []],
 	'getServerConfig': [getServerConfig, []],
-	'saveServerConfig': [saveServerConfig, ["config"]]
+	'saveServerConfig': [saveServerConfig, ["config"]],
+	'getStatus': [getStatus, []],
+	'getErrors': [getErrors, []],
 }

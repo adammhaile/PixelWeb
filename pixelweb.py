@@ -56,8 +56,10 @@ def api():
 
 
 config.initConfig()
+status.pushStatus("Reading server config")
 server = config.readServerConfig()
 config.writeServerConfig(server)
 
 initBPM()
+status.pushStatus("BiblioPixel Init Complete")
 run(host=server.host, port=server.port, reloader=False)

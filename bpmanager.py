@@ -88,7 +88,7 @@ class BPManager:
 			drv = d(drv)
 			if not drv.id in self._driverClasses:
 				return fail("Invalid Driver")
-		
+
 		if not ledConfig.id in self._contClasses:
 			return fail("Invalid Controller")
 
@@ -108,7 +108,7 @@ class BPManager:
 
 	def getConfig(self):
 		setup = d(config.readConfig("current_setup"))
-		if not ("driver" in setup): setup.driver = None 
+		if not ("driver" in setup): setup.driver = None
 		if not ("controller" in setup): setup.controller = None
 		return setup
 
@@ -131,25 +131,21 @@ class BPManager:
 			self._animCfg = None
 
 	def startAnim(self, config, run):
-		self.stopAnim()
-		config = d(config)
-		run = d(run)
-		
-		if not config.id in self._animClasses:
-			return fail("Invalid Animation")
+		try:
+			self.stopAnim()
+			config = d(config)
+			run = d(run)
 
-		self._animCfg = config
-		config.config.led = self.led
-		self.anim = self._animClasses[config.id](**(config.config))
+			if not config.id in self._animClasses:
+				return fail("Invalid Animation")
 
-		run.threaded = True
-		self.anim.run(**(run))
+			self._animCfg = config
+			config.config.led = self.led
+			self.anim = self._animClasses[config.id](**(config.config))
 
-		return success()
+			run.threaded = True
+			self.anim.run(**(run))
 
-
-
-
-
-
-
+			return success()
+		except:
+			return fail(traceback.format_exc(), error=ErrorCode.BP_ERROR, data=None)

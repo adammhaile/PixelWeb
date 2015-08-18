@@ -117,9 +117,17 @@
 
     function showServerConfig(){
         $("#serverConfig").modal({
-            blurring: false,
-            closable: true
-        }).modal('show');
+            blurring:false,
+            closable:true,
+            onApprove: function() {
+                var config = $server_config.val();
+                saveServerConfig(config.config, function(result){
+                    console.log(result);
+                    alert("Save Complete! Please restart server.");
+                });
+            }
+        })
+        .modal('show');
     }
 
     function setLoading(id, state){
@@ -243,21 +251,13 @@
                 });
             });
 
-            $("#saveServerConfig").click(function() {
-                var config = $server_config.val();
-                saveServerConfig(config.config, function(result){
-                    console.log(result);
-                    alert("Save Complete! Please restart server.")
-                });
-            });
-
             $("#btnStatus").click(showStatusFeed);
             $("#btnSettings").click(showServerConfig);
         });
     </script>
 </head>
 
-<body class="ui blurring">
+<body class="ui">
     <div class="ui dimmer" id="loadDimmer">
         <div class="ui large text loader">Loading</div>
     </div>
@@ -287,7 +287,6 @@
     </div>
     <div class="ui modal" id="serverConfig">
         <div id="server_config"></div>
-        <div class="ui button green" id="saveServerConfig">Save</div>
         <div class="actions">
             <div class="ui approve green button">Save</div>
             <div class="ui deny red button">Cancel</div>

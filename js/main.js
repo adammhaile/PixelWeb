@@ -240,18 +240,15 @@ function genFeedItem(item){
     var html = "\
     <div class='event'>\
         <div class='content'>\
-          <div class='summary'>\
-             @summary\
-          </div>\
-          <div class='date'>\
-            @date\
-          </div>\
+            <div class='summary'>@summary</div>\
         </div>\
     </div>\
     ";
 
-    html = strReplace(html, "@date", item.timestamp);
-    html = strReplace(html, "@summary", item.msg);
+    // <div class='date'>@date</div>\
+
+    // html = strReplace(html, "@date", item.timestamp);
+    html = strReplace(html, "@summary", item.timestamp + ": " + item.msg);
     return html;
 }
 

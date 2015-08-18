@@ -27,3 +27,13 @@
 .nud_btns {
 	margin-left: 10px;
 }
+
+.scroll_feed {
+	max-height: 400px;
+	overflow-y: auto;
+	overflow-x: auto;
+}
+
+#menuBtns {
+	margin: 0.5rem;
+}

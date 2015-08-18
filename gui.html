@@ -109,14 +109,17 @@
 
     function showStatusFeed(){
         getStatus(function(result){
-            console.log(result);
             var html = buildFeed(result);
-            console.log(html);
             $("#statusFeed").html(html);
-            $("#statusFeedModal").modal({blurring:true}).modal('show');
-
+            $("#statusFeedModal").modal({blurring:true, closable:true}).modal('show');
         });
+    }
 
+    function showServerConfig(){
+        $("#serverConfig").modal({
+            blurring: false,
+            closable: true
+        }).modal('show');
     }
 
     function setLoading(id, state){
@@ -247,6 +250,9 @@
                     alert("Save Complete! Please restart server.")
                 });
             });
+
+            $("#btnStatus").click(showStatusFeed);
+            $("#btnSettings").click(showServerConfig);
         });
     </script>
 </head>
@@ -255,10 +261,16 @@
     <div class="ui dimmer" id="loadDimmer">
         <div class="ui large text loader">Loading</div>
     </div>
+
+    <div class="ui right floated icon buttons" id="menuBtns">
+      <button class="ui button" id="btnSettings"><i class="settings icon"></i></button>
+      <button class="ui green button" id="btnStatus"><i class="info icon"></i></button>
+      <button class="ui red button" id="btnErrors"><i class="warning sign icon"></i></button>
+    </div>
     <div class="ui top attached tabular menu">
         <a class="active item" data-tab="config_tab">Config</a>
         <a class="item" data-tab="anim_tab">Animation</a>
-        <a class="item" data-tab="server_tab">Server Config</a>
+        <!-- <a class="item" data-tab="server_tab">Server Config</a> -->
     </div>
     <div class="ui bottom attached active tab segment" data-tab="config_tab" id="tabConfig">
         <div id="driver"></div>
@@ -273,9 +285,13 @@
         <div class="ui button green" id="startAnim">Start</div>
         <div class="ui button red" id="stopAnim">Stop</div>
     </div>
-    <div class="ui bottom attached tab segment" data-tab="server_tab" id="tabServer">
+    <div class="ui modal" id="serverConfig">
         <div id="server_config"></div>
         <div class="ui button green" id="saveServerConfig">Save</div>
+        <div class="actions">
+            <div class="ui approve green button">Save</div>
+            <div class="ui deny red button">Cancel</div>
+        </div>
     </div>
 
     <div class="ui basic small modal" id="BPError">
@@ -285,19 +301,19 @@
             <p class="" id="bpErrorMsg"></p>
         </div>
         <div class="actions">
-            <div class="ui approve button">OK</div>
+            <div class="ui approve green button">OK</div>
         </div>
     </div>
 
-    <div class="ui Large modal" id="statusFeedModal">
+    <div class="ui large modal" id="statusFeedModal">
         <div class="header">PixelWeb Status</div>
-        <div class="content">
+        <div class="ui content scroll_feed" >
             <!-- <img class="image"><i class="huge red warning sign icon"></i></img> -->
             <div class="ui feed" id="statusFeed">
             </div>
         </div>
         <div class="actions">
-            <div class="ui button">OK</div>
+            <div class="ui approve green button">OK</div>
         </div>
     </div>
 </body>

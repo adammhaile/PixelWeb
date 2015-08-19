@@ -241,8 +241,10 @@ $.fn._nud = function(config) {
                     <input type="text" style="" id="@id_input" placeholder="@placeholder">\
                     @default\
                 </div>\
-                <button class="ui compact circular icon button" id="@id_minus"><i class="minus icon"></i></button>\
-                <button class="ui compact circular icon button" id="@id_plus"><i class="plus icon"></i></button>\
+                <div class="ui icon buttons">\
+                <button class="ui compact icon button" id="@id_minus"><i class="minus icon"></i></button>\
+                <button class="ui compact icon button" id="@id_plus"><i class="plus icon"></i></button>\
+                </div>\
             </div>\
             ';
         html = strReplace(html, "@action", "action");

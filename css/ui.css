@@ -1,5 +1,5 @@
 .ui_input {
-	margin-bottom: 0.4em;
+	margin-bottom: 0.5em;
 }
 
 .multi_input {
@@ -40,4 +40,16 @@
 
 #serverConfig {
 	padding: 0.5rem;
+}
+
+#serverConfigBtns {
+	padding: 0.5rem;
+}
+
+.paramCombo {
+	display:inline-block
+}
+
+.ui.icon.button>.icon, .ui.icon.buttons .button>.icon {
+	vertical-align: inherit;
 }

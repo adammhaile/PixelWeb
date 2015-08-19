@@ -73,6 +73,9 @@ $.fn.param_loader = function(config) {
     var id = $node.attr('id');
     var _onChanged = null;
 
+    $node._onSaveClick = null;
+    $node._onLoadClick = null;
+
     function showParams($n, params, run) {
         var cfg = $node.data().config;
         cfg.control_map = {};
@@ -144,6 +147,7 @@ $.fn.param_loader = function(config) {
 
     function optionChanged(val) {
         var cfg = $node.data().config;
+        $node.find(".presetBtn").removeClass("disabled");
         showParams($("#" + id + "_params"), cfg.data[val].params, cfg.run);
         $desc = $node.children("#" + id + "_desc");
         if(cfg.data[val].desc){
@@ -203,11 +207,19 @@ $.fn.param_loader = function(config) {
         config.run_map = {};
         $node.data("config", config);
 
+        $node._onSaveClick = config.onSaveClick;
+        $node._onLoadClick = config.onLoadClick;
+
         $node.empty();
-        $node.append('<div id="' + id + '_combo"></div>\
+        $node.append('<div class="paramCombo" id="' + id + '_combo"></div>\
+                      <div class="ui icon buttons" >\
+                          <button class="ui disabled icon button presetBtn" id="' + id + '_param_save"><i class="save icon"></i></button>\
+                          <button class="ui disabled icon button presetBtn" id="' + id + '_param_open"><i class="Folder Open Outline icon"></i></button>\
+                      </div>\
                       <div class="ui inverted segment" id="' + id + '_desc"></div>\
                       <div id="' + id + '_params" class="params_box"></div>\
                     ');
+
 
         $node.children("#" + id + "_desc").hide();
         var options = {};
@@ -223,6 +235,9 @@ $.fn.param_loader = function(config) {
             default: config.default,
             onChange: optionChanged
         });
+
+        $node.find("#" + id + "_param_save").click(function(){if($node._onSaveClick) $node._onSaveClick();})
+        $node.find("#" + id + "_param_open").click(function(){if($node._onSaveClick) $node._onSaveClick();})
 
         if(config.disable_option){
             $node.children("#" + id + "_combo").hide();

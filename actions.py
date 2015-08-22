@@ -89,6 +89,16 @@ def getStatus(req):
 def getErrors(req):
 	return success(data=status.dumpErrors())
 
+def savePreset(req):
+	cfg = config.readConfig("presets", key=req.type)
+	cfg[req.name] = req.data
+	config.writeConfig("presets", cfg, key=req.type)
+
+def getPresets(req):
+	cfg = config.readConfig("presets", key=req.type)
+	print cfg
+	return success(data=cfg)
+
 
 actions = {
 	'setColor' : [setColor, ['color']],
@@ -104,4 +114,6 @@ actions = {
 	'saveServerConfig': [saveServerConfig, ["config"]],
 	'getStatus': [getStatus, []],
 	'getErrors': [getErrors, []],
+	'savePreset': [savePreset, ['type', 'name', 'data']],
+	'getPresets': [getPresets, ['type']]
 }

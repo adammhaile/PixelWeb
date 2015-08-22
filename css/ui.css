@@ -51,5 +51,10 @@
 }
 
 .ui.icon.button>.icon, .ui.icon.buttons .button>.icon {
-	vertical-align: inherit;
+	vertical-align: middle;
+}
+
+#loadPresetList {
+	max-height: 400px;
+	overflow-y: auto;
 }

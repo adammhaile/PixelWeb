@@ -13,271 +13,16 @@
     <script src="js/core.js"></script>
     <script src="js/api.js"></script>
     <script src="js/api.calls.js"></script>
-    <script src="js/main.js"></script>
     <script src="js/bp.js"></script>
-    <script>
-
-    var _curConfig = null;
-
-    var _drivers = null;
-    var driverPickers = [];
-
-    var _controllers = null;
-    var $controller = null;
-
-    var _anims = null;
-    var _animRun = null;
-    var $anims = null;
-
-    var $server_config = null;
-
-    function clearDriverChoosers() {
-        $("#driver").empty();
-        driverPickers = [];
-    }
-
-    function addDriverChooser(params) {
-        var id = "driver_" + driverPickers.length;
-        $("#driver").append('<div id="' + id + '"></div>');
-        $("#driver").append('<div class="ui hidden divider short"></div>');
-        var $d = $("#driver").children("#" + id);
-        $d = $d.param_loader({
-            data: _drivers,
-            label: "Driver",
-            placeholder: "Select Driver...",
-            onSaveClick: saveDriverPreset
-            // default: "visualizer"
-        });
-        if (params) {
-            setTimeout(function() {
-                $d.val(params);
-            }, 5);
-        }
-
-        driverPickers.push($d);
-    }
-
-    function loadAnimOptions(data, run) {
-        $anims = $("#anims").param_loader({
-            data: data,
-            run: run,
-            label: "Animation",
-            placeholder: "Select Animation...",
-        });
-    }
-
-    function filterAnims(val) {
-        loadAnimOptions(_anims[val], _animRun);
-    }
-
-    function getCurrentConfig() {
-        var drivers = [];
-        $.each(driverPickers, function(i, d) {
-            drivers.push(d.val());
-        });
-        var cont = $controller.val();
-
-        return {
-            drivers: drivers,
-            controller: cont
-        };
-    }
-
-    function getAnimConfig() {
-        var config = $anims.val();
-        return config;
-    }
-
-    function displayCurConfig(){
-        if (_curConfig.driver) {
-            clearDriverChoosers();
-            $.each(_curConfig.driver, function(i, d) {
-                addDriverChooser(d);
-            });
-            // $.each(_curConfig.driver, function(i, d){
-            //     driverPickers[i].val(d);
-            // });
-        }
-        if (_curConfig.controller) {
-            $controller.val(_curConfig.controller);
-        }
-    }
-
-    function showBPError(msg){
-        $("#bpErrorMsg").html(msg);
-        $("#BPError").modal({blurring:true}).modal('show');
-    }
-
-    function showStatusFeed(){
-        getStatus(function(result){
-            var html = buildFeed(result);
-            $("#statusFeed").html(html);
-            $("#statusFeedModal").modal({blurring:true, closable:true}).modal('show');
-        });
-    }
-
-    function doSaveServerConfig() {
-        var config = $server_config.val();
-        saveServerConfig(config.config, function(result){
-            console.log(result);
-            alert("Save Complete! Please restart server.");
-            $("#serverConfig").sidebar('toggle');
-        });
-    }
-
-    function cancelServerConfig() {
-        $("#serverConfig").sidebar('toggle');
-    }
-
-    function showServerConfig(){
-        $("#serverConfig").sidebar('toggle');
-    }
-
-    function setLoading(id, state){
-        if(state || state === undefined){
-            $(id).addClass('loading');
-        }
-        else {
-            $(id).removeClass('loading');
-        }
-    }
-
-    function showPresetSaveModal(){
-        $("#savePresetModal").modal({blurring:true, closable:false}).modal('show');
-    }
-    function saveDriverPreset(){
-
-    }
-    function saveControllerPreset(){
-
-    }
-
-    $(document)
-        .ready(function() {
-
-            $("#loadDimmer").dimmer('show');
-            $('.menu .item')
-                .tab();
-
-            setLoading("body");
-            getDrivers(function(drivers) {
-                _drivers = drivers;
-                clearDriverChoosers();
-                addDriverChooser();
-                getAnims(function(anims) {
-                    _anims = anims.anims;
-                    _animRun = anims.run;
-                    loadAnimOptions(null);
-                    getControllers(function(controllers) {
-                        _controllers = controllers;
-                        $controller = $("#controller").param_loader({
-                            data: controllers,
-                            label: "Controller",
-                            placeholder: "Select Controller...",
-                            default: "matrix",
-                            onChange: filterAnims,
-                            onSaveClick: saveControllerPreset
-                        });
-
-                        getConfig(function(config) {
-                            _curConfig = config;
-                            setLoading("body", false);
-
-                            setTimeout(function(){$("#loadDimmer").dimmer('hide');}, 1000);
-                        });
-                    });
-                });
-            });
-
-            setTimeout(displayCurConfig, 1000);
-
-            getServerConfig(function(srv) {
-                console.log(srv);
-                $server_config = $("#server_config").param_loader({
-                    data: [srv.setup],
-                    label: "",
-                    placeholder: "",
-                    disable_option: true,
-                    default: "server_config"
-                });
-
-                setTimeout(function(){$server_config.val(srv.config);}, 5);
-            });
-
-            $('.ui.accordion').accordion({
-                exclusive: false
-            });
-
-            $("#startDriver").click(function() {
-
-                setLoading("#startDriver");
-                var config = getCurrentConfig();
-                console.log(config);
-                config.action = "startConfig"
-                callAPI(config, function(result) {
-                    console.log(result);
-                    if(result.status){
-
-                    }
-                    else {
-                        showBPError(result.msg);
-                    }
-                    setLoading("#startDriver", false);
-                });
-            });
-
-            $("#startAnim").click(function() {
-                setLoading("#startAnim");
-                var params = getAnimConfig();
-                callAPI({
-                    action: "startAnim",
-                    config: {
-                        id: params.id,
-                        config: params.config
-                    },
-                    run: params.run
-                }, function(result) {
-                    console.log(result);
-                    if(result.status){
-
-                    }
-                    else {
-                        showBPError(result.msg);
-                    }
-                    setLoading("#startAnim", false);
-                });
-            });
-
-            $("#stopAnim").click(function() {
-                setLoading("#stopAnim");
-                var params = getAnimConfig();
-                callAPI({
-                    action: "stopAnim"
-                }, function(result) {
-                    console.log(result);
-                    if(result.status){
-
-                    }
-                    else {
-                        showBPError(result.msg);
-                    }
-                    setLoading("#stopAnim", false);
-                });
-            });
-
-            $("#btnStatus").click(showStatusFeed);
-            $("#btnSettings").click(showServerConfig);
-            $("#saveServerConfig").click(doSaveServerConfig);
-            $("#cancelServerConfig").click(cancelServerConfig);
-        });
-    </script>
+    <script src="js/controls.js"></script>
+    <script src="js/main.js"></script>
 </head>
 
-<body class="ui blurring">
+<body class="ui">
 
-    <div class="ui dimmer" id="loadDimmer">
+    <!-- <div class="ui dimmer" id="loadDimmer">
         <div class="ui large text loader">Loading</div>
-    </div>
+    </div> -->
 
     <div class="ui top sidebar inverted vertical menu" id="serverConfig">
         <div id="server_config"></div>
@@ -349,10 +94,24 @@
             </div>
         </div>
         <div class="actions">
-            <div class="ui approve green button">Save</div>
+            <div class="ui approve green button" id="presetSaveBtn">Save</div>
             <div class="ui deny red button">Cancel</div>
         </div>
     </div>
+
+    <div class="ui small modal" id="loadPresetModal">
+        <i class="close icon"></i>
+        <div class="header">Load Preset</div>
+        <div class="ui content" >
+            <div class="ui middle aligned divided scrolling list" id="loadPresetList">
+            </div>
+        </div>
+        <!-- <div class="actions">
+            <div class="ui approve green button" id="presetSaveBtn">Save</div>
+            <div class="ui deny red button">Cancel</div>
+        </div> -->
+    </div>
+
 </body>
 
 </html>

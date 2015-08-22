@@ -1,276 +1,324 @@
-function insert_int($node, params) {
-    return $node._nud({
-        label: params.label,
-        placeholder: params.msg,
-        default: params.default,
-        min: params.min,
-        max: params.max,
-        step: params.step,
-        help: params.help
+var _curConfig = null;
+
+var _drivers = null;
+var driverPickers = [];
+
+var _controllers = null;
+var $controller = null;
+
+var _anims = null;
+var _animRun = null;
+var $anims = null;
+
+var $server_config = null;
+
+function clearDriverChoosers() {
+    $("#driver").empty();
+    driverPickers = [];
+}
+
+function addDriverChooser(params) {
+    var id = "driver_" + driverPickers.length;
+    $("#driver").append('<div id="' + id + '"></div>');
+    $("#driver").append('<div class="ui hidden divider short"></div>');
+    var $d = $("#driver").children("#" + id);
+    $d = $d.param_loader({
+        data: _drivers,
+        label: "Driver",
+        placeholder: "Select Driver...",
+        onSaveClick:  function($node){showPresetSaveModal("driver", $node);},
+        onLoadClick: function($node){showPresetLoadModal("driver", $node);}
+        // default: "visualizer"
+    });
+    if (params) {
+        setTimeout(function() {
+            $d.val(params);
+        }, 5);
+    }
+
+    driverPickers.push($d);
+}
+
+function loadAnimOptions(data, run) {
+    $anims = $("#anims").param_loader({
+        data: data,
+        run: run,
+        label: "Animation",
+        placeholder: "Select Animation...",
     });
 }
 
-function insert_str($node, params) {
-    return $node._input({
-        label: params.label,
-        placeholder: params.msg,
-        default: params.default,
-        help: params.help,
-        replace: params.replace
+function filterAnims(val) {
+    loadAnimOptions(_anims[val], _animRun);
+}
+
+function getCurrentConfig() {
+    var drivers = [];
+    $.each(driverPickers, function(i, d) {
+        drivers.push(d.val());
     });
+    var cont = $controller.val();
+
+    return {
+        drivers: drivers,
+        controller: cont
+    };
 }
 
-function insert_str_multi($node, params) {
-    return $node._input_multi({
-        label: params.label,
-        placeholder: params.msg,
-        default: params.default,
-        help: params.help,
-        replace: params.replace
-    });
+function getAnimConfig() {
+    var config = $anims.val();
+    return config;
 }
 
-function insert_combo($node, params) {
-    return $node._dropdown({
-        label: params.label,
-        placeholder: params.msg,
-        default: params.default,
-        data: params.options,
-        data_map: params.options_map,
-        help: params.help
-    });
-}
-
-function insert_bool($node, params) {
-    return $node._toggle({
-        label: params.label,
-        default: params.default,
-        help: params.help
-    });
-}
-
-function insert_color($node, params) {
-    return $node._color({
-        label: params.label,
-        default: params.default,
-        help: params.help
-    });
-}
-
-var insertFuncs = {
-    "int": insert_int,
-    "str": insert_str,
-    "combo": insert_combo,
-    "bool": insert_bool,
-    "color": insert_color,
-    "str_multi": insert_str_multi
-}
-
-var _divider = '<div class="ui hidden divider short"></div>';
-
-$.fn.param_loader = function(config) {
-    var $node = $(this);
-    var id = $node.attr('id');
-    var _onChanged = null;
-
-    $node._onSaveClick = null;
-    $node._onLoadClick = null;
-
-    function showParams($n, params, run) {
-        var cfg = $node.data().config;
-        cfg.control_map = {};
-        cfg.run_map = {};
-        $n.empty();
-
-        //$n.append(_divider);
-        $n.append('<div class="ui styled accordion" id="' + id + '_view"></div>');
-        var $accordion = $n.children("#" + id + "_view");
-
-        var _html = '\
-            <div class="title" id="@id_@group_title">\
-                <i class="dropdown icon"></i> @group\
-            </div>\
-            <div class="active content ui list" id="@id_@group_content"></div>\
-        ';
-
-        var paramMap = {"Basic":[]};
-
-        $.each(params, function(i, v) {
-            $c = $('<div id="' + v.id + '"></div>');
-            $c.addClass("ui_input");
-            $c.addClass("item");
-            if(!v.group)
-                v.group = "Basic";
-            if(!(v.group in paramMap)) paramMap[v.group] = []
-            paramMap[v.group].push($c);
-            cfg.control_map[v.id] = insertFuncs[v.type]($c, v);
+function displayCurConfig(){
+    if (_curConfig.driver) {
+        clearDriverChoosers();
+        $.each(_curConfig.driver, function(i, d) {
+            addDriverChooser(d);
         });
+        // $.each(_curConfig.driver, function(i, d){
+        //     driverPickers[i].val(d);
+        // });
+    }
+    if (_curConfig.controller) {
+        $controller.val(_curConfig.controller);
+    }
+}
 
-        $.each(paramMap, function(k,v){
-            var html = strReplace(_html, "@id", id)
-            html = strReplace(html, "@group", k)
-            $accordion.append(html);
-            $section = $accordion.children("#" + id + "_" + k + "_content");
-            $.each(v, function(i, p){
-                $section.append(p);
-            });
-        });
+function showBPError(msg){
+    $("#bpErrorMsg").html(msg);
+    $("#BPError").modal({blurring:true}).modal('show');
+}
 
-        if(run){
-            var run_html = '\
-                <div class="title" id="@id_run_title">\
-                    <i class="dropdown icon"></i> Run Parameters\
-                </div>\
-                <div class="active content ui list" id="@id_run_content"></div>\
-            ';
-            run_html = strReplace(run_html, "@id", id)
-            var run_controls = [];
-            $.each(run, function(i, v) {
-                $c = $('<div id="' + v.id + '"></div>');
-                $c.addClass("ui_input");
-                $c.addClass("item");
-                run_controls.push($c);
-                cfg.run_map[v.id] = insertFuncs[v.type]($c, v);
-            });
-            $accordion.append(run_html);
-            $run = $accordion.children("#" + id + "_run_content");
-            $.each(run_controls, function(i, $c) {
-                //$adv.append($(_divider));
-                $run.append($c);
-            });
+function showStatusFeed(){
+    getStatus(function(result){
+        var html = buildFeed(result);
+        $("#statusFeed").html(html);
+        $("#statusFeedModal").modal({blurring:true, closable:true}).modal('show');
+    });
+}
+
+function doSaveServerConfig() {
+    var config = $server_config.val();
+    saveServerConfig(config.config, function(result){
+        console.log(result);
+        alert("Save Complete! Please restart server.");
+        $("#serverConfig").sidebar('toggle');
+    });
+}
+
+function cancelServerConfig() {
+    $("#serverConfig").sidebar('toggle');
+}
+
+function showServerConfig(){
+    $("#serverConfig").sidebar('toggle');
+}
+
+function setLoading(id, state){
+    if(state || state === undefined){
+        $(id).addClass('loading');
+    }
+    else {
+        $(id).removeClass('loading');
+    }
+}
+
+function showPresetSaveModal(type, $node){
+    $("#presetSaveBtn").removeClass('loading');
+    $("#savePresetName").val('');
+    $("#savePresetDesc").val('');
+    $("#savePresetModal").modal({
+        blurring:true,
+        closable:false,
+        onApprove: function(){
+            $("#presetSaveBtn").addClass('loading');
+            var name = $("#savePresetName").val();
+            var desc = $("#savePresetDesc").val();
+            var data = $node.val();
+            savePreset(type, name, desc, data, function(){
+                $("#savePresetModal").modal('hide');
+            })
+        },
+        onDeny: function(){}
+    }).modal('show');
+}
+
+function savePreset(type, name, desc, data, callback){
+    data.help = desc;
+    callAPI({
+        action:"savePreset",
+        name: name,
+        data: data,
+        type: type
+    }, function(result){
+        console.log(result);
+        if(callback) callback();
+    });
+}
+
+function showPresetLoadModal(type, $node){
+    var _presets = {};
+    var doLoad = function(){
+        var n = $(this);
+        var name = n.attr('name');
+        if(name in _presets){
+            console.log($node);
+            $node.val(_presets[name]);
+            $("#loadPresetModal").modal('hide');
         }
+    }
+    $("#loadPresetList").empty();
+    callAPI({
+        action:"getPresets",
+        type: type
+    }, function(result){
+        if(result.status){
+            _presets = result.data;
+            var html = buildPresetList(result.data, type);
+            $("#loadPresetList").html(html);
+            $("#loadPresetList .presetLoadBtn").click(doLoad);
+            $("#loadPresetModal").modal({
+                blurring:true,
+                closable:true
+                // onApprove: function(){
+                //     $("#presetSaveBtn").addClass('loading');
+                //     var name = $("#savePresetName").val();
+                //     var desc = $("#savePresetDesc").val();
+                //     var data = $node.val();
+                //     savePreset(type, name, desc, data, function(){
+                //         $("#savePresetModal").modal('hide');
+                //     })
+                // },
+                // onDeny: function(){}
+            }).modal('show');
 
-        $n.children('#' + id + "_view").accordion({
+        }
+        else {
+            showBPError(result.msg);
+        }
+    });
+
+
+}
+
+
+$(document)
+    .ready(function() {
+
+        $("#loadDimmer").dimmer('show');
+        $('.menu .item')
+            .tab();
+
+        setLoading("body");
+        getDrivers(function(drivers) {
+            _drivers = drivers;
+            clearDriverChoosers();
+            addDriverChooser();
+            getAnims(function(anims) {
+                _anims = anims.anims;
+                _animRun = anims.run;
+                loadAnimOptions(null);
+                getControllers(function(controllers) {
+                    _controllers = controllers;
+                    $controller = $("#controller").param_loader({
+                        data: controllers,
+                        label: "Controller",
+                        placeholder: "Select Controller...",
+                        default: "matrix",
+                        onChange: filterAnims,
+                        onSaveClick: function($node){showPresetSaveModal("controller", $node);},
+                        onLoadClick: function($node){showPresetLoadModal("controller", $node);}
+                    });
+
+                    getConfig(function(config) {
+                        _curConfig = config;
+                        setLoading("body", false);
+
+                        setTimeout(function(){$("#loadDimmer").dimmer('hide');}, 1000);
+                    });
+                });
+            });
+        });
+
+        setTimeout(displayCurConfig, 1000);
+
+        getServerConfig(function(srv) {
+            console.log(srv);
+            $server_config = $("#server_config").param_loader({
+                data: [srv.setup],
+                label: "",
+                placeholder: "",
+                disable_option: true,
+                default: "server_config"
+            });
+
+            setTimeout(function(){$server_config.val(srv.config);}, 5);
+        });
+
+        $('.ui.accordion').accordion({
             exclusive: false
         });
-    }
 
-    function optionChanged(val) {
-        var cfg = $node.data().config;
-        $node.find(".presetBtn").removeClass("disabled");
-        showParams($("#" + id + "_params"), cfg.data[val].params, cfg.run);
-        $desc = $node.children("#" + id + "_desc");
-        if(cfg.data[val].desc){
-            $desc.html('<p>'+ cfg.data[val].desc + '</p>');
-            $desc.show();
-        }
-        else{
-            $desc.empty();
-            $desc.hide();
-        }
-        if(_onChanged) _onChanged(val);
-    }
+        $("#startDriver").click(function() {
 
-    //TODO - setter should take new id/config format
-    $node.val = function(value){
-        if(value == null){
-            var cfg = $node.data().config;
-            var config = {};
-            $.each(cfg.control_map, function(k,v){
-                config[k] = v.val();
-            });
-            var run = {};
-            $.each(cfg.run_map, function(k,v){
-                run[k] = v.val();
-            });
-            var idval = $node.children("#" + id + "_combo")._dropdown().val();
-            if(cfg.disable_option) idval = cfg.data[0].id;
-            var result = {id:idval, config: config};
-            if(Object.keys(run).length > 0) result.run = run
-            return result;
-        }
-        else{
-            var cfg = $node.data().config;
-            $node.children("#" + id + "_combo")._dropdown().val(value.id)
-            function setParams(){
-                if(value.config){
-                    $.each(value.config, function(k,v){
-                        if(k in cfg.control_map){
-                            cfg.control_map[k].val(v);
-                        }
-                    });
+            setLoading("#startDriver");
+            var config = getCurrentConfig();
+            console.log(config);
+            config.action = "startConfig"
+            callAPI(config, function(result) {
+                console.log(result);
+                if(result.status){
+
                 }
-                if(value.run){
-                    $.each(value.run, function(k,v){
-                        if(k in cfg.run_map){
-                            cfg.run_map[k].val(v);
-                        }
-                    });
+                else {
+                    showBPError(result.msg);
                 }
-            }
-            setTimeout(setParams, 0);
-        }
-    };
-
-    if (config) {
-        config.control_map = {};
-        config.run_map = {};
-        $node.data("config", config);
-
-        $node._onSaveClick = config.onSaveClick;
-        $node._onLoadClick = config.onLoadClick;
-
-        $node.empty();
-        $node.append('<div class="paramCombo" id="' + id + '_combo"></div>\
-                      <div class="ui icon buttons" >\
-                          <button class="ui disabled icon button presetBtn" id="' + id + '_param_save"><i class="save icon"></i></button>\
-                          <button class="ui disabled icon button presetBtn" id="' + id + '_param_open"><i class="Folder Open Outline icon"></i></button>\
-                      </div>\
-                      <div class="ui inverted segment" id="' + id + '_desc"></div>\
-                      <div id="' + id + '_params" class="params_box"></div>\
-                    ');
-
-
-        $node.children("#" + id + "_desc").hide();
-        var options = {};
-        if(!config.data) config.data = {};
-        $.each(config.data, function(k, v) {
-            options[k] = {name: v.display, desc: v.desc};
+                setLoading("#startDriver", false);
+            });
         });
 
-        $node.children("#" + id + "_combo")._dropdown({
-            data: options,
-            label: config.label,
-            placeholder: config.placeholder,
-            default: config.default,
-            onChange: optionChanged
+        $("#startAnim").click(function() {
+            setLoading("#startAnim");
+            var params = getAnimConfig();
+            callAPI({
+                action: "startAnim",
+                config: {
+                    id: params.id,
+                    config: params.config
+                },
+                run: params.run
+            }, function(result) {
+                console.log(result);
+                if(result.status){
+
+                }
+                else {
+                    showBPError(result.msg);
+                }
+                setLoading("#startAnim", false);
+            });
         });
 
-        $node.find("#" + id + "_param_save").click(function(){if($node._onSaveClick) $node._onSaveClick();})
-        $node.find("#" + id + "_param_open").click(function(){if($node._onSaveClick) $node._onSaveClick();})
+        $("#stopAnim").click(function() {
+            setLoading("#stopAnim");
+            var params = getAnimConfig();
+            callAPI({
+                action: "stopAnim"
+            }, function(result) {
+                console.log(result);
+                if(result.status){
 
-        if(config.disable_option){
-            $node.children("#" + id + "_combo").hide();
-            //setTimeout(function(){$node.children("#" + id + "_combo").hide();}, 5);
-        }
+                }
+                else {
+                    showBPError(result.msg);
+                }
+                setLoading("#stopAnim", false);
+            });
+        });
 
-        _onChanged = config.onChange;
-    }
-
-    return $node;
-}
-
-
-function genFeedItem(item){
-    var html = "\
-    <div class='event'>\
-        <div class='content'>\
-            <div class='summary'>@summary</div>\
-        </div>\
-    </div>\
-    ";
-
-    // <div class='date'>@date</div>\
-
-    // html = strReplace(html, "@date", item.timestamp);
-    html = strReplace(html, "@summary", item.timestamp + ": " + item.msg);
-    return html;
-}
-
-function buildFeed(items){
-    var html = '';
-    $.each(items, function(i, v){
-        html += genFeedItem(v);
-    })
-    return html;
-}
+        $("#btnStatus").click(showStatusFeed);
+        $("#btnSettings").click(showServerConfig);
+        $("#saveServerConfig").click(doSaveServerConfig);
+        $("#cancelServerConfig").click(cancelServerConfig);
+    });

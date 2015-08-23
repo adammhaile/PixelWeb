@@ -96,7 +96,6 @@ def savePreset(req):
 
 def getPresets(req):
 	cfg = config.readConfig("presets", key=req.type)
-	print cfg
 	return success(data=cfg)
 
 

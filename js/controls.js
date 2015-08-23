@@ -147,7 +147,7 @@ $.fn.param_loader = function(config) {
 
     function optionChanged(val) {
         var cfg = $node.data().config;
-        $node.find(".presetBtn").removeClass("disabled");
+        $node.find(".presetSaveBtn").removeClass("disabled");
         showParams($("#" + id + "_params"), cfg.data[val].params, cfg.run);
         $desc = $node.children("#" + id + "_desc");
         if(cfg.data[val].desc){
@@ -213,8 +213,8 @@ $.fn.param_loader = function(config) {
         $node.empty();
         $node.append('<div class="paramCombo" id="' + id + '_combo"></div>\
                       <div class="ui icon buttons" >\
-                          <button class="ui disabled icon button presetBtn" id="' + id + '_param_save"><i class="save icon"></i></button>\
-                          <button class="ui disabled icon button presetBtn" id="' + id + '_param_open"><i class="Folder Open Outline icon"></i></button>\
+                          <button class="ui disabled icon button presetSaveBtn" id="' + id + '_param_save"><i class="save icon"></i></button>\
+                          <button class="ui icon button presetLoadBtn" id="' + id + '_param_open"><i class="Folder Open Outline icon"></i></button>\
                       </div>\
                       <div class="ui inverted segment" id="' + id + '_desc"></div>\
                       <div id="' + id + '_params" class="params_box"></div>\
@@ -294,8 +294,23 @@ function genPresetItem(item, name, type){
     return html;
 }
 function buildPresetList(items, type){
+    if(type == "anim"){
+        var temp = {};
+        $.each(items, function(k, v){
+            if(v.type == _animType)
+            temp[k] = v;
+        });
+        items = temp;
+    }
     var html = '';
     $.each(items, function(i, v){
+        var typeName = null;
+        if(type in _configs){
+            if(v.id in _configs[type]){
+                typeName = _configs[type][v.id].display;
+            }
+        }
+        if(typeName) i = typeName + ": " + i;
         html += genPresetItem(v, i, type);
     })
     return html;

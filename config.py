@@ -49,7 +49,10 @@ def readConfig(file, key = None, path=__home):
         with open(path + "/" + file + ".json", "r") as fp:
             data = json.load(fp, encoding='utf-8')
             if key:
-                data = data[key]
+                if key in data:
+                    data = data[key]
+                else:
+                    data = {}
     except Exception, e:
         pass
 

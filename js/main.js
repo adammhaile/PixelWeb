@@ -1,12 +1,12 @@
 var _curConfig = null;
 
-var _drivers = null;
+var _configs = {};
+
 var driverPickers = [];
 
-var _controllers = null;
 var $controller = null;
 
-var _anims = null;
+var _animType = null;
 var _animRun = null;
 var $anims = null;
 
@@ -23,7 +23,7 @@ function addDriverChooser(params) {
     $("#driver").append('<div class="ui hidden divider short"></div>');
     var $d = $("#driver").children("#" + id);
     $d = $d.param_loader({
-        data: _drivers,
+        data: _configs.driver,
         label: "Driver",
         placeholder: "Select Driver...",
         onSaveClick:  function($node){showPresetSaveModal("driver", $node);},
@@ -45,11 +45,14 @@ function loadAnimOptions(data, run) {
         run: run,
         label: "Animation",
         placeholder: "Select Animation...",
+        onSaveClick:  function($node){showPresetSaveModal("anim", $node);},
+        onLoadClick: function($node){showPresetLoadModal("anim", $node);}
     });
 }
 
 function filterAnims(val) {
-    loadAnimOptions(_anims[val], _animRun);
+    _animType = val;
+    loadAnimOptions(_configs.anim[val], _animRun);
 }
 
 function getCurrentConfig() {
@@ -136,6 +139,9 @@ function showPresetSaveModal(type, $node){
             var name = $("#savePresetName").val();
             var desc = $("#savePresetDesc").val();
             var data = $node.val();
+            if(type == "anim"){
+                data.type = _animType;
+            }
             savePreset(type, name, desc, data, function(){
                 $("#savePresetModal").modal('hide');
             })
@@ -212,15 +218,15 @@ $(document)
 
         setLoading("body");
         getDrivers(function(drivers) {
-            _drivers = drivers;
+            _configs.driver = drivers;
             clearDriverChoosers();
             addDriverChooser();
             getAnims(function(anims) {
-                _anims = anims.anims;
+                _configs.anim = anims.anims;
                 _animRun = anims.run;
                 loadAnimOptions(null);
                 getControllers(function(controllers) {
-                    _controllers = controllers;
+                    _configs.controller = controllers;
                     $controller = $("#controller").param_loader({
                         data: controllers,
                         label: "Controller",

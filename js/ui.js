@@ -49,7 +49,9 @@ $.fn._dropdown = function(config) {
     var id = $node.attr('id');
 
     $node.load = function(data) {
-        // $node.dropdown("restore defaults");
+        var cfg = $node.data().config;
+        $node.children(".dropdown").dropdown("restore defaults");
+        $node.children(".dropdown").children(".default").html(cfg.placeholder);
         $menu = $node.find(".menu");
         $menu.empty();
         $.each(data, function(k, v) {
@@ -104,25 +106,26 @@ $.fn._dropdown = function(config) {
     $node.setDefault = function() {
         var cfg = $node.data().config;
         if(cfg.default != null) $node.val(cfg.default);
-        else $node.dropdown("restore defaults");
+        else $node.children(".dropdown").dropdown("restore defaults");
     };
 
     function onChange(){
         var cfg = $node.data().config;
-        if(cfg.onChange)
+        var val = $node.val();
+        if(val && cfg.onChange)
             cfg.onChange($node.val(), $node.attr('id'));
     }
 
     if (config) {
         if(!('default' in config)) config.default = "";
-        if(!('data' in config)) config.data = {};
+        if(!('data' in config) || (config.data == null)) config.data = {};
         if(!config.placeholder) config.placeholder = "Choose...";
 
         $node.data("config", config);
 
         var html = '\
             <div class="ui label pointing right large">@label</div>\
-            <div class="ui search selection dropdown">\
+            <div class="ui selection dropdown">\
                 <i class="dropdown icon"></i>\
                 <div class="default text">@placeholder</div>\
                 <div class="menu"></div>\
@@ -132,10 +135,11 @@ $.fn._dropdown = function(config) {
         html = strReplace(html, "@label", config.label)
 
         $node.html(html);
+        if(config.label == null) $node.children(".label").hide();
 
         $node.children(".dropdown").dropdown({
             transition: 'drop',
-            fullTextSearch: true,
+            // fullTextSearch: true,
             onChange: onChange
         });
 

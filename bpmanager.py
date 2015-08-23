@@ -53,7 +53,11 @@ class BPManager:
 		config = d(config)
 		self._animClasses[config.id] = config['class']
 		if "desc" not in config: config.desc = ""
-		c = {"display":config.display, "desc":config.desc, "params":config.params}
+
+		if "presets" not in config:
+			config.presets = {}
+
+		c = {"display":config.display, "desc":config.desc, "params":config.params, "presets": config.presets}
 		cont = config.controller
 		if not cont in self.anims:
 			self.anims[cont] = {}

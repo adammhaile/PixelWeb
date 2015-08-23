@@ -148,6 +148,9 @@ $.fn.param_loader = function(config) {
     function optionChanged(val) {
         var cfg = $node.data().config;
         $node.find(".presetSaveBtn").removeClass("disabled");
+        console.log($node);
+        console.log(cfg.data);
+        console.log(val);
         showParams($("#" + id + "_params"), cfg.data[val].params, cfg.run);
         $desc = $node.children("#" + id + "_desc");
         if(cfg.data[val].desc){
@@ -158,7 +161,18 @@ $.fn.param_loader = function(config) {
             $desc.empty();
             $desc.hide();
         }
+        var p = {};
+        if(val in config.presets){
+            p = config.presets[val];
+        }
+
+        cfg.presetCombo.load(p);
+
         if(_onChanged) _onChanged(val);
+    }
+
+    function presetChanged(val){
+
     }
 
     //TODO - setter should take new id/config format
@@ -212,20 +226,26 @@ $.fn.param_loader = function(config) {
 
         $node.empty();
         $node.append('<div class="paramCombo" id="' + id + '_combo"></div>\
-                      <div class="ui icon buttons" >\
-                          <button class="ui disabled icon button presetSaveBtn" id="' + id + '_param_save"><i class="save icon"></i></button>\
-                          <button class="ui icon button presetLoadBtn" id="' + id + '_param_open"><i class="Folder Open Outline icon"></i></button>\
-                      </div>\
+                      <button class="ui disabled icon button presetSaveBtn" id="' + id + '_param_save"><i class="save icon"></i></button>\
+                      <div class="paramCombo" id="' + id + '_preset_combo"></div>\
                       <div class="ui inverted segment" id="' + id + '_desc"></div>\
                       <div id="' + id + '_params" class="params_box"></div>\
                     ');
 
+        //<button class="ui icon button presetLoadBtn" id="' + id + '_param_open"><i class="Folder Open Outline icon"></i></button>\
 
         $node.children("#" + id + "_desc").hide();
         var options = {};
+        config.presets = {};
         if(!config.data) config.data = {};
         $.each(config.data, function(k, v) {
             options[k] = {name: v.display, desc: v.desc};
+            if("presets" in v){
+                config.presets[k] = [];
+                $.each(v.presets, function(i, v){
+                    config.presets[k].push({name: v.display, desc: v.desc});
+                })
+            }
         });
 
         $node.children("#" + id + "_combo")._dropdown({
@@ -234,6 +254,14 @@ $.fn.param_loader = function(config) {
             placeholder: config.placeholder,
             default: config.default,
             onChange: optionChanged
+        });
+
+        config.presetCombo = $node.children("#" + id + "_preset_combo")._dropdown({
+            data: null,
+            label: null,
+            placeholder: "Select Preset",
+            default: config.default,
+            // onChange: presetChanged
         });
 
         $node.find("#" + id + "_param_save").click(function(){if($node._onSaveClick) $node._onSaveClick($node);})

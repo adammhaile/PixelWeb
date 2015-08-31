@@ -72,9 +72,9 @@ $.fn.param_loader = function(config) {
     var $node = $(this);
     var id = $node.attr('id');
     var _onChanged = null;
+    var _onPresetChanged = null;
 
     $node._onSaveClick = null;
-    $node._onLoadClick = null;
 
     function showParams($n, params, run) {
         var cfg = $node.data().config;
@@ -148,31 +148,39 @@ $.fn.param_loader = function(config) {
     function optionChanged(val) {
         var cfg = $node.data().config;
         $node.find(".presetSaveBtn").removeClass("disabled");
-        showParams($("#" + id + "_params"), cfg.data[val].params, cfg.run);
-        $desc = $node.children("#" + id + "_desc");
-        if(cfg.data[val].desc){
-            $desc.html('<p>'+ cfg.data[val].desc + '</p>');
-            $desc.show();
-        }
-        else{
-            $desc.empty();
-            $desc.hide();
-        }
-        var p = {};
-        if(val in config.presets){
-            p = config.presets[val];
-        }
+        if(cfg.data[val]){
+            showParams($("#" + id + "_params"), cfg.data[val].params, cfg.run);
 
-        cfg.presetCombo.load(p);
+            $desc = $node.children("#" + id + "_desc");
+            if(cfg.data[val].desc){
+                $desc.html('<p>'+ cfg.data[val].desc + '</p>');
+                $desc.show();
+            }
+            else{
+                $desc.empty();
+                $desc.hide();
+            }
+            var p = {};
+            if(val in config.presets){
+                p = config.presets[val];
+            }
 
-        if(_onChanged) _onChanged(val);
+            cfg.presetCombo.load(p);
+
+            if(_onChanged) _onChanged(val);
+        }
     }
 
     function presetChanged(val){
+        var cfg = $node.data().config;
+        var cur = $node.val();
+        if(cur.id in cfg.presets && cfg.presets[cur.id][val]){
+            $node.val(cfg.presets[cur.id][val].data);
+        }
 
+        // if(_onPresetChanged) _onPresetChanged(val, $node);
     }
 
-    //TODO - setter should take new id/config format
     $node.val = function(value){
         if(value == null){
             var cfg = $node.data().config;
@@ -219,7 +227,6 @@ $.fn.param_loader = function(config) {
         $node.data("config", config);
 
         $node._onSaveClick = config.onSaveClick;
-        $node._onLoadClick = config.onLoadClick;
 
         $node.empty();
         $node.append('<div class="paramCombo" id="' + id + '_combo"></div>\
@@ -240,7 +247,7 @@ $.fn.param_loader = function(config) {
             if("presets" in v){
                 config.presets[k] = [];
                 $.each(v.presets, function(i, v){
-                    config.presets[k].push({name: v.display, desc: v.desc});
+                    config.presets[k].push({name: v.display, desc: v.desc, data: v});
                 })
             }
         });
@@ -258,11 +265,10 @@ $.fn.param_loader = function(config) {
             label: null,
             placeholder: "Select Preset",
             default: config.default,
-            // onChange: presetChanged
+            onChange: presetChanged
         });
 
         $node.find("#" + id + "_param_save").click(function(){if($node._onSaveClick) $node._onSaveClick($node);})
-        $node.find("#" + id + "_param_open").click(function(){if($node._onLoadClick) $node._onLoadClick($node);})
 
         if(config.disable_option){
             $node.children("#" + id + "_combo").hide();
@@ -270,6 +276,7 @@ $.fn.param_loader = function(config) {
         }
 
         _onChanged = config.onChange;
+        _onPresetChanged = config.onPresetChanged;
     }
 
     return $node;

@@ -68,6 +68,7 @@ $.fn._dropdown = function(config) {
                 $item.addToolTip(desc);
             }
         });
+        _doSetup();
     };
 
     $node.add = function(value, text){
@@ -109,8 +110,16 @@ $.fn._dropdown = function(config) {
     function onChange(){
         var cfg = $node.data().config;
         var val = $node.val();
-        if(val && cfg.onChange)
+        if(!isNU(val) && cfg.onChange)
             cfg.onChange($node.val(), $node.attr('id'));
+    }
+
+    function _doSetup(){
+        $node.children(".dropdown").dropdown({
+            transition: 'drop',
+            // fullTextSearch: true,
+            onChange: onChange
+        });
     }
 
     if (config) {
@@ -134,14 +143,9 @@ $.fn._dropdown = function(config) {
         $node.html(html);
         if(config.label == null) $node.children(".label").hide();
 
-        $node.children(".dropdown").dropdown({
-            transition: 'drop',
-            // fullTextSearch: true,
-            onChange: onChange
-        });
 
         $node.load(config.data);
-
+        _doSetup();
         $node.addToolTip(config.help);
 
         //cannot be set immediately, do after 5ms
@@ -444,7 +448,6 @@ $.fn._input_multi = function(config) {
                 cfg.inputs[index].remove();
                 cfg.inputs.splice( index, 1 );
             }
-            console.log(cfg.inputs);
         });
 
         $input.find("#" + id + "_input")[0].value = value;
@@ -454,7 +457,6 @@ $.fn._input_multi = function(config) {
     };
 
     if (config) {
-        console.log(config);
         if(!config.default) config.default = [""]
         if (!config.placeholder) config.placeholder = "";
         config.inputs = [];
@@ -480,7 +482,6 @@ $.fn._input_multi = function(config) {
         $node.addToolTip(config.help);
 
         if (config.default) {
-            console.log(config.default);
             $node.val(config.default);
         }
     }

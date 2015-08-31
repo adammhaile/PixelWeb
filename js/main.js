@@ -26,8 +26,7 @@ function addDriverChooser(params) {
         data: _configs.driver,
         label: "Driver",
         placeholder: "Select Driver...",
-        onSaveClick:  function($node){showPresetSaveModal("driver", $node);},
-        onLoadClick: function($node){showPresetLoadModal("driver", $node);}
+        onSaveClick:  function($node){showPresetSaveModal("driver", $node);}
         // default: "visualizer"
     });
     if (params) {
@@ -45,8 +44,7 @@ function loadAnimOptions(data, run) {
         run: run,
         label: "Animation",
         placeholder: "Select Animation...",
-        onSaveClick:  function($node){showPresetSaveModal("anim", $node);},
-        onLoadClick: function($node){showPresetLoadModal("anim", $node);}
+        onSaveClick:  function($node){showPresetSaveModal("anim", $node);}
     });
 }
 
@@ -141,8 +139,8 @@ function showPresetSaveModal(type, $node){
             var data = $node.val();
             if(type == "anim"){
                 data.type = _animType;
-                data.display = name;
             }
+            data.display = name;
             savePreset(type, name, desc, data, function(){
                 $("#savePresetModal").modal('hide');
             })
@@ -161,39 +159,6 @@ function savePreset(type, name, desc, data, callback){
     }, function(result){
         console.log(result);
         if(callback) callback();
-    });
-}
-
-function showPresetLoadModal(type, $node){
-    var _presets = {};
-    var doLoad = function(){
-        var n = $(this);
-        var name = n.attr('name');
-        if(name in _presets){
-            console.log($node);
-            $node.val(_presets[name]);
-            $("#loadPresetModal").modal('hide');
-        }
-    }
-    $("#loadPresetList").empty();
-    callAPI({
-        action:"getPresets",
-        type: type
-    }, function(result){
-        if(result.status){
-            _presets = result.data;
-            var html = buildPresetList(result.data, type);
-            $("#loadPresetList").html(html);
-            $("#loadPresetList .presetLoadBtn").click(doLoad);
-            $("#loadPresetModal").modal({
-                blurring:true,
-                closable:true
-            }).modal('show');
-
-        }
-        else {
-            showBPError(result.msg);
-        }
     });
 }
 

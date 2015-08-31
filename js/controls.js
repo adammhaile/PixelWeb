@@ -148,9 +148,6 @@ $.fn.param_loader = function(config) {
     function optionChanged(val) {
         var cfg = $node.data().config;
         $node.find(".presetSaveBtn").removeClass("disabled");
-        console.log($node);
-        console.log(cfg.data);
-        console.log(val);
         showParams($("#" + id + "_params"), cfg.data[val].params, cfg.run);
         $desc = $node.children("#" + id + "_desc");
         if(cfg.data[val].desc){

@@ -21,11 +21,8 @@ $.fn._numeric = function(){
     $node.data("selected", false);
     var _selected = false;
     function replace(event) {
-        console.log($node.data("selected"));
         if(!$node.data("selected")){
-            console.log("replace");
             var val = $node.val();
-            console.log(val);
             if(!val.match("^-?[0-9]*$")){
                 $node.val($node.data("last"))
             }

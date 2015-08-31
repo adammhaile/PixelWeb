@@ -95,6 +95,8 @@ def savePreset(req):
 	config.writeConfig("presets", cfg, key=req.type)
 
 def getPresets(req):
+	if "type" not in req:
+		req.type = None
 	cfg = config.readConfig("presets", key=req.type)
 	return success(data=cfg)
 
@@ -114,5 +116,5 @@ actions = {
 	'getStatus': [getStatus, []],
 	'getErrors': [getErrors, []],
 	'savePreset': [savePreset, ['type', 'name', 'data']],
-	'getPresets': [getPresets, ['type']]
+	'getPresets': [getPresets, []]
 }

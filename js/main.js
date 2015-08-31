@@ -141,6 +141,7 @@ function showPresetSaveModal(type, $node){
             var data = $node.val();
             if(type == "anim"){
                 data.type = _animType;
+                data.display = name;
             }
             savePreset(type, name, desc, data, function(){
                 $("#savePresetModal").modal('hide');
@@ -151,7 +152,7 @@ function showPresetSaveModal(type, $node){
 }
 
 function savePreset(type, name, desc, data, callback){
-    data.help = desc;
+    data.desc = desc;
     callAPI({
         action:"savePreset",
         name: name,
@@ -187,16 +188,6 @@ function showPresetLoadModal(type, $node){
             $("#loadPresetModal").modal({
                 blurring:true,
                 closable:true
-                // onApprove: function(){
-                //     $("#presetSaveBtn").addClass('loading');
-                //     var name = $("#savePresetName").val();
-                //     var desc = $("#savePresetDesc").val();
-                //     var data = $node.val();
-                //     savePreset(type, name, desc, data, function(){
-                //         $("#savePresetModal").modal('hide');
-                //     })
-                // },
-                // onDeny: function(){}
             }).modal('show');
 
         }
@@ -204,8 +195,34 @@ function showPresetLoadModal(type, $node){
             showBPError(result.msg);
         }
     });
+}
 
-
+function loadPresets(){
+    callAPI({
+        action:"getPresets"
+    }, function(result){
+        if(result.status){
+            $.each(result.data, function(t, v){
+                if(t in _configs){
+                    var cfg = _configs[t];
+                    $.each(v, function(p, v){
+                        var c = cfg;
+                        if(t == "anim"){
+                            c = cfg[v.type];
+                        }
+                        if(v.id in c){
+                            if(!(("presets") in c[v.id]))
+                                c[v.id].presets = [];
+                            c[v.id].presets.push(v);
+                        }
+                    });
+                }
+            })
+        }
+        else {
+            showBPError(result.msg);
+        }
+    });
 }
 
 
@@ -236,21 +253,19 @@ $(document)
                         onSaveClick: function($node){showPresetSaveModal("controller", $node);},
                         onLoadClick: function($node){showPresetLoadModal("controller", $node);}
                     });
-
+                    loadPresets();
                     getConfig(function(config) {
                         _curConfig = config;
                         setLoading("body", false);
 
                         setTimeout(function(){$("#loadDimmer").dimmer('hide');}, 1000);
+                        displayCurConfig();
                     });
                 });
             });
         });
 
-        setTimeout(displayCurConfig, 1000);
-
         getServerConfig(function(srv) {
-            console.log(srv);
             $server_config = $("#server_config").param_loader({
                 data: [srv.setup],
                 label: "",
@@ -270,7 +285,6 @@ $(document)
 
             setLoading("#startDriver");
             var config = getCurrentConfig();
-            console.log(config);
             config.action = "startConfig"
             callAPI(config, function(result) {
                 console.log(result);

@@ -55,7 +55,7 @@ class BPManager:
 		if "desc" not in config: config.desc = ""
 
 		if "presets" not in config:
-			config.presets = {}
+			config.presets = []
 
 		c = {"display":config.display, "desc":config.desc, "params":config.params, "presets": config.presets}
 		cont = config.controller

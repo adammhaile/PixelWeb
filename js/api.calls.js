@@ -3,6 +3,9 @@ function _get(action, callback) {
         if (result.status) {
             if (callback) callback(result.data);
         }
+        else {
+            showBPError(result.msg);
+        }
     });
 }
 

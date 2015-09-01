@@ -175,14 +175,19 @@ function loadPresets(){
                         if(t == "anim"){
                             c = cfg[v.type];
                         }
-                        if(v.id in c){
+                        if(c != undefined && v.id in c){
                             if(!(("presets") in c[v.id]))
                                 c[v.id].presets = [];
                             c[v.id].presets.push(v);
                         }
                     });
                 }
-            })
+            });
+
+            $controller.reloadPresets(_configs.controller);
+            $.each(driverPickers, function(i, $d){
+                $d.reloadPresets(_configs.driver);
+            });
         }
         else {
             showBPError(result.msg);

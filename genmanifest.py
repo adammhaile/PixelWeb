@@ -91,7 +91,7 @@ if __name__ == "__main__":
                     "params": params
                 }
                 results.append(manifest)
-            if len(results) > 0:    
+            if len(results) > 0:
                 manifest = json.dumps(results, indent=4, sort_keys=True)
                 for c in clist:
                     manifest = manifest.replace('"##' + c.name + '"', c.name)
@@ -106,5 +106,3 @@ if __name__ == "__main__":
                 print "No valid animations to parse..."
 
         print "\nComplete! Please fill in the rest of the manifest manually."
-
-

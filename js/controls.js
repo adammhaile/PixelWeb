@@ -221,6 +221,20 @@ $.fn.param_loader = function(config) {
         }
     };
 
+    $node.reloadPresets = function(data){
+        var cfg = $node.data().config;
+        cfg.data = data;
+        $.each(cfg.data, function(k, v) {
+            options[k] = {name: v.display, desc: v.desc};
+            if("presets" in v){
+                config.presets[k] = [];
+                $.each(v.presets, function(i, v){
+                    config.presets[k].push({name: v.display, desc: v.desc, data: v});
+                })
+            }
+        });
+    }
+
     if (config) {
         config.control_map = {};
         config.run_map = {};
@@ -242,15 +256,8 @@ $.fn.param_loader = function(config) {
         var options = {};
         config.presets = {};
         if(!config.data) config.data = {};
-        $.each(config.data, function(k, v) {
-            options[k] = {name: v.display, desc: v.desc};
-            if("presets" in v){
-                config.presets[k] = [];
-                $.each(v.presets, function(i, v){
-                    config.presets[k].push({name: v.display, desc: v.desc, data: v});
-                })
-            }
-        });
+
+        $node.reloadPresets(config.data);
 
         $node.children("#" + id + "_combo")._dropdown({
             data: options,
@@ -272,6 +279,8 @@ $.fn.param_loader = function(config) {
 
         if(config.disable_option){
             $node.children("#" + id + "_combo").hide();
+            $node.children("#" + id + "_param_save").hide();
+            $node.children("#" + id + "_preset_combo").hide();
             //setTimeout(function(){$node.children("#" + id + "_combo").hide();}, 5);
         }
 

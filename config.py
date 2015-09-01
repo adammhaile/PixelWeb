@@ -12,7 +12,7 @@ BASE_SERVER_CONFIG = d({
                 "label": "Server Host IP",
                 "type": "str",
                 "default": "0.0.0.0",
-                "help":"Network interface to listen on."
+                "help":"Network interface to listen on. 0.0.0.0 listens on all. Use 127.0.0.1 for local only."
             },{
                 "id": "port",
                 "label": "Server Port",
@@ -26,11 +26,11 @@ BASE_SERVER_CONFIG = d({
                 "default": False,
                 "help":"Load default configuration on application start."
             },{
-                "id": "anim_dirs",
-                "label": "Animation Directories",
+                "id": "mod_dirs",
+                "label": "Module Directories",
                 "type": "str_multi",
                 "default": [],
-                "help":"Directories from which to load animations.",
+                "help":"Directories from which to load modules (animations, drivers, controllers, pre-configs).",
                 "replace": {"\\":"/"}
             },]
         });

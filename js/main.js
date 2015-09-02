@@ -49,8 +49,15 @@ function loadAnimOptions(data, run) {
 }
 
 function filterAnims(val) {
-    _animType = val;
-    loadAnimOptions(_configs.anim[val], _animRun);
+    var data = $controller.data('config').data;
+    _animType = null;
+    var anims = [];
+    if(val in data){
+        _animType = data[val].control_type;
+        anims = _configs.anim[_animType];
+    }
+
+    loadAnimOptions(anims, _animRun);
 }
 
 function getCurrentConfig() {

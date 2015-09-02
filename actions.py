@@ -36,6 +36,7 @@ def getDrivers(req):
 	return success(bpm.drivers)
 
 def getControllers(req):
+	print bpm.controllers
 	return success(bpm.controllers)
 
 def getAnims(req):

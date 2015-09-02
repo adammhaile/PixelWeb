@@ -95,17 +95,21 @@ $.fn.param_loader = function(config) {
 
         var paramMap = {"Basic":[]};
 
-        $.each(params, function(i, v) {
-            $c = $('<div id="' + v.id + '"></div>');
-            $c.addClass("ui_input");
-            $c.addClass("item");
-            if(!v.group)
-                v.group = "Basic";
-            if(!(v.group in paramMap)) paramMap[v.group] = []
-            paramMap[v.group].push($c);
-            cfg.control_map[v.id] = insertFuncs[v.type]($c, v);
-        });
-
+        if(params.length > 0){
+            $.each(params, function(i, v) {
+                $c = $('<div id="' + v.id + '"></div>');
+                $c.addClass("ui_input");
+                $c.addClass("item");
+                if(!v.group)
+                    v.group = "Basic";
+                if(!(v.group in paramMap)) paramMap[v.group] = []
+                paramMap[v.group].push($c);
+                cfg.control_map[v.id] = insertFuncs[v.type]($c, v);
+            });
+        }
+        else {
+            paramMap["Basic"].push($('<div class="ui segment">There are no modifiabled parameters to be set.</div>'))
+        }
         $.each(paramMap, function(k,v){
             var html = strReplace(_html, "@id", id)
             html = strReplace(html, "@group", k)
@@ -115,6 +119,8 @@ $.fn.param_loader = function(config) {
                 $section.append(p);
             });
         });
+
+
 
         if(run){
             var run_html = '\

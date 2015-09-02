@@ -7,6 +7,8 @@ __home = os.path.expanduser("~").replace('\\', '/') + "/PixelWeb/"
 BASE_SERVER_CONFIG = d({
             "id":"server_config",
             "display": "server_config",
+            "preconfig": False,
+            "presets":[],
             "params": [{
                 "id": "host",
                 "label": "Server Host IP",

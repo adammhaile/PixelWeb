@@ -1,4 +1,26 @@
-var $currentPage = null;
+function setLogAll() {
+    log.enableAll();
+}
+
+function setLogDebug() {
+    log.setLevel(log.levels.DEBUG);
+}
+
+function setLogInfo() {
+    log.setLevel(log.levels.INFO);
+}
+
+function setLogWarn() {
+    log.setLevel(log.levels.WARN);
+}
+
+function setLogError() {
+    log.setLevel(log.levels.ERROR);
+}
+
+function setLogNone() {
+    log.disableAll();
+}
 
 function showHideByID(id, state) {
   $('#' + id).css('display', state ? 'block' : 'none');

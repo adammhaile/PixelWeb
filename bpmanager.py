@@ -42,14 +42,22 @@ class BPManager:
 		if "desc" not in config: config.desc = ""
 		if "presets" not in config:
 			config.presets = []
+		if "params" not in config:
+			config.params = []
+		if "preconfig" not in config:
+			config.preconfig = {}
+
 	 	c = {
 				"display":config.display,
 				"desc":config.desc,
 				"params":config.params,
 				"presets": config.presets,
-				"preconfig": False
+				"preconfig": config.preconfig
 			}
-		return d(c)
+		c = d(c)
+		if config.type == "controller" or (config.type =="preset" and config.preset_type == "controller"):
+			c.control_type = config.control_type
+		return c
 
 	def __loadDriverDef(self, config):
 		config = d(config)
@@ -74,16 +82,15 @@ class BPManager:
 
 	def __loadPresetDef(self, config):
 		config = d(config)
-		config.id = "*!#preset#!*_" + config.id
+		config.id = "*!#_" + config.id
 		config.display = "* " + config.display
 
 		self._preConfigs[config.id] = {
 			"class": config['class'],
-			"params": config.params
+			"preconfig": config.preconfig
 		}
 
 		c = self.__genModObj(config)
-		c.preconfig = True
 
 		if config.preset_type == "driver":
 			self.drivers[config.id] = c

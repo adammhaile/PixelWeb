@@ -78,6 +78,7 @@ $.fn._dropdown = function(config) {
     };
 
     $node.val = function(value) {
+        if(! $node.data()) return null;
         var cfg = $node.data().config;
         if (value != null) {
             if(cfg.data_map) {
@@ -111,7 +112,7 @@ $.fn._dropdown = function(config) {
         var cfg = $node.data().config;
         var val = $node.val();
         if(!isNU(val) && cfg.onChange)
-            cfg.onChange($node.val(), $node.attr('id'));
+            cfg.onChange(val, $node.attr('id'));
     }
 
     function _doSetup(){

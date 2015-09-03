@@ -72,7 +72,6 @@ $.fn.param_loader = function(config) {
     var $node = $(this);
     var id = $node.attr('id');
     var _onChanged = null;
-    var _onPresetChanged = null;
 
     $node._onSaveClick = null;
 
@@ -93,36 +92,37 @@ $.fn.param_loader = function(config) {
             <div class="active content ui list" id="@id_@group_content"></div>\
         ';
 
-        var paramMap = {"Basic":[]};
+        var paramMap = {
+            "Basic": []
+        };
 
-        if(params.length > 0){
+        if (params.length > 0) {
             $.each(params, function(i, v) {
                 $c = $('<div id="' + v.id + '"></div>');
                 $c.addClass("ui_input");
                 $c.addClass("item");
-                if(!v.group)
+                if (!v.group)
                     v.group = "Basic";
-                if(!(v.group in paramMap)) paramMap[v.group] = []
+                if (!(v.group in paramMap)) paramMap[v.group] = []
                 paramMap[v.group].push($c);
                 cfg.control_map[v.id] = insertFuncs[v.type]($c, v);
             });
-        }
-        else {
+        } else {
             paramMap["Basic"].push($('<div class="ui segment">There are no modifiabled parameters to be set.</div>'))
         }
-        $.each(paramMap, function(k,v){
+        $.each(paramMap, function(k, v) {
             var html = strReplace(_html, "@id", id)
             html = strReplace(html, "@group", k)
             $accordion.append(html);
             $section = $accordion.children("#" + id + "_" + k + "_content");
-            $.each(v, function(i, p){
+            $.each(v, function(i, p) {
                 $section.append(p);
             });
         });
 
 
 
-        if(run){
+        if (run) {
             var run_html = '\
                 <div class="title" id="@id_run_title">\
                     <i class="dropdown icon"></i> Run Parameters\
@@ -151,84 +151,88 @@ $.fn.param_loader = function(config) {
         });
     }
 
-    function reloadPresetCombo(){
+    function reloadPresetCombo() {
         var cfg = $node.data().config;
-        if(cfg){
+        if (cfg) {
             var val = $node.val().id;
             var p = {};
-            if(val in config.presets){
+            if (val in config.presets) {
                 p = config.presets[val];
             }
 
-            if(cfg.presetCombo){
+            if (cfg.presetCombo) {
                 cfg.presetCombo.load(p);
-            }    
+            }
         }
     }
 
     function optionChanged(val) {
         var cfg = $node.data().config;
         $node.find(".presetSaveBtn").removeClass("disabled");
-        if(cfg.data[val]){
+        if (cfg.curVal != val && cfg.data[val]) {
             showParams($("#" + id + "_params"), cfg.data[val].params, cfg.run);
 
             $desc = $node.children("#" + id + "_desc");
-            if(cfg.data[val].desc){
-                $desc.html('<p>'+ cfg.data[val].desc + '</p>');
+            if (cfg.data[val].desc) {
+                $desc.html('<p>' + cfg.data[val].desc + '</p>');
                 $desc.show();
-            }
-            else{
+            } else {
                 $desc.empty();
                 $desc.hide();
             }
 
             reloadPresetCombo();
 
-            if(_onChanged) _onChanged(val);
+            cfg.curVal = val;
+            if (_onChanged) _onChanged(val);
         }
     }
 
-    function presetChanged(val){
+    function presetChanged(val) {
         var cfg = $node.data().config;
         var cur = $node.val();
-        if(cur.id in cfg.presets && cfg.presets[cur.id][val]){
+        if (cur.id in cfg.presets && cfg.presets[cur.id][val]) {
             $node.val(cfg.presets[cur.id][val].data);
         }
-
-        // if(_onPresetChanged) _onPresetChanged(val, $node);
     }
 
-    $node.val = function(value){
-        if(value == null){
+    $node.val = function(value) {
+        if (value == null) {
             var cfg = $node.data().config;
             var config = {};
-            $.each(cfg.control_map, function(k,v){
+            $.each(cfg.control_map, function(k, v) {
                 config[k] = v.val();
             });
             var run = {};
-            $.each(cfg.run_map, function(k,v){
+            $.each(cfg.run_map, function(k, v) {
                 run[k] = v.val();
             });
             var idval = $node.children("#" + id + "_combo")._dropdown().val();
-            if(cfg.disable_option) idval = cfg.data[0].id;
-            var result = {id:idval, config: config};
-            if(Object.keys(run).length > 0) result.run = run
+            if (cfg.disable_option) idval = cfg.data[0].id;
+            var result = {
+                id: idval,
+                config: config
+            };
+            if (Object.keys(run).length > 0) result.run = run
             return result;
-        }
-        else{
+        } else {
             var cfg = $node.data().config;
-            $node.children("#" + id + "_combo")._dropdown().val(value.id)
-            function setParams(){
-                if(value.config){
-                    $.each(value.config, function(k,v){
-                        if(k in cfg.control_map){
+            // var id = $node.children("#" + id + "_combo")._dropdown().val();
+            // if (id != value.id) {
+                $node.children("#" + id + "_combo")._dropdown().val(value.id)
+            // }
+
+            function setParams() {
+                if (value.config) {
+                    $.each(value.config, function(k, v) {
+                        if (k in cfg.control_map) {
                             cfg.control_map[k].val(v);
                         }
                     });
                 }
-                if(value.run){
-                    $.each(value.run, function(k,v){
-                        if(k in cfg.run_map){
+                if (value.run) {
+                    $.each(value.run, function(k, v) {
+                        if (k in cfg.run_map) {
                             cfg.run_map[k].val(v);
                         }
                     });
@@ -238,15 +242,22 @@ $.fn.param_loader = function(config) {
         }
     };
 
-    $node.reloadPresets = function(data){
+    $node.reloadPresets = function(data) {
         var cfg = $node.data().config;
         cfg.data = data;
         $.each(cfg.data, function(k, v) {
-            options[k] = {name: v.display, desc: v.desc};
-            if("presets" in v){
+            options[k] = {
+                name: v.display,
+                desc: v.desc
+            };
+            if ("presets" in v) {
                 config.presets[k] = [];
-                $.each(v.presets, function(i, v){
-                    config.presets[k].push({name: v.display, desc: v.desc, data: v});
+                $.each(v.presets, function(i, v) {
+                    config.presets[k].push({
+                        name: v.display,
+                        desc: v.desc,
+                        data: v
+                    });
                 })
             }
         });
@@ -257,6 +268,7 @@ $.fn.param_loader = function(config) {
     if (config) {
         config.control_map = {};
         config.run_map = {};
+        config.curVal = config.default;
         $node.data("config", config);
 
         $node._onSaveClick = config.onSaveClick;
@@ -274,7 +286,7 @@ $.fn.param_loader = function(config) {
         $node.children("#" + id + "_desc").hide();
         var options = {};
         config.presets = {};
-        if(!config.data) config.data = {};
+        if (!config.data) config.data = {};
 
         $node.reloadPresets(config.data);
 
@@ -294,9 +306,11 @@ $.fn.param_loader = function(config) {
             onChange: presetChanged
         });
 
-        $node.find("#" + id + "_param_save").click(function(){if($node._onSaveClick) $node._onSaveClick($node);})
+        $node.find("#" + id + "_param_save").click(function() {
+            if ($node._onSaveClick) $node._onSaveClick($node);
+        })
 
-        if(config.disable_option){
+        if (config.disable_option) {
             $node.children("#" + id + "_combo").hide();
             $node.children("#" + id + "_param_save").hide();
             $node.children("#" + id + "_preset_combo").hide();
@@ -304,14 +318,13 @@ $.fn.param_loader = function(config) {
         }
 
         _onChanged = config.onChange;
-        _onPresetChanged = config.onPresetChanged;
     }
 
     return $node;
 }
 
 
-function genFeedItem(item){
+function genFeedItem(item) {
     var html = "\
     <div class='event'>\
         <div class='content'>\
@@ -327,15 +340,15 @@ function genFeedItem(item){
     return html;
 }
 
-function buildFeed(items){
+function buildFeed(items) {
     var html = '';
-    $.each(items, function(i, v){
+    $.each(items, function(i, v) {
         html += genFeedItem(v);
     })
     return html;
 }
 
-function genPresetItem(item, name, type){
+function genPresetItem(item, name, type) {
     html = '\
     <div class="item">\
         <div class="right floated content">\
@@ -353,24 +366,25 @@ function genPresetItem(item, name, type){
     html = strReplace(html, "@loadID", name);
     return html;
 }
-function buildPresetList(items, type){
-    if(type == "anim"){
+
+function buildPresetList(items, type) {
+    if (type == "anim") {
         var temp = {};
-        $.each(items, function(k, v){
-            if(v.type == _animType)
-            temp[k] = v;
+        $.each(items, function(k, v) {
+            if (v.type == _animType)
+                temp[k] = v;
         });
         items = temp;
     }
     var html = '';
-    $.each(items, function(i, v){
+    $.each(items, function(i, v) {
         var typeName = null;
-        if(type in _configs){
-            if(v.id in _configs[type]){
+        if (type in _configs) {
+            if (v.id in _configs[type]) {
                 typeName = _configs[type][v.id].display;
             }
         }
-        if(typeName) i = typeName + ": " + i;
+        if (typeName) i = typeName + ": " + i;
         html += genPresetItem(v, i, type);
     })
     return html;

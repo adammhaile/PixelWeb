@@ -116,18 +116,6 @@ class BPManager:
 		for dir in mod_dirs:
 			self.loadModules(loader.load_folder(dir))
 
-	def loadPreConfig(self):
-		config = []
-		pre_config_dirs = config.readServerConfig().pre_config_dirs
-		for dir in pre_config_dirs:
-			config.extend(loader.load_folder(dir))
-		for a in config:
-			if hasattr(a, 'MANIFEST'):
-				status.pushStatus("Loading: {}".format(a.__file__))
-				for ref in a.MANIFEST:
-					ref = d(ref)
-					self.__loadAnimDef(ref)
-
 	def __getInstance(self, config, inst_type):
 		config = d(config)
 		params = d(config.config)
@@ -153,6 +141,8 @@ class BPManager:
 			raise Exception("Invalid " + inst_type)
 
 		if preconfig:
+			if hasattr(preconfig, '__call__'):
+				preconfig = preconfig()
 			params.upgrade(preconfig)
 
 		return (obj, params)

@@ -7,6 +7,8 @@ from actions import *
 import config
 import status
 
+import bibliopixel.log as log
+
 @route('/')
 def home():
 	return static_file("gui.html", root='')
@@ -27,10 +29,8 @@ def send_root(filename):
 def postonly():
 	return "Please use POST JSON API calls only."
 
-@route('/api', method='POST')
-def api():
+def doAPI(req):
 	try:
-		req = d(request.json)
 		if req and'action' in req:
 			if req['action'] in actions:
 				action = actions[req['action']]
@@ -53,12 +53,24 @@ def api():
 			return fail("Invalid request data.")
 	except Exception, e:
 		return fail(traceback.format_exc(), error=ErrorCode.GENERAL_ERROR, data=None)
+@route('/api', method='POST')
+def api():
+	req = d(request.json)
+	result = doAPI(req)
+	if not result.status:
+		status.pushError(result.msg)
+	return result
 
 
 config.initConfig()
 status.pushStatus("Reading server config")
 server = config.readServerConfig()
 config.writeServerConfig(server)
+
+cfg = d(server)
+level = log.INFO
+if cfg.show_debug: level = log.DEBUG
+log.setLogLevel(level)
 
 initBPM()
 status.pushStatus("BiblioPixel Init Complete")

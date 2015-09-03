@@ -27,6 +27,13 @@ BASE_SERVER_CONFIG = d({
                 "type": "bool",
                 "default": False,
                 "help":"Load default configuration on application start."
+            },
+            {
+                "id": "show_debug",
+                "label": "Show Debug in Console",
+                "type": "bool",
+                "default": False,
+                "help":"Show BiblioPixel debug in server console (not in main UI)."
             },{
                 "id": "mod_dirs",
                 "label": "Module Directories",

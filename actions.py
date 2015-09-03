@@ -3,7 +3,6 @@ import traceback, sys
 import status
 
 import bibliopixel.log as log
-log.setLogLevel(log.DEBUG)
 
 from bpmanager import *
 bpm = None
@@ -36,7 +35,6 @@ def getDrivers(req):
 	return success(bpm.drivers)
 
 def getControllers(req):
-	print bpm.controllers
 	return success(bpm.controllers)
 
 def getAnims(req):
@@ -82,6 +80,10 @@ def getServerConfig(req):
 
 def saveServerConfig(req):
 	config.writeServerConfig(req["config"])
+	cfg = d(req["config"])
+	level = log.INFO
+	if cfg.show_debug: level = log.DEBUG
+	log.setLogLevel(level)
 	return success()
 
 def getStatus(req):
@@ -94,6 +96,7 @@ def savePreset(req):
 	cfg = config.readConfig("presets", key=req.type)
 	cfg[req.name] = req.data
 	config.writeConfig("presets", cfg, key=req.type)
+	return success()
 
 def getPresets(req):
 	if "type" not in req:

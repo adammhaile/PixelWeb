@@ -60,13 +60,13 @@ def load_folder(dir):
     # for p in glob.glob(dir + "/*/"):
     #     base = p.replace("\\", "").replace("/", "")
     #     base = base.replace(dir.replace("\\", "").replace("/", ""), "")
-    #     package = load_package(dir, base) 
+    #     package = load_package(dir, base)
     #     if package:
     #         hash, pack = package
     #         mods[hash] = pack
 
     for m in glob.glob(dir + "/*.py"):
-        hash, mod = load_module(m) 
+        hash, mod = load_module(m)
         if mod:
             mods.append(mod)
 

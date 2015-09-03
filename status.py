@@ -6,6 +6,7 @@ errorQ = deque(maxlen=100)
 statusQ = deque(maxlen=100)
 
 def pushStatus(msg):
+    msg = str(msg)
     statusQ.appendleft({"msg":msg, "timestamp":time.strftime("%H:%M:%S")})
     log.logger.info(msg)
 
@@ -15,6 +16,8 @@ def dumpStatus():
     return res
 
 def pushError(error):
+    error = str(error)
+    pushStatus(error)
     errorQ.appendleft({"msg":error, "timestamp":time.strftime("%H:%M:%S")})
     log.logger.error(error)
 

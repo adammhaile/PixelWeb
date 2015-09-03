@@ -93,7 +93,7 @@ $.fn._dropdown = function(config) {
         } else {
             var v = $node.children(".dropdown").dropdown("get value");
             if(typeof v == "object") v = null;
-            if(cfg.data_map) {
+            if(cfg && cfg.data_map) {
                 v = cfg.data_map[v];
                 if(!v) v = null;
             }

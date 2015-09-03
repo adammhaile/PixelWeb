@@ -58,3 +58,7 @@
 	max-height: 400px;
 	overflow-y: auto;
 }
+
+.param_loader {
+	margin-bottom: 1rem;
+}

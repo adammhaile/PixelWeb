@@ -38,9 +38,9 @@
 
     <div class="pusher">
         <div class="ui right floated icon buttons" id="menuBtns">
-          <button class="ui button" id="btnSettings"><i class="settings icon"></i></button>
-          <button class="ui green button" id="btnStatus"><i class="info icon"></i></button>
-          <button class="ui red button" id="btnErrors"><i class="warning sign icon"></i></button>
+            <button class="ui button" id="btnSettings"><i class="settings icon"></i></button>
+            <button class="ui green button" id="btnStatus"><i class="info icon"></i></button>
+            <button class="ui red button" id="btnErrors"><i class="warning sign icon"></i></button>
         </div>
         <div class="ui top attached tabular menu">
             <a class="active item" data-tab="config_tab">Config</a>
@@ -49,6 +49,10 @@
         </div>
         <div class="ui bottom attached active tab segment" data-tab="config_tab" id="tabConfig">
             <div id="driver"></div>
+            <div class="ui icon buttons">
+                <button class="ui button" id="btnAddDriver"><i class="green plus icon"></i></button>
+                <button class="ui button disabled" id="btnRemoveDriver"><i class="red minus icon"></i></button>
+            </div>
             <div class="ui hidden divider short"></div>
             <div id="controller"></div>
             <div class="ui hidden divider short"></div>
@@ -75,7 +79,7 @@
 
     <div class="ui large modal" id="statusFeedModal">
         <div class="header">PixelWeb Status</div>
-        <div class="ui content scroll_feed" >
+        <div class="ui content scroll_feed">
             <!-- <img class="image"><i class="huge red warning sign icon"></i></img> -->
             <div class="ui feed" id="statusFeed">
             </div>
@@ -87,7 +91,7 @@
 
     <div class="ui basic small modal" id="savePresetModal">
         <div class="header">Save Preset</div>
-        <div class="ui content" >
+        <div class="ui content">
             <div class="ui fluid labeled input ui_input">
                 <div class="ui label">Preset Name</div>
                 <input type="text" id="savePresetName">

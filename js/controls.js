@@ -151,6 +151,21 @@ $.fn.param_loader = function(config) {
         });
     }
 
+    function reloadPresetCombo(){
+        var cfg = $node.data().config;
+        if(cfg){
+            var val = $node.val().id;
+            var p = {};
+            if(val in config.presets){
+                p = config.presets[val];
+            }
+
+            if(cfg.presetCombo){
+                cfg.presetCombo.load(p);
+            }    
+        }
+    }
+
     function optionChanged(val) {
         var cfg = $node.data().config;
         $node.find(".presetSaveBtn").removeClass("disabled");
@@ -166,12 +181,8 @@ $.fn.param_loader = function(config) {
                 $desc.empty();
                 $desc.hide();
             }
-            var p = {};
-            if(val in config.presets){
-                p = config.presets[val];
-            }
 
-            cfg.presetCombo.load(p);
+            reloadPresetCombo();
 
             if(_onChanged) _onChanged(val);
         }
@@ -239,6 +250,8 @@ $.fn.param_loader = function(config) {
                 })
             }
         });
+
+        reloadPresetCombo();
     }
 
     if (config) {

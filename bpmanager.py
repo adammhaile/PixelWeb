@@ -44,15 +44,12 @@ class BPManager:
 			config.presets = []
 		if "params" not in config:
 			config.params = []
-		if "preconfig" not in config:
-			config.preconfig = {}
 
 	 	c = {
 				"display":config.display,
 				"desc":config.desc,
 				"params":config.params,
 				"presets": config.presets,
-				"preconfig": config.preconfig
 			}
 		c = d(c)
 		if config.type == "controller" or (config.type =="preset" and config.preset_type == "controller"):
@@ -131,30 +128,52 @@ class BPManager:
 					ref = d(ref)
 					self.__loadAnimDef(ref)
 
+	def __getInstance(self, config, inst_type):
+		config = d(config)
+		params = d(config.config)
+		result = None
+		obj = None
+		preconfig = None
+		if config.id in self._preConfigs:
+			p = self._preConfigs[config.id]
+			obj = p['class']
+			preconfig = p['preconfig']
+		else:
+			if inst_type == "driver":
+				if config.id in self._driverClasses:
+					obj = self._driverClasses[config.id]
+			elif inst_type == "controller":
+				if config.id in self._contClasses:
+					obj = self._contClasses[config.id]
+			elif inst_type == "animation":
+				if config.id in self._animClasses:
+					obj = self._animClasses[config.id]
+
+		if not obj:
+			raise Exception("Invalid " + inst_type)
+
+		if preconfig:
+			params.upgrade(preconfig)
+
+		return (obj, params)
+
 	def startConfig(self, driverConfig, ledConfig):
 		self.stopConfig();
-		ledConfig = d(ledConfig)
-
-		for drv in driverConfig:
-			drv = d(drv)
-			if not drv.id in self._driverClasses:
-				return fail("Invalid Driver")
-
-		if not ledConfig.id in self._contClasses:
-			return fail("Invalid Controller")
-
-		config.writeConfig("current_setup", driverConfig, "driver")
-		config.writeConfig("current_setup", ledConfig, "controller")
-
 		self._driverCfg = driverConfig
+		self._ledCfg = d(ledConfig)
+
+		config.writeConfig("current_setup", self._driverCfg, "driver")
+		config.writeConfig("current_setup", self._ledCfg, "controller")
+
+
 		self.driver = []
-		for drv in driverConfig:
-			drv = d(drv)
-			self.driver.append(self._driverClasses[drv.id](**(drv.config)))
-		self._ledCfg = ledConfig
-		cfg = ledConfig.config
-		cfg['driver'] = self.driver
-		self.led = self._contClasses[ledConfig.id](**(cfg))
+		for drv in self._driverCfg:
+			obj, params = self.__getInstance(d(drv), "driver")
+			self.driver.append(obj(**(params)))
+
+		obj, params = self.__getInstance(self._ledCfg, "controller")
+		params['driver'] = self.driver
+		self.led = obj(**(params))
 		return success()
 
 	def getConfig(self):

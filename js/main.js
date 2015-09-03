@@ -19,8 +19,8 @@ function clearDriverChoosers() {
 
 function addDriverChooser(params) {
     var id = "driver_" + driverPickers.length;
-    $("#driver").append('<div id="' + id + '"></div>');
-    $("#driver").append('<div class="ui hidden divider short"></div>');
+    $("#driver").append('<div id="' + id + '" class="param_loader"></div>');
+    // $("#driver").append('<div class="ui hidden divider short"></div>');
     var $d = $("#driver").children("#" + id);
     $d = $d.param_loader({
         data: _configs.driver,
@@ -36,6 +36,18 @@ function addDriverChooser(params) {
     }
 
     driverPickers.push($d);
+    if(driverPickers.length > 1) $("#btnRemoveDriver").removeClass('disabled');
+    else $("#btnRemoveDriver").addClass('disabled');
+}
+
+function removeDriverChooser() {
+    if(driverPickers.length > 1){
+        var $d = driverPickers.pop();
+        $d.remove();
+    }
+
+    if(driverPickers.length > 1) $("#btnRemoveDriver").removeClass('disabled');
+    else $("#btnRemoveDriver").addClass('disabled');
 }
 
 function loadAnimOptions(data, run) {
@@ -109,7 +121,6 @@ function showStatusFeed(){
 function doSaveServerConfig() {
     var config = $server_config.val();
     saveServerConfig(config.config, function(result){
-        console.log(result);
         alert("Save Complete! Please restart server.");
         $("#serverConfig").sidebar('toggle');
     });
@@ -149,6 +160,8 @@ function showPresetSaveModal(type, $node){
             }
             data.display = name;
             savePreset(type, name, desc, data, function(){
+                pushPreset(type, data);
+                reloadPresets();
                 $("#savePresetModal").modal('hide');
             })
         },
@@ -169,6 +182,32 @@ function savePreset(type, name, desc, data, callback){
     });
 }
 
+
+function pushPreset(t, v){
+    var c = _configs[t];
+    if(t == "anim"){
+        c = c[v.type];
+    }
+    if(c != undefined && v.id in c){
+        if(!(("presets") in c[v.id]))
+            c[v.id].presets = [];
+        c[v.id].presets.push(v);
+    }
+}
+function reloadPresets(){
+    $controller.reloadPresets(_configs.controller);
+    $.each(driverPickers, function(i, $d){
+        $d.reloadPresets(_configs.driver);
+    });
+    var data = $controller.data('config').data;
+    var val = $controller.val().id;
+    var anims = [];
+    if(val in data){
+        anims = _configs.anim[data[val].control_type];
+        $anims.reloadPresets(anims);
+    }
+
+}
 function loadPresets(){
     callAPI({
         action:"getPresets"
@@ -177,24 +216,13 @@ function loadPresets(){
             $.each(result.data, function(t, v){
                 if(t in _configs){
                     var cfg = _configs[t];
-                    $.each(v, function(p, v){
-                        var c = cfg;
-                        if(t == "anim"){
-                            c = cfg[v.type];
-                        }
-                        if(c != undefined && v.id in c){
-                            if(!(("presets") in c[v.id]))
-                                c[v.id].presets = [];
-                            c[v.id].presets.push(v);
-                        }
+                    $.each(v, function(p, val){
+                        pushPreset(t, val);
                     });
                 }
             });
 
-            $controller.reloadPresets(_configs.controller);
-            $.each(driverPickers, function(i, $d){
-                $d.reloadPresets(_configs.driver);
-            });
+            reloadPresets();
         }
         else {
             showBPError(result.msg);
@@ -318,4 +346,6 @@ $(document)
         $("#btnSettings").click(showServerConfig);
         $("#saveServerConfig").click(doSaveServerConfig);
         $("#cancelServerConfig").click(cancelServerConfig);
+        $("#btnAddDriver").click(addDriverChooser);
+        $("#btnRemoveDriver").click(removeDriverChooser);
     });

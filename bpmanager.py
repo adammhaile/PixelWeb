@@ -5,6 +5,7 @@ from static_objects import *
 import loader
 import config
 import status
+import traceback
 
 class BPManager:
 	def __init__(self):
@@ -94,7 +95,7 @@ class BPManager:
 		elif config.preset_type == "controller":
 			self.controllers[config.id] = c
 		elif config.preset_type == "animation":
-			elf.__addToAnims(config, c)
+			self.__addToAnims(config, c)
 		else:
 			return
 
@@ -196,12 +197,10 @@ class BPManager:
 			config = d(config)
 			run = d(run)
 
-			if not config.id in self._animClasses:
-				return fail("Invalid Animation")
-
 			self._animCfg = config
 			config.config.led = self.led
-			self.anim = self._animClasses[config.id](**(config.config))
+			obj, params = self.__getInstance(config, "animation")
+			self.anim = obj(**(params))
 
 			run.threaded = True
 			self.anim.run(**(run))

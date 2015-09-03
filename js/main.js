@@ -96,9 +96,6 @@ function displayCurConfig(){
         $.each(_curConfig.driver, function(i, d) {
             addDriverChooser(d);
         });
-        // $.each(_curConfig.driver, function(i, d){
-        //     driverPickers[i].val(d);
-        // });
     }
     if (_curConfig.controller) {
         $controller.val(_curConfig.controller);
@@ -253,7 +250,7 @@ $(document)
                         data: controllers,
                         label: "Controller",
                         placeholder: "Select Controller...",
-                        default: "matrix",
+                        default: null,
                         onChange: filterAnims,
                         onSaveClick: function($node){showPresetSaveModal("controller", $node);},
                         onLoadClick: function($node){showPresetLoadModal("controller", $node);}

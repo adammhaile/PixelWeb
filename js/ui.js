@@ -104,7 +104,9 @@ $.fn._dropdown = function(config) {
 
     $node.setDefault = function() {
         var cfg = $node.data().config;
-        if(cfg.default != null) $node.val(cfg.default);
+        if(cfg.default != null){
+             $node.val(cfg.default);
+         }
         else $node.children(".dropdown").dropdown("restore defaults");
     };
 

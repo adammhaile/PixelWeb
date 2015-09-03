@@ -217,10 +217,7 @@ $.fn.param_loader = function(config) {
             return result;
         } else {
             var cfg = $node.data().config;
-            // var id = $node.children("#" + id + "_combo")._dropdown().val();
-            // if (id != value.id) {
-                $node.children("#" + id + "_combo")._dropdown().val(value.id)
-            // }
+            $node.children("#" + id + "_combo")._dropdown().val(value.id)
 
             function setParams() {
                 if (value.config) {
@@ -302,7 +299,7 @@ $.fn.param_loader = function(config) {
             data: null,
             label: null,
             placeholder: "Select Preset",
-            default: config.default,
+            default: null,
             onChange: presetChanged
         });
 

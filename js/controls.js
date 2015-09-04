@@ -120,8 +120,6 @@ $.fn.param_loader = function(config) {
             });
         });
 
-
-
         if (run) {
             var run_html = '\
                 <div class="title" id="@id_run_title">\

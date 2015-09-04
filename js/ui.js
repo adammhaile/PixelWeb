@@ -90,6 +90,7 @@ $.fn._dropdown = function(config) {
                     }
                 })
             }
+            value = value.toString();
             return $node.children(".dropdown").dropdown("set selected", value);
         } else {
             var v = $node.children(".dropdown").dropdown("get value");
@@ -98,16 +99,27 @@ $.fn._dropdown = function(config) {
                 v = cfg.data_map[v];
                 if(!v) v = null;
             }
+            else {
+                if(v=="") v=null;
+                else {
+                    i = parseInt(v)
+                    if(!isNaN(i))
+                        v = i;
+                }
+            }
             return v;
         }
     };
 
     $node.setDefault = function() {
-        var cfg = $node.data().config;
-        if(cfg.default != null){
-             $node.val(cfg.default);
-         }
-        else $node.children(".dropdown").dropdown("restore defaults");
+        setTimeout(function(){
+            var cfg = $node.data().config;
+            if(cfg.default != null){
+                 $node.val(cfg.default);
+             }
+            else $node.children(".dropdown").dropdown("restore defaults");
+        }, 5);
+
     };
 
     function onChange(){
@@ -133,8 +145,8 @@ $.fn._dropdown = function(config) {
         $node.data("config", config);
 
         var html = '\
-            <div class="ui label pointing right large">@label</div>\
-            <div class="ui selection dropdown">\
+            <div class="ui label large">@label</div>\
+            <div class="ui labeled selection dropdown">\
                 <i class="dropdown icon"></i>\
                 <div class="default text">@placeholder</div>\
                 <div class="menu"></div>\
@@ -152,7 +164,8 @@ $.fn._dropdown = function(config) {
         $node.addToolTip(config.help);
 
         //cannot be set immediately, do after 5ms
-        setTimeout(function(){$node.setDefault();}, 5);
+        // setTimeout(function(){$node.setDefault();}, 5);
+        $node.setDefault();
     }
 
     return $node;

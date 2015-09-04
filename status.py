@@ -5,9 +5,12 @@ import time
 errorQ = deque(maxlen=100)
 statusQ = deque(maxlen=100)
 
+def pushStatusQ(msg):
+    statusQ.appendleft({"msg":msg, "timestamp":time.strftime("%H:%M:%S")})
+
 def pushStatus(msg):
     msg = str(msg)
-    statusQ.appendleft({"msg":msg, "timestamp":time.strftime("%H:%M:%S")})
+    pushStatusQ(msg)
     log.logger.info(msg)
 
 def dumpStatus():
@@ -17,7 +20,7 @@ def dumpStatus():
 
 def pushError(error):
     error = str(error)
-    pushStatus(error)
+    pushStatusQ(error)
     errorQ.appendleft({"msg":error, "timestamp":time.strftime("%H:%M:%S")})
     log.logger.error(error)
 

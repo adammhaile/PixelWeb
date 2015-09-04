@@ -146,7 +146,7 @@ $.fn._dropdown = function(config) {
 
         var html = '\
             <div class="ui label large">@label</div>\
-            <div class="ui labeled selection dropdown">\
+            <div class="ui selection dropdown">\
                 <i class="dropdown icon"></i>\
                 <div class="default text">@placeholder</div>\
                 <div class="menu"></div>\

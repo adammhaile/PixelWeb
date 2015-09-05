@@ -1,3 +1,17 @@
+body {
+	overflow: hidden;
+}
+
+#main_content {
+	height: 100%;
+	width: calc(100% - 150px);
+	overflow-y: auto;
+}
+
+.ui_pane {
+	display: none;
+}
+
 .ui_input {
 	margin-bottom: 0.5em;
 }
@@ -29,9 +43,6 @@
 }
 
 .scroll_feed {
-	max-height: 400px;
-	overflow-y: auto;
-	overflow-x: auto;
 }
 
 #menuBtns {

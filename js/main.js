@@ -107,13 +107,6 @@ function showBPError(msg){
     $("#BPError").modal({blurring:true}).modal('show');
 }
 
-function showStatusFeed(){
-    getStatus(function(result){
-        var html = buildFeed(result);
-        $("#statusFeed").html(html);
-        $("#statusFeedModal").modal({blurring:true, closable:true}).modal('show');
-    });
-}
 
 function doSaveServerConfig() {
     var config = $server_config.val();
@@ -225,6 +218,38 @@ function loadPresets(){
             showBPError(result.msg);
         }
     });
+}
+
+function loadConsoleStatus(){
+    setLoading("#paneConsole", true);
+    getStatus(function(result){
+        var html = buildFeed(result);
+        $("#statusFeed").html(html);
+        setLoading("#paneConsole", false);
+    });
+}
+
+var _paneLoadFuncs ={
+    "Console": loadConsoleStatus
+}
+
+function activatePane(id){
+    var menu = "mnu" + id;
+    var pane = "pane" + id;
+    $('.side_menu').removeClass('active');
+    $('#' + menu).addClass('active');
+    $('.ui_pane').hide();
+
+    $('#' + pane).fadeIn();
+    if(id in _paneLoadFuncs){
+        _paneLoadFuncs[id]();
+    }
+}
+
+function handleSideMenu(){
+    var $m = $(this);
+    var id = $m.attr('id').replace("mnu", "");
+    activatePane(id);
 }
 
 
@@ -339,10 +364,12 @@ $(document)
             });
         });
 
-        $("#btnStatus").click(showStatusFeed);
         $("#btnSettings").click(showServerConfig);
         $("#saveServerConfig").click(doSaveServerConfig);
         $("#cancelServerConfig").click(cancelServerConfig);
         $("#btnAddDriver").click(addDriverChooser);
         $("#btnRemoveDriver").click(removeDriverChooser);
+        $(".side_menu").click(handleSideMenu);
+
+        activatePane("Config");
     });

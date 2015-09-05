@@ -53,7 +53,7 @@ def startConfig(req):
 
 def startAnim(req):
 	try:
-		status.pushStatus("Starting Animation")
+		status.pushStatus("Starting Animation: " + req['config']['id'])
 		result = bpm.startAnim(req['config'], req['run'])
 		if result.status:
 			return success()

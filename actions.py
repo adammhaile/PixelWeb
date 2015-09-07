@@ -32,13 +32,13 @@ def setBrightness(req):
 
 
 def getDrivers(req):
-	return success(bpm.drivers)
+	return success({"drivers":bpm.drivers, "names":bpm._driverNames})
 
 def getControllers(req):
-	return success(bpm.controllers)
+	return success({"controllers":bpm.controllers, "names":bpm._contNames})
 
 def getAnims(req):
-	return success({"anims":bpm.anims, "run":bpm.animRunParams})
+	return success({"anims":bpm.anims, "run":bpm.animRunParams, "names":bpm._animNames})
 
 def startConfig(req):
 	try:
@@ -53,8 +53,7 @@ def startConfig(req):
 
 def startAnim(req):
 	try:
-		status.pushStatus("Starting Animation: " + req['config']['id'])
-		result = bpm.startAnim(req['config'], req['run'])
+		result = bpm.startAnim(req['config'])
 		if result.status:
 			return success()
 		else:
@@ -112,7 +111,7 @@ actions = {
 	'getControllers' : [getControllers, []],
 	'getAnims' : [getAnims, []],
 	'startConfig': [startConfig, ['drivers', 'controller']],
-	'startAnim': [startAnim, ['config', 'run']],
+	'startAnim': [startAnim, ['config']],
 	'stopAnim': [stopAnim, []],
 	'getConfig': [getConfig, []],
 	'getServerConfig': [getServerConfig, []],

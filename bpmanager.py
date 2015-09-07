@@ -1,5 +1,5 @@
 from bibliopixel import *
-from bibliopixel.animation import BaseAnimation
+from bibliopixel.animation import BaseAnimation, AnimationQueue
 from util import *
 from static_objects import *
 import loader
@@ -18,14 +18,18 @@ class BPManager:
 
 		self.drivers = {}
 		self._driverClasses = {}
+		self._driverNames = {}
 
 		self.controllers = {}
 		self._contClasses = {}
+		self._contNames = {}
 
 		self.anims = {}
 		self._animClasses = {}
+		self._animNames = {}
 
 		self._preConfigs = {}
+		self._preNames = {}
 
 		self.animRunParams = BaseAnimation.RUN_PARAMS
 
@@ -61,17 +65,20 @@ class BPManager:
 		config = d(config)
 		self._driverClasses[config.id] = config['class']
 		self.drivers[config.id] = self.__genModObj(config)
+		self._driverNames[config.id] = config.display;
 
 	def __loadControllerDef(self, config):
 		config = d(config)
 		self._contClasses[config.id] = config['class']
 		self.controllers[config.id] = self.__genModObj(config)
+		self._contNames[config.id] = config.display;
 
 	def __addToAnims(self, config, c):
 		cont = config.controller
 		if not cont in self.anims:
 			self.anims[cont] = {}
 		self.anims[cont][config.id] = c
+		self._animNames[config.id] = config.display;
 
 	def __loadAnimDef(self, config):
 		config = d(config)
@@ -88,12 +95,16 @@ class BPManager:
 			"preconfig": config.preconfig
 		}
 
+		self._preNames[config.id] = config.display;
+
 		c = self.__genModObj(config)
 
 		if config.preset_type == "driver":
 			self.drivers[config.id] = c
+			self._driverNames[config.id] = config.display;
 		elif config.preset_type == "controller":
 			self.controllers[config.id] = c
+			self._contNames[config.id] = config.display;
 		elif config.preset_type == "animation":
 			self.__addToAnims(config, c)
 		else:
@@ -191,20 +202,45 @@ class BPManager:
 			self.anim = None
 			self._animCfg = None
 
-	def startAnim(self, config, run):
+	def startAnim(self, config):
+		def getAnim(c):
+			cfg = d(c['config'])
+			run = d(c['run'])
+
+			cfg.led = self.led
+			c['config'] = cfg
+			obj, params = self.__getInstance(c, "animation")
+			print obj
+			print params
+			anim = obj(**(params))
+			return anim, d(run)
+
 		try:
 			self.stopAnim()
-			config = d(config)
-			run = d(run)
-
 			self._animCfg = config
-			config.config.led = self.led
-			obj, params = self.__getInstance(config, "animation")
-			self.anim = obj(**(params))
+			if('queue' in config):
+				q = config['queue']
+				run = d(config['run'])
+				run.threaded = True
+				self.anim = AnimationQueue(self.led)
+				for a in q:
+					anim, r = getAnim(a)
+					self.anim.addAnim(
+						anim=anim,
+						amt = r.amt,
+						fps = r.fps,
+						max_steps = r.max_steps,
+						untilComplete = r.untilComplete,
+						max_cycles = r.max_cycles)
+				status.pushStatus("Starting Animation Queue")
+				self.anim.run(**(run))
+				return success()
+			else:
+				self.anim, run = getAnim(config)
+				run.threaded = True
+				status.pushStatus("Starting Animation: {}".format(self._animNames[config.id]))
+				self.anim.run(**(run))
 
-			run.threaded = True
-			self.anim.run(**(run))
-
-			return success()
+				return success()
 		except:
 			return fail(traceback.format_exc(), error=ErrorCode.BP_ERROR, data=None)

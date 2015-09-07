@@ -45,7 +45,11 @@ function setHeaderTitle(title) {
 
 
 function _enable(id, state) {
-  $(id).prop('disabled', !state);
+    if(state === undefined) state = true;
+    if(state)
+        $(id).removeClass('disabled');
+    else
+        $(id).addClass('disabled');
 }
 
 function _inArray(array, val) {

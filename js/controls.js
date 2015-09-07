@@ -318,6 +318,36 @@ $.fn.param_loader = function(config) {
     return $node;
 }
 
+function genQueueFeedItem(item, num) {
+
+    var html = "\
+    <div class='item' num='@num'>\
+        <div class='right floated content'>\
+            <button class='ui button'><i class='pencil icon'></i>Edit</button>\
+            <button class='ui red button'><i class='remove icon'></i>Remove</button>\
+        </div>\
+        <i class='film icon'></i>\
+        <div class='content'>\
+            <div class='header'>@name</div>\
+            <div class='description'>@desc</div>\
+        </div>\
+    </div>\
+    ";
+
+    html = strReplace(html, "@num", num);
+    var name = _names.anim[item.id]
+    html = strReplace(html, "@name", name);
+    html = strReplace(html, "@desc", item.desc);
+    return html;
+}
+
+function buildQueueFeed(items) {
+    var html = '';
+    $.each(items, function(i, v) {
+        html += genQueueFeedItem(v, i);
+    })
+    return html;
+}
 
 function genFeedItem(item) {
     var html = "\

@@ -167,16 +167,21 @@ class BPManager:
 		config.writeConfig("current_setup", self._driverCfg, "driver")
 		config.writeConfig("current_setup", self._ledCfg, "controller")
 
+		try:
+			status.pushStatus("Starting config...")
+			self.driver = []
+			for drv in self._driverCfg:
+				obj, params = self.__getInstance(d(drv), "driver")
+				self.driver.append(obj(**(params)))
 
-		self.driver = []
-		for drv in self._driverCfg:
-			obj, params = self.__getInstance(d(drv), "driver")
-			self.driver.append(obj(**(params)))
-
-		obj, params = self.__getInstance(self._ledCfg, "controller")
-		params['driver'] = self.driver
-		self.led = obj(**(params))
-		return success()
+			obj, params = self.__getInstance(self._ledCfg, "controller")
+			params['driver'] = self.driver
+			self.led = obj(**(params))
+			status.pushStatus("Config start success!")
+			return success()
+		except:
+			status.pushStatus("Config start failure! {}".format(traceback.format_exc()))
+			return fail(traceback.format_exc(), error=ErrorCode.BP_ERROR, data=None)
 
 	def getConfig(self):
 		setup = d(config.readConfig("current_setup"))

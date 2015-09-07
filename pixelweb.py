@@ -72,6 +72,6 @@ level = log.INFO
 if cfg.show_debug: level = log.DEBUG
 log.setLogLevel(level)
 
-initBPM()
+initBPM(cfg)
 status.pushStatus("BiblioPixel Init Complete")
 run(host=server.host, port=server.port, reloader=False)

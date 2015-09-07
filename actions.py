@@ -7,11 +7,14 @@ import bibliopixel.log as log
 from bpmanager import *
 bpm = None
 
-def initBPM():
+def initBPM(server_config):
 	global bpm
 	bpm = BPManager()
 	bpm.loadBaseMods()
 	bpm.loadMods()
+	cfg = config.readConfig("current_setup")
+	if "controller" in cfg and "driver" in cfg and server_config.load_defaults:
+		bpm.startConfig(cfg.driver, cfg.controller)
 
 fillColor = (0,0,0)
 def setColor(req):
@@ -42,7 +45,6 @@ def getAnims(req):
 
 def startConfig(req):
 	try:
-		status.pushStatus("Starting Config")
 		result = bpm.startConfig(req['drivers'], req['controller'])
 		if result.status:
 			return success()

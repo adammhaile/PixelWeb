@@ -323,8 +323,8 @@ function genQueueFeedItem(item, num) {
     var html = "\
     <div class='item' num='@num'>\
         <div class='right floated content'>\
-            <button class='ui button'><i class='pencil icon'></i>Edit</button>\
-            <button class='ui red button'><i class='remove icon'></i>Remove</button>\
+            <button class='ui button q_edit'><i class='pencil icon'></i>Edit</button>\
+            <button class='ui red button q_remove'><i class='remove icon'></i>Remove</button>\
         </div>\
         <i class='film icon'></i>\
         <div class='content'>\

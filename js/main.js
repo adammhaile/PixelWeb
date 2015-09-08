@@ -13,70 +13,73 @@ var $anims = null;
 
 var $server_config = null;
 
+var _animEditMode = false;
+_animEditConfig = null;
+
 var _curQueue = [];
-// _curQueue = [{
-//     "id": "GameOfLifeRGB",
-//     "config": {
-//         "toroidal": false
-//     },
-//     "run": {
-//         "amt": 1,
-//         "fps": 30,
-//         "max_steps": 0,
-//         "untilComplete": false,
-//         "max_cycles": 1
-//     },
-//     "desc": "Game of Life"
-// }, {
-//     "id": "BounceText",
-//     "config": {
-//         "text": "",
-//         "size": 1,
-//         "bgcolor": [0, 0, 0],
-//         "color": [255, 255, 255],
-//         "buffer": 0,
-//         "yPos": 0,
-//         "xPos": 0
-//     },
-//     "run": {
-//         "amt": 1,
-//         "fps": 30,
-//         "max_steps": 0,
-//         "untilComplete": false,
-//         "max_cycles": 1
-//     },
-//     "desc": "Bouncy Text"
-// }, {
-//     "id": "TicTacToe",
-//     "config": {},
-//     "run": {
-//         "amt": 1,
-//         "fps": 30,
-//         "max_steps": 0,
-//         "untilComplete": false,
-//         "max_cycles": 1
-//     },
-//     "desc": "The only winning move is not to play."
-// }, {
-//     "id": "BounceText",
-//     "config": {
-//         "text": "",
-//         "size": 1,
-//         "bgcolor": [0, 0, 0],
-//         "color": [255, 255, 255],
-//         "buffer": 0,
-//         "yPos": 0,
-//         "xPos": 0
-//     },
-//     "run": {
-//         "amt": 1,
-//         "fps": 30,
-//         "max_steps": 0,
-//         "untilComplete": false,
-//         "max_cycles": 1
-//     },
-//     "desc": "Bouncy Again"
-// }];
+_curQueue = [{
+    "id": "GameOfLifeRGB",
+    "config": {
+        "toroidal": false
+    },
+    "run": {
+        "amt": 1,
+        "fps": 30,
+        "max_steps": 0,
+        "untilComplete": false,
+        "max_cycles": 1
+    },
+    "desc": "Game of Life"
+}, {
+    "id": "BounceText",
+    "config": {
+        "text": "",
+        "size": 1,
+        "bgcolor": [0, 0, 0],
+        "color": [255, 255, 255],
+        "buffer": 0,
+        "yPos": 0,
+        "xPos": 0
+    },
+    "run": {
+        "amt": 1,
+        "fps": 30,
+        "max_steps": 0,
+        "untilComplete": false,
+        "max_cycles": 1
+    },
+    "desc": "Bouncy Text"
+}, {
+    "id": "TicTacToe",
+    "config": {},
+    "run": {
+        "amt": 1,
+        "fps": 30,
+        "max_steps": 0,
+        "untilComplete": false,
+        "max_cycles": 1
+    },
+    "desc": "The only winning move is not to play."
+}, {
+    "id": "BounceText",
+    "config": {
+        "text": "",
+        "size": 1,
+        "bgcolor": [0, 0, 0],
+        "color": [255, 255, 255],
+        "buffer": 0,
+        "yPos": 0,
+        "xPos": 0
+    },
+    "run": {
+        "amt": 1,
+        "fps": 30,
+        "max_steps": 0,
+        "untilComplete": false,
+        "max_cycles": 1
+    },
+    "desc": "Bouncy Again"
+}];
 
 function clearDriverChoosers() {
     $("#driver").empty();
@@ -238,6 +241,39 @@ function showPresetSaveModal(type, $node) {
     }).modal('show');
 }
 
+function showAddQueueModal() {
+    if(_animEditMode){
+        $("#addQueueHeader").html("Edit Queue Item");
+        $("#addQueueBtn").html("Save");
+        $("#addQueueDesc").val(_animEditConfig.config.desc);
+    }
+    else {
+        $("#addQueueHeader").html("Add to Queue");
+        $("#addQueueBtn").html("Add");
+        $("#addQueueDesc").val('');
+    }
+    
+    $("#addQueueModal").modal({
+        blurring: true,
+        closable: false,
+        onApprove: function() {
+            var desc = $("#addQueueDesc").val();
+
+            var params = getAnimConfig();
+            params.desc = desc;
+            if(_animEditMode){
+                _curQueue[_animEditConfig.index] = params;
+                activatePane("Queue");
+            }
+            else {
+                _curQueue.push(params);
+            }
+            $("#addQueueModal").modal('hide');
+        },
+        onDeny: function() {}
+    }).modal('show');
+}
+
 function savePreset(type, name, desc, data, callback) {
     data.desc = desc;
     callAPI({
@@ -250,7 +286,6 @@ function savePreset(type, name, desc, data, callback) {
         if (callback) callback();
     });
 }
-
 
 function pushPreset(t, v) {
     var c = _configs[t];
@@ -327,36 +362,59 @@ function loadAnimQueue() {
     $("#queueList").sortable({
         update: q_sort
     });
+
+    $("#queueList .q_edit").click(function(){
+        var n = $(this).closest('.item').attr('num');
+        activatePane("Anim", {
+            "config":_curQueue[n],
+            "index": n
+        });
+    });
+
+    $("#queueList .q_remove").click(function(){
+        var n = $(this).closest('.item').attr('num');
+        _curQueue.splice(n, 1);
+        loadAnimQueue();
+    });
+}
+
+function loadAnim(config){
+    var isEdit = config != undefined;
+    _show("#saveQueueEdit", isEdit);
+    _show("#addQueue", !isEdit);
+    _show("#startAnim", !isEdit);
+    _show("#stopAnim", !isEdit);
+    _animEditMode = isEdit;
+    _animEditConfig = config;
+    if(_animEditMode){
+        $anims.val(config.config);
+    }
 }
 
 var _paneLoadFuncs = {
     "Console": loadConsoleStatus,
-    "Queue": loadAnimQueue
+    "Queue": loadAnimQueue,
+    "Anim": loadAnim
 }
 
-function activatePane(id) {
+function activatePane(id, option) {
     var menu = "mnu" + id;
     var pane = "pane" + id;
     $('.side_menu').removeClass('active');
     $('#' + menu).addClass('active');
     $('.ui_pane').hide();
 
-    $('#' + pane).fadeIn();
     if (id in _paneLoadFuncs) {
-        _paneLoadFuncs[id]();
+        _paneLoadFuncs[id](option);
     }
+
+    $('#' + pane).fadeIn();
 }
 
 function handleSideMenu() {
     var $m = $(this);
     var id = $m.attr('id').replace("mnu", "");
     activatePane(id);
-}
-
-function addToQueue() {
-    var params = getAnimConfig();
-    _curQueue.push(params);
-    log.debug(_curQueue);
 }
 
 function _startAnim(anim){
@@ -378,6 +436,22 @@ function _startAnim(anim){
 function startAnim(){
     var params = getAnimConfig();
     _startAnim(params);
+}
+
+function stopAnim(){
+    setLoading("#stopAnim");
+    var params = getAnimConfig();
+    callAPI({
+        action: "stopAnim"
+    }, function(result) {
+        console.log(result);
+        if (result.status) {
+
+        } else {
+            showBPError(result.msg);
+        }
+        setLoading("#stopAnim", false);
+    });
 }
 
 function startQ(){
@@ -466,21 +540,6 @@ $(document)
             });
         });
 
-        $("#stopAnim").click(function() {
-            setLoading("#stopAnim");
-            var params = getAnimConfig();
-            callAPI({
-                action: "stopAnim"
-            }, function(result) {
-                console.log(result);
-                if (result.status) {
-
-                } else {
-                    showBPError(result.msg);
-                }
-                setLoading("#stopAnim", false);
-            });
-        });
 
         $("#btnSettings").click(showServerConfig);
         $("#saveServerConfig").click(doSaveServerConfig);
@@ -488,11 +547,14 @@ $(document)
         $("#btnAddDriver").click(addDriverChooser);
         $("#btnRemoveDriver").click(removeDriverChooser);
         $(".side_menu").click(handleSideMenu);
-        $("#addQueue").click(addToQueue);
+        $("#addQueue").click(showAddQueueModal);
         $("#startAnim").click(startAnim);
+        $("#stopAnim").click(stopAnim);
         $("#startQ").click(startQ);
+        $("#stopQ").click(stopAnim);
+        $("#saveQueueEdit").click(showAddQueueModal);
 
         setTimeout(function() {
-            activatePane("Queue");
+            activatePane("Anim");
         }, 1000);
     });

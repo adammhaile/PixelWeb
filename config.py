@@ -23,7 +23,7 @@ BASE_SERVER_CONFIG = d({
                 "help":"Port to listen on."
             },{
                 "id": "load_defaults",
-                "label": "Load Defaults on Start",
+                "label": "Load Last Config on Start",
                 "type": "bool",
                 "default": False,
                 "help":"Load default configuration on application start."

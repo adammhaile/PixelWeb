@@ -52,6 +52,14 @@ function _enable(id, state) {
         $(id).addClass('disabled');
 }
 
+function _show(id, state) {
+    if(state === undefined) state = true;
+    if(state)
+        $(id).css('display', 'inline-block');
+    else
+        $(id).css('display', 'none');
+}
+
 function _inArray(array, val) {
   return array.indexOf(val) >= 0;
 }

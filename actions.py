@@ -105,6 +105,9 @@ def getPresets(req):
 	cfg = config.readConfig("presets", key=req.type)
 	return success(data=cfg)
 
+def saveQueue(req):
+	pass
+
 
 actions = {
 	'setColor' : [setColor, ['color']],

@@ -60,6 +60,7 @@
             <div class="ui basic segment ui_pane" id="paneAnim">
                 <div id="anims"></div>
                 <div class="ui hidden divider short"></div>
+                <div class="ui green button" id="saveQueueEdit">Save</div>
                 <div class="ui disabled button" id="addQueue">Add to Queue</div>
                 <div class="ui disabled button green" id="startAnim">Start</div>
                 <div class="ui button red" id="stopAnim">Stop</div>
@@ -129,6 +130,20 @@
         </div>
         <div class="actions">
             <div class="ui approve green button" id="presetSaveBtn">Save</div>
+            <div class="ui deny red button">Cancel</div>
+        </div>
+    </div>
+
+    <div class="ui basic small modal" id="addQueueModal">
+        <div class="header" id="addQueueHeader">Add to Queue</div>
+        <div class="ui content">
+            <div class="ui fluid labeled input">
+                <div class="ui label">Description</div>
+                <input type="text" id="addQueueDesc">
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui approve green button" id="addQueueBtn">Add</div>
             <div class="ui deny red button">Cancel</div>
         </div>
     </div>

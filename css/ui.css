@@ -73,3 +73,11 @@ body {
 .param_loader {
 	margin-bottom: 1rem;
 }
+
+#saveQueueEdit {
+	display: none;
+}
+
+.ui-sortable-handle{
+	cursor: grab !important;
+}

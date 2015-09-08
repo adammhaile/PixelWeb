@@ -215,8 +215,6 @@ class BPManager:
 			cfg.led = self.led
 			c['config'] = cfg
 			obj, params = self.__getInstance(c, "animation")
-			print obj
-			print params
 			anim = obj(**(params))
 			return anim, d(run)
 

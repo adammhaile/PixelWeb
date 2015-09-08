@@ -78,6 +78,6 @@ body {
 	display: none;
 }
 
-.ui-sortable-handle{
-	cursor: grab !important;
+.grabber{
+	cursor: move;
 }

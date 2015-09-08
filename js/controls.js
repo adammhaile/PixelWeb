@@ -166,7 +166,8 @@ $.fn.param_loader = function(config) {
 
     function optionChanged(val) {
         var cfg = $node.data().config;
-        $node.find(".presetSaveBtn").removeClass("disabled");
+        $node.find("#" + id + "_param_save").removeClass("disabled");
+        $node.find("#" + id + "_param_delete").addClass("disabled");
         if (cfg.curVal != val && cfg.data[val]) {
             showParams($("#" + id + "_params"), cfg.data[val].params, cfg.run);
 
@@ -191,6 +192,7 @@ $.fn.param_loader = function(config) {
         var cur = $node.val();
         if (cur.id in cfg.presets && cfg.presets[cur.id][val]) {
             $node.val(cfg.presets[cur.id][val].data);
+            $node.find("#" + id + "_param_delete").removeClass("disabled");
         }
     }
 
@@ -267,11 +269,13 @@ $.fn.param_loader = function(config) {
         $node.data("config", config);
 
         $node._onSaveClick = config.onSaveClick;
+        $node._onDeleteClick = config.onDeleteClick;
 
         $node.empty();
         $node.append('<div class="paramCombo" id="' + id + '_combo"></div>\
                       <button class="ui disabled icon button presetSaveBtn" id="' + id + '_param_save"><i class="save icon"></i></button>\
                       <div class="paramCombo" id="' + id + '_preset_combo"></div>\
+                      <button class="ui disabled icon button presetSaveBtn" id="' + id + '_param_delete"><i class="trash icon"></i></button>\
                       <div class="ui inverted segment" id="' + id + '_desc"></div>\
                       <div id="' + id + '_params" class="params_box"></div>\
                     ');
@@ -305,9 +309,16 @@ $.fn.param_loader = function(config) {
             if ($node._onSaveClick) $node._onSaveClick($node);
         })
 
+        $node.find("#" + id + "_param_delete").click(function() {
+            if ($node._onDeleteClick) $node._onDeleteClick($node, config.presetCombi.val());
+        })
+
+        $node.find("#" + id + "_param_delete").addClass('disabled');
+
         if (config.disable_option) {
             $node.children("#" + id + "_combo").hide();
             $node.children("#" + id + "_param_save").hide();
+            $node.children("#" + id + "_param_delete").hide();
             $node.children("#" + id + "_preset_combo").hide();
             //setTimeout(function(){$node.children("#" + id + "_combo").hide();}, 5);
         }
@@ -321,7 +332,7 @@ $.fn.param_loader = function(config) {
 function genQueueFeedItem(item, num) {
 
     var html = "\
-    <div class='item' num='@num'>\
+    <div class='item grabber' num='@num'>\
         <div class='right floated content'>\
             <button class='ui button q_edit'><i class='pencil icon'></i>Edit</button>\
             <button class='ui red button q_remove'><i class='remove icon'></i>Remove</button>\

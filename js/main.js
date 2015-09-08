@@ -17,69 +17,69 @@ var _animEditMode = false;
 _animEditConfig = null;
 
 var _curQueue = [];
-_curQueue = [{
-    "id": "GameOfLifeRGB",
-    "config": {
-        "toroidal": false
-    },
-    "run": {
-        "amt": 1,
-        "fps": 30,
-        "max_steps": 0,
-        "untilComplete": false,
-        "max_cycles": 1
-    },
-    "desc": "Game of Life"
-}, {
-    "id": "BounceText",
-    "config": {
-        "text": "",
-        "size": 1,
-        "bgcolor": [0, 0, 0],
-        "color": [255, 255, 255],
-        "buffer": 0,
-        "yPos": 0,
-        "xPos": 0
-    },
-    "run": {
-        "amt": 1,
-        "fps": 30,
-        "max_steps": 0,
-        "untilComplete": false,
-        "max_cycles": 1
-    },
-    "desc": "Bouncy Text"
-}, {
-    "id": "TicTacToe",
-    "config": {},
-    "run": {
-        "amt": 1,
-        "fps": 30,
-        "max_steps": 0,
-        "untilComplete": false,
-        "max_cycles": 1
-    },
-    "desc": "The only winning move is not to play."
-}, {
-    "id": "BounceText",
-    "config": {
-        "text": "",
-        "size": 1,
-        "bgcolor": [0, 0, 0],
-        "color": [255, 255, 255],
-        "buffer": 0,
-        "yPos": 0,
-        "xPos": 0
-    },
-    "run": {
-        "amt": 1,
-        "fps": 30,
-        "max_steps": 0,
-        "untilComplete": false,
-        "max_cycles": 1
-    },
-    "desc": "Bouncy Again"
-}];
+// _curQueue = [{
+//     "id": "GameOfLifeRGB",
+//     "config": {
+//         "toroidal": false
+//     },
+//     "run": {
+//         "amt": 1,
+//         "fps": 30,
+//         "max_steps": 0,
+//         "untilComplete": false,
+//         "max_cycles": 1
+//     },
+//     "desc": "Game of Life"
+// }, {
+//     "id": "BounceText",
+//     "config": {
+//         "text": "",
+//         "size": 1,
+//         "bgcolor": [0, 0, 0],
+//         "color": [255, 255, 255],
+//         "buffer": 0,
+//         "yPos": 0,
+//         "xPos": 0
+//     },
+//     "run": {
+//         "amt": 1,
+//         "fps": 30,
+//         "max_steps": 0,
+//         "untilComplete": false,
+//         "max_cycles": 1
+//     },
+//     "desc": "Bouncy Text"
+// }, {
+//     "id": "TicTacToe",
+//     "config": {},
+//     "run": {
+//         "amt": 1,
+//         "fps": 30,
+//         "max_steps": 0,
+//         "untilComplete": false,
+//         "max_cycles": 1
+//     },
+//     "desc": "The only winning move is not to play."
+// }, {
+//     "id": "BounceText",
+//     "config": {
+//         "text": "",
+//         "size": 1,
+//         "bgcolor": [0, 0, 0],
+//         "color": [255, 255, 255],
+//         "buffer": 0,
+//         "yPos": 0,
+//         "xPos": 0
+//     },
+//     "run": {
+//         "amt": 1,
+//         "fps": 30,
+//         "max_steps": 0,
+//         "untilComplete": false,
+//         "max_cycles": 1
+//     },
+//     "desc": "Bouncy Again"
+// }];
 
 function clearDriverChoosers() {
     $("#driver").empty();
@@ -252,7 +252,7 @@ function showAddQueueModal() {
         $("#addQueueBtn").html("Add");
         $("#addQueueDesc").val('');
     }
-    
+
     $("#addQueueModal").modal({
         blurring: true,
         closable: false,

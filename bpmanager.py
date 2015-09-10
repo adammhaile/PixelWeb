@@ -50,6 +50,9 @@ class BPManager:
 		if "params" not in config:
 			config.params = []
 
+		for p in config.presets:
+			p.id = config.id
+
 	 	c = {
 				"display":config.display,
 				"desc":config.desc,

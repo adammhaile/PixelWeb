@@ -689,6 +689,31 @@ function onQueueChange(val){
     }
 }
 
+function getQSOptions(){
+    var type = _configs.controller[$controller.val().id].control_type;
+    var q = [];
+    $.each(_queues, function(k,v){
+        if(v.type == type){
+            q.push(v);
+        }
+    })
+    var a = [];
+    if(type in _configs.anim){
+        $.each(_configs.anim[type], function(k,v){
+            if("presets" in v){
+                $.each(v.presets, function(i,p){
+                    a.push(p);
+                })
+            }
+        });
+    }
+
+    return {
+        queue: q,
+        anim: a
+    }
+}
+
 $(document)
     .ready(function() {
         showLoader();

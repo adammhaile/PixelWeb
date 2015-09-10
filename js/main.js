@@ -256,8 +256,28 @@ function showSaveQueueModal() {
     }).modal('show');
 }
 
+function showQueueDeleteModal() {
+    var name = $queueCombo.val();
+    if(!name) return;
+    var msg = "Are you sure you want to delete the following Queue? <b>" + name + "</b>";
+    $("#deleteQueueMsg").html(msg);
+    $("#deleteQueueModal").modal({
+        blurring: true,
+        closable: false,
+        onApprove: function() {
+            deleteQueue(name, function() {
+                delete _queues[name];
+                reloadQueues();
+                $("#deleteQueueModal").modal('hide');
+            });
+        },
+        onDeny: function() {}
+    }).modal('show');
+}
+
 function reloadQueues(){
     $queueCombo.load(_queues);
+    $("#queue_delete").addClass('disabled');
 }
 
 function showPresetDeleteModal(type, preset, $node) {
@@ -326,6 +346,8 @@ function showAddQueueModal() {
                     _curQueue.push(params);
                 }
                 $("#addQueueModal").modal('hide');
+
+                updateQueueCount();
             },
             onDeny: function() {}
         }).modal('show');
@@ -376,7 +398,16 @@ function loadConsoleStatus() {
     });
 }
 
-function loadAnimQueue() {
+function updateQueueCount(){
+    if(_curQueue.length > 0){
+        $("#queueCount").html(_curQueue.length);
+        $("#queueCount").removeClass("hidden");
+    }
+    else {
+        $("#queueCount").addClass("hidden");
+    }
+}
+function loadAnimQueue(preset) {
     var q_sort = function(event, ui) {
         var num = 0;
         var temp = [];
@@ -401,7 +432,10 @@ function loadAnimQueue() {
     }
 
     $("#queueList").html(html);
-    reloadQueues();
+    if(!preset){
+        reloadQueues();
+    }
+
     if (_curQueue.length > 0) {
         $("#queueList").sortable({
             update: q_sort
@@ -421,6 +455,8 @@ function loadAnimQueue() {
             loadAnimQueue();
         });
     }
+
+    updateQueueCount();
 }
 
 function loadAnim(config) {
@@ -625,7 +661,7 @@ function loadInitData() {
     var nextLoad = function(){
         _loadIndex += 1;
         if(_loadIndex >= _loadFuncs.length){
-            activatePane("Anim");
+            activatePane("Queue");
             setTimeout(hideLoader, 250);
         }
         else{
@@ -664,6 +700,14 @@ function incLoad(msg){
     });
 }
 
+function onQueueChange(val){
+    if(val in _queues){
+        _curQueue = JSON.parse(JSON.stringify(_queues[val].data));
+        loadAnimQueue(true);
+        $("#queue_delete").removeClass('disabled');
+    }
+}
+
 $(document)
     .ready(function() {
         showLoader();
@@ -691,6 +735,7 @@ $(document)
             placeholder: "Select Queue...",
             default: null,
             data: null,
+            onChange: onQueueChange
             // help: "params.help"
         });
 
@@ -707,6 +752,7 @@ $(document)
         $("#stopQ").click(stopAnim);
         $("#saveQueueEdit").click(showAddQueueModal);
         $("#queue_save").click(showSaveQueueModal);
+        $("#queue_delete").click(showQueueDeleteModal);
 
         // setTimeout(function() {
         //     activatePane("Queue");

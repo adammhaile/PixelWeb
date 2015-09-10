@@ -63,3 +63,12 @@ function saveQueue(name, q, callback) {
         if (callback) callback();
     });
 }
+
+function deleteQueue(name, callback) {
+    callAPI({
+        action: "deleteQueue",
+        name: name
+    }, function(result) {
+        if (callback) callback();
+    });
+}

@@ -118,6 +118,13 @@ def saveQueue(req):
 	config.writeConfig("queues", cfg)
 	return success()
 
+def deleteQueue(req):
+	cfg = config.readConfig("queues")
+	if req.name in cfg:
+		del cfg[req.name]
+		config.writeConfig("queues", cfg)
+	return success()
+
 def getQueues(req):
 	cfg = config.readConfig("queues")
 	return success(data=cfg)
@@ -140,5 +147,6 @@ actions = {
 	'deletePreset': [deletePreset, ['type', 'name']],
 	'getPresets': [getPresets, []],
 	'saveQueue': [saveQueue, ['name', 'data']],
+	'deleteQueue': [deleteQueue, ['name']],
 	'getQueues': [getQueues, []],
 }

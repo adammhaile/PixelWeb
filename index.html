@@ -44,6 +44,7 @@
             </a>
             <a class="side_menu item" id="mnuQueue">
                 <i class="retweet icon"></i> Queue
+                <!-- <div class="floating ui red label">22</div> -->
             </a>
             <a class="side_menu item" id="mnuConfig">
                 <i class="configure icon"></i> Configure
@@ -143,6 +144,24 @@
         </div>
     </div>
 
+    <div class="ui basic small modal" id="saveQueueModal">
+        <div class="header">Save Queue</div>
+        <div class="ui content">
+            <div class="ui fluid labeled input ui_input">
+                <div class="ui label">Queue Name</div>
+                <input type="text" id="saveQueueName">
+            </div>
+            <div class="ui fluid labeled input">
+                <div class="ui label">Description</div>
+                <input type="text" id="saveQueueDesc">
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui approve green button" id="queueSaveBtn">Save</div>
+            <div class="ui deny red button">Cancel</div>
+        </div>
+    </div>
+
     <div class="ui basic small modal" id="deletePresetModal">
         <div class="header">Delete Preset</div>
         <div class="ui content" id="deletePresetMsg">
@@ -154,11 +173,11 @@
         </div>
     </div>
 
-    <div class="ui basic small modal" id="noDeleteModal">
-        <div class="header">Unable to Delete</div>
+    <div class="ui basic small modal" id="genericWarning">
+        <div class="header" id="warnHeader">Unable to Delete</div>
         <div class="image content">
             <img class="image"><i class="huge yellow warning circle icon"></i></img>
-            <p>The selected preset is part of a pre-configred module and cannot be deleted.</p>
+            <p id="warnMsg"></p>
         </div>
         <div class="actions">
             <div class="ui approve green button">OK</div>

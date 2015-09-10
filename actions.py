@@ -113,8 +113,14 @@ def getPresets(req):
 	return success(data=cfg)
 
 def saveQueue(req):
-	pass
+	cfg = config.readConfig("queues")
+	cfg[req.name] = req.data
+	config.writeConfig("queues", cfg)
+	return success()
 
+def getQueues(req):
+	cfg = config.readConfig("queues")
+	return success(data=cfg)
 
 actions = {
 	'setColor' : [setColor, ['color']],
@@ -132,5 +138,7 @@ actions = {
 	'getErrors': [getErrors, []],
 	'savePreset': [savePreset, ['type', 'name', 'data']],
 	'deletePreset': [deletePreset, ['type', 'name']],
-	'getPresets': [getPresets, []]
+	'getPresets': [getPresets, []],
+	'saveQueue': [saveQueue, ['name', 'data']],
+	'getQueues': [getQueues, []],
 }

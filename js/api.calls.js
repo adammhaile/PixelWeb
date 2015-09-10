@@ -19,6 +19,8 @@ function getConfig(callback) { _get("getConfig", callback); }
 
 function getServerConfig(callback) { _get("getServerConfig", callback); }
 
+function getQueues(callback) { _get("getQueues", callback); }
+
 function saveServerConfig(config, callback) {
     callAPI({action: "saveServerConfig", config: config}, function(result) {
         if (result.status) {
@@ -47,6 +49,16 @@ function deletePreset(type, name, callback) {
         action: "deletePreset",
         name: name,
         type: type
+    }, function(result) {
+        if (callback) callback();
+    });
+}
+
+function saveQueue(name, q, callback) {
+    callAPI({
+        action: "saveQueue",
+        name: name,
+        data: q
     }, function(result) {
         if (callback) callback();
     });

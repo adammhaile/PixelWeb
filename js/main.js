@@ -16,70 +16,37 @@ var $server_config = null;
 var _animEditMode = false;
 _animEditConfig = null;
 
+var $queueCombo = null;
 var _curQueue = [];
-// _curQueue = [{
-//     "id": "GameOfLifeRGB",
-//     "config": {
-//         "toroidal": false
-//     },
-//     "run": {
-//         "amt": 1,
-//         "fps": 30,
-//         "max_steps": 0,
-//         "untilComplete": false,
-//         "max_cycles": 1
-//     },
-//     "desc": "Game of Life"
-// }, {
-//     "id": "BounceText",
-//     "config": {
-//         "text": "",
-//         "size": 1,
-//         "bgcolor": [0, 0, 0],
-//         "color": [255, 255, 255],
-//         "buffer": 0,
-//         "yPos": 0,
-//         "xPos": 0
-//     },
-//     "run": {
-//         "amt": 1,
-//         "fps": 30,
-//         "max_steps": 0,
-//         "untilComplete": false,
-//         "max_cycles": 1
-//     },
-//     "desc": "Bouncy Text"
-// }, {
-//     "id": "TicTacToe",
-//     "config": {},
-//     "run": {
-//         "amt": 1,
-//         "fps": 30,
-//         "max_steps": 0,
-//         "untilComplete": false,
-//         "max_cycles": 1
-//     },
-//     "desc": "The only winning move is not to play."
-// }, {
-//     "id": "BounceText",
-//     "config": {
-//         "text": "",
-//         "size": 1,
-//         "bgcolor": [0, 0, 0],
-//         "color": [255, 255, 255],
-//         "buffer": 0,
-//         "yPos": 0,
-//         "xPos": 0
-//     },
-//     "run": {
-//         "amt": 1,
-//         "fps": 30,
-//         "max_steps": 0,
-//         "untilComplete": false,
-//         "max_cycles": 1
-//     },
-//     "desc": "Bouncy Again"
-// }];
+var _queues = {};
+
+_curQueue = [{
+    "id": "GameOfLifeRGB",
+    "config": {
+        "toroidal": false
+    },
+    "run": {
+        "amt": 1,
+        "fps": 30,
+        "max_steps": 120,
+        "untilComplete": false,
+        "max_cycles": 1
+    },
+    "desc": "RGB Life"
+}, {
+    "id": "Bloom",
+    "config": {
+        "dir": true
+    },
+    "run": {
+        "amt": 1,
+        "fps": 30,
+        "max_steps": 120,
+        "untilComplete": false,
+        "max_cycles": 1
+    },
+    "desc": "Flower"
+}]
 
 function clearDriverChoosers() {
     $("#driver").empty();
@@ -96,8 +63,8 @@ function addDriverChooser(params) {
         label: "Driver",
         placeholder: "Select Driver...",
         onSaveClick: function($node) {
-                showPresetSaveModal("driver", $node);
-            },
+            showPresetSaveModal("driver", $node);
+        },
         onDeleteClick: function($node, preset) {
                 showPresetDeleteModal("driver", preset, $node);
             }
@@ -196,7 +163,6 @@ function showBPError(msg) {
     }).modal('show');
 }
 
-
 function doSaveServerConfig() {
     var config = $server_config.val();
     saveServerConfig(config.config, function(result) {
@@ -241,17 +207,49 @@ function showPresetSaveModal(type, $node) {
                 pushPreset(type, data);
                 reloadPresets();
                 $("#savePresetModal").modal('hide');
-            })
+            });
         },
         onDeny: function() {}
     }).modal('show');
 }
 
-function showPresetDeleteModal(type, preset, $node){
+function showSaveQueueModal() {
+    $("#queueSaveBtn").removeClass('loading');
+    $("#saveQueueName").val('');
+    $("#saveQueueDesc").val('');
+    $("#saveQueueModal").modal({
+        blurring: true,
+        closable: false,
+        onApprove: function() {
+            $("#queueSaveBtn").addClass('loading');
+            var name = $("#saveQueueName").val();
+            var desc = $("#saveQueueDesc").val();
+
+            var q = {
+                "name": name,
+                "desc": desc,
+                "data": _curQueue
+            }
+            log.debug(q);
+            saveQueue(name, q, function() {
+                _queues[name] = q;
+                reloadQueues();
+                $("#saveQueueModal").modal('hide');
+            });
+        },
+        onDeny: function() {}
+    }).modal('show');
+}
+
+function reloadQueues(){
+    $queueCombo.load(_queues);
+}
+
+function showPresetDeleteModal(type, preset, $node) {
     var id = $node.val().id;
     var p = findPreset(type, preset, id);
-    if(p){
-        if(!p[1][p[0]].locked){
+    if (p) {
+        if (!p[1][p[0]].locked) {
             var msg = "Are you sure you want to delete the following preset? <b>" + preset.name + "</b>";
             $("#deletePresetMsg").html(msg);
             $("#deletePresetModal").modal({
@@ -266,64 +264,74 @@ function showPresetDeleteModal(type, preset, $node){
                 },
                 onDeny: function() {}
             }).modal('show');
-        }
-        else{
-            $("#noDeleteModal").modal({
-                blurring: true,
-                closable: true,
-            }).modal('show');
+        } else {
+            showWarning("Unable to Delete", "The selected preset is part of a pre-configred module and cannot be deleted.");
         }
     }
 }
 
-function showAddQueueModal() {
-    if(_animEditMode){
-        $("#addQueueHeader").html("Edit Queue Item");
-        $("#addQueueBtn").html("Save");
-        $("#addQueueDesc").val(_animEditConfig.config.desc);
-    }
-    else {
-        $("#addQueueHeader").html("Add to Queue");
-        $("#addQueueBtn").html("Add");
-        $("#addQueueDesc").val('');
-    }
-
-    $("#addQueueModal").modal({
+function showWarning(header, msg) {
+    $("#warnHeader").html(header);
+    $("#warnMsg").html(msg);
+    $("#genericWarning").modal({
         blurring: true,
-        closable: false,
-        onApprove: function() {
-            var desc = $("#addQueueDesc").val();
-
-            var params = getAnimConfig();
-            params.desc = desc;
-            if(_animEditMode){
-                _curQueue[_animEditConfig.index] = params;
-                activatePane("Queue");
-            }
-            else {
-                _curQueue.push(params);
-            }
-            $("#addQueueModal").modal('hide');
-        },
-        onDeny: function() {}
+        closable: true,
     }).modal('show');
 }
 
-function findPreset(t, p, id){
+function showAddQueueModal() {
+    var params = getAnimConfig();
+    if (!params.run.untilComplete && params.run.max_steps == 0) {
+        showWarning("Add to Queue Warning",
+            'Queued animations require a stop condition, otherwise the animation will run forever.<br/>\
+             Please either set Max Frames or Until Complete and Max Cycles.<br \>\
+             Note: Not all animations support Until Complete but Max Frames will always work.')
+    } else {
+        if (_animEditMode) {
+            $("#addQueueHeader").html("Edit Queue Item");
+            $("#addQueueBtn").html("Save");
+            $("#addQueueDesc").val(_animEditConfig.config.desc);
+        } else {
+            $("#addQueueHeader").html("Add to Queue");
+            $("#addQueueBtn").html("Add");
+            $("#addQueueDesc").val('');
+        }
+
+        $("#addQueueModal").modal({
+            blurring: true,
+            closable: false,
+            onApprove: function() {
+                var desc = $("#addQueueDesc").val();
+
+                params.desc = desc;
+                if (_animEditMode) {
+                    _curQueue[_animEditConfig.index] = params;
+                    activatePane("Queue");
+                } else {
+                    _curQueue.push(params);
+                }
+                $("#addQueueModal").modal('hide');
+            },
+            onDeny: function() {}
+        }).modal('show');
+    }
+}
+
+function findPreset(t, p, id) {
     var c = _configs[t];
     if (t == "anim") {
         c = c[p.data.type];
     }
 
     if (c != undefined && id in c) {
-        if (("presets") in c[id]){
-            $.each(c[id].presets, function(i, v){
-                if(v.display == p.data.display){
+        if (("presets") in c[id]) {
+            $.each(c[id].presets, function(i, v) {
+                if (v.display == p.data.display) {
                     index = i;
                     return false;
                 }
             })
-            if(index >= 0){
+            if (index >= 0) {
                 return [index, c[id].presets]
             }
         }
@@ -343,8 +351,6 @@ function pushPreset(t, v) {
         c[v.id].presets.push(v);
     }
 }
-
-
 
 function reloadPresets() {
     $controller.reloadPresets(_configs.controller);
@@ -392,10 +398,10 @@ function loadConsoleStatus() {
 }
 
 function loadAnimQueue() {
-    var q_sort = function(event, ui){
+    var q_sort = function(event, ui) {
         var num = 0;
         var temp = [];
-        $.each($("#queueList").children(), function(i,v){
+        $.each($("#queueList").children(), function(i, v) {
             num = $(v).attr('num');
             temp.push(_curQueue[num]);
         });
@@ -404,34 +410,41 @@ function loadAnimQueue() {
     };
 
     $("#queueList").empty();
-    _enable("#startQ", false);
+
     var html = "No animations! Go to the Animation pane and add some.";
-    if(_curQueue.length > 0){
+    if (_curQueue.length > 0) {
         html = buildQueueFeed(_curQueue);
         _enable("#startQ", true);
+        _enable("#queue_save", true);
+    } else {
+        _enable("#startQ", false);
+        _enable("#queue_save", false);
     }
 
     $("#queueList").html(html);
-    $("#queueList").sortable({
-        update: q_sort
-    });
-
-    $("#queueList .q_edit").click(function(){
-        var n = $(this).closest('.item').attr('num');
-        activatePane("Anim", {
-            "config":_curQueue[n],
-            "index": n
+    reloadQueues();
+    if (_curQueue.length > 0) {
+        $("#queueList").sortable({
+            update: q_sort
         });
-    });
 
-    $("#queueList .q_remove").click(function(){
-        var n = $(this).closest('.item').attr('num');
-        _curQueue.splice(n, 1);
-        loadAnimQueue();
-    });
+        $("#queueList .q_edit").click(function() {
+            var n = $(this).closest('.item').attr('num');
+            activatePane("Anim", {
+                "config": _curQueue[n],
+                "index": n
+            });
+        });
+
+        $("#queueList .q_remove").click(function() {
+            var n = $(this).closest('.item').attr('num');
+            _curQueue.splice(n, 1);
+            loadAnimQueue();
+        });
+    }
 }
 
-function loadAnim(config){
+function loadAnim(config) {
     var isEdit = config != undefined;
     _show("#saveQueueEdit", isEdit);
     _show("#addQueue", !isEdit);
@@ -439,7 +452,7 @@ function loadAnim(config){
     _show("#stopAnim", !isEdit);
     _animEditMode = isEdit;
     _animEditConfig = config;
-    if(_animEditMode){
+    if (_animEditMode) {
         $anims.val(config.config);
     }
 }
@@ -470,7 +483,7 @@ function handleSideMenu() {
     activatePane(id);
 }
 
-function _startAnim(anim){
+function _startAnim(anim) {
     // setLoading("#startAnim");
 
     callAPI({
@@ -486,12 +499,13 @@ function _startAnim(anim){
         // setLoading("#startAnim", false);
     });
 }
-function startAnim(){
+
+function startAnim() {
     var params = getAnimConfig();
     _startAnim(params);
 }
 
-function stopAnim(){
+function stopAnim() {
     setLoading("#stopAnim");
     var params = getAnimConfig();
     callAPI({
@@ -507,78 +521,99 @@ function stopAnim(){
     });
 }
 
-function startQ(){
-    _startAnim({'queue':_curQueue, 'run':{}});
+function startQ() {
+    _startAnim({
+        'queue': _curQueue,
+        'run': {}
+    });
+}
+
+function _loadDrivers(){
+
+}
+
+function _loadAnims(){
+
+}
+
+function _loadControllers(){
+
+}
+
+function _loadConfig(){
+
+}
+
+function loadInitData() {
+    $("#loadDimmer").dimmer('show');
+    setLoading("body");
+    getDrivers(function(drivers) {
+        _configs.driver = drivers.drivers;
+        _names.driver = drivers.names;
+        clearDriverChoosers();
+        addDriverChooser();
+        getAnims(function(anims) {
+            _configs.anim = anims.anims;
+            _names.anim = anims.names;
+            _animRun = anims.run;
+            loadAnimOptions(null);
+            getControllers(function(controllers) {
+                _configs.controller = controllers.controllers;
+                _names.controller = controllers.names;
+                $controller = $("#controller").param_loader({
+                    data: _configs.controller,
+                    label: "Controller",
+                    placeholder: "Select Controller...",
+                    default: null,
+                    onChange: filterAnims,
+                    onSaveClick: function($node) {
+                        showPresetSaveModal("controller", $node);
+                    },
+                    onDeleteClick: function($node, preset) {
+                        showPresetDeleteModal("controller", preset, $node);
+                    },
+                    onLoadClick: function($node) {
+                        showPresetLoadModal("controller", $node);
+                    }
+                });
+                loadPresets();
+                getConfig(function(config) {
+                    _curConfig = config;
+                    setLoading("body", false);
+
+                    setTimeout(function() {
+                        $("#loadDimmer").dimmer('hide');
+                    }, 1000);
+                    displayCurConfig();
+                });
+            });
+        });
+    });
+
+    getQueues(function(q){
+        _queues = q;
+    })
+
+    getServerConfig(function(srv) {
+        $server_config = $("#server_config").param_loader({
+            data: [srv.setup],
+            label: "",
+            placeholder: "",
+            disable_option: true,
+            default: "server_config"
+        });
+
+        setTimeout(function() {
+            $server_config.val(srv.config);
+        }, 5);
+    });
+
 }
 
 $(document)
     .ready(function() {
 
-        $("#loadDimmer").dimmer('show');
-        $('.menu .item')
-            .tab();
-
-        setLoading("body");
-        getDrivers(function(drivers) {
-            _configs.driver = drivers.drivers;
-            _names.driver = drivers.names;
-            clearDriverChoosers();
-            addDriverChooser();
-            getAnims(function(anims) {
-                _configs.anim = anims.anims;
-                _names.anim = anims.names;
-                _animRun = anims.run;
-                loadAnimOptions(null);
-                getControllers(function(controllers) {
-                    _configs.controller = controllers.controllers;
-                    _names.controller = controllers.names;
-                    $controller = $("#controller").param_loader({
-                        data: _configs.controller,
-                        label: "Controller",
-                        placeholder: "Select Controller...",
-                        default: null,
-                        onChange: filterAnims,
-                        onSaveClick: function($node) {
-                            showPresetSaveModal("controller", $node);
-                        },
-                        onDeleteClick: function($node, preset) {
-                            showPresetDeleteModal("controller", preset, $node);
-                        },
-                        onLoadClick: function($node) {
-                            showPresetLoadModal("controller", $node);
-                        }
-                    });
-                    loadPresets();
-                    getConfig(function(config) {
-                        _curConfig = config;
-                        setLoading("body", false);
-
-                        setTimeout(function() {
-                            $("#loadDimmer").dimmer('hide');
-                        }, 1000);
-                        displayCurConfig();
-                    });
-                });
-            });
-        });
-
-        getServerConfig(function(srv) {
-            $server_config = $("#server_config").param_loader({
-                data: [srv.setup],
-                label: "",
-                placeholder: "",
-                disable_option: true,
-                default: "server_config"
-            });
-
-            setTimeout(function() {
-                $server_config.val(srv.config);
-            }, 5);
-        });
-
-        $('.ui.accordion').accordion({
-            exclusive: false
-        });
+        loadInitData();
 
         $("#startDriver").click(function() {
 
@@ -596,7 +631,7 @@ $(document)
             });
         });
 
-        $("#queueCombo")._dropdown({
+        $queueCombo = $("#queueCombo")._dropdown({
             label: "Saved Queues",
             placeholder: "Select Queue...",
             default: null,
@@ -616,8 +651,9 @@ $(document)
         $("#startQ").click(startQ);
         $("#stopQ").click(stopAnim);
         $("#saveQueueEdit").click(showAddQueueModal);
+        $("#queue_save").click(showSaveQueueModal);
 
         setTimeout(function() {
             activatePane("Queue");
-        }, 1000);
+        }, 250);
     });

@@ -229,9 +229,14 @@ function showPresetSaveModal(type, $node) {
 }
 
 function showSaveQueueModal() {
+    var pre = $queueCombo.val();
     $("#queueSaveBtn").removeClass('loading');
     $("#saveQueueName").val('');
     $("#saveQueueDesc").val('');
+    if(pre){
+        $("#saveQueueName").val(_queues[pre].name);
+        $("#saveQueueDesc").val(_queues[pre].desc);
+    }
     $("#saveQueueModal").modal({
         blurring: true,
         closable: false,
@@ -245,10 +250,11 @@ function showSaveQueueModal() {
                 "desc": desc,
                 "data": _curQueue
             }
-            log.debug(q);
+
             saveQueue(name, q, function() {
                 _queues[name] = q;
                 reloadQueues();
+                $queueCombo.val(name);
                 $("#saveQueueModal").modal('hide');
             });
         },
@@ -407,7 +413,7 @@ function updateQueueCount(){
         $("#queueCount").addClass("hidden");
     }
 }
-function loadAnimQueue(preset) {
+function loadAnimQueue() {
     var q_sort = function(event, ui) {
         var num = 0;
         var temp = [];
@@ -417,6 +423,7 @@ function loadAnimQueue(preset) {
         });
 
         _curQueue = temp;
+        loadAnimQueue();
     };
 
     $("#queueList").empty();
@@ -432,9 +439,9 @@ function loadAnimQueue(preset) {
     }
 
     $("#queueList").html(html);
-    if(!preset){
-        reloadQueues();
-    }
+    // if(!preset){
+    //     reloadQueues();
+    // }
 
     if (_curQueue.length > 0) {
         $("#queueList").sortable({
@@ -637,6 +644,7 @@ function _loadServerConfig(callback){
 function _loadQueues(callback){
     getQueues(function(q){
         _queues = q;
+        reloadQueues();
         callback();
     })
 }
@@ -703,7 +711,7 @@ function incLoad(msg){
 function onQueueChange(val){
     if(val in _queues){
         _curQueue = JSON.parse(JSON.stringify(_queues[val].data));
-        loadAnimQueue(true);
+        loadAnimQueue();
         $("#queue_delete").removeClass('disabled');
     }
 }

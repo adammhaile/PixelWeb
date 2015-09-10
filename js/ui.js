@@ -10,7 +10,7 @@ function isNU(val){
 $.fn.addToolTip = function(text){
     var $node = $(this);
     $node.attr("data-content",text);
-    $node.attr("data-variation","wide inverted large");
+    $node.attr("data-variation","very wide inverted large");
     $node.attr("data-position", "top left");
     $node.popup({delay:{show:500, hide:0}, duration:100});
 }
@@ -163,8 +163,6 @@ $.fn._dropdown = function(config) {
         _doSetup();
         $node.addToolTip(config.help);
 
-        //cannot be set immediately, do after 5ms
-        // setTimeout(function(){$node.setDefault();}, 5);
         $node.setDefault();
     }
 

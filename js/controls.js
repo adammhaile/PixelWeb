@@ -274,9 +274,9 @@ $.fn.param_loader = function(config) {
 
         $node.empty();
         $node.append('<div class="paramCombo" id="' + id + '_combo"></div>\
-                      <button class="ui disabled icon button presetSaveBtn" id="' + id + '_param_save"><i class="save icon"></i></button>\
+                      <button class="ui disabled icon button" id="' + id + '_param_save"><i class="save icon"></i></button>\
                       <div class="paramCombo" id="' + id + '_preset_combo"></div>\
-                      <button class="ui disabled icon button presetSaveBtn" id="' + id + '_param_delete"><i class="trash icon"></i></button>\
+                      <button class="ui disabled icon button" id="' + id + '_param_delete"><i class="trash icon"></i></button>\
                       <div class="ui inverted segment" id="' + id + '_desc"></div>\
                       <div id="' + id + '_params" class="params_box"></div>\
                     ');

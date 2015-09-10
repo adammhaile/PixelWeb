@@ -1,3 +1,7 @@
+html {
+  min-width: 780px;
+}
+
 body {
 	overflow: hidden;
 }
@@ -80,4 +84,9 @@ body {
 
 .grabber{
 	cursor: move;
+}
+
+#queueHeader {
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
 }

@@ -10,11 +10,11 @@ BASE_SERVER_CONFIG = d({
             "preconfig": False,
             "presets":[],
             "params": [{
-                "id": "host",
-                "label": "Server Host IP",
-                "type": "str",
-                "default": "0.0.0.0",
-                "help":"Network interface to listen on. 0.0.0.0 listens on all. Use 127.0.0.1 for local only."
+                "id": "external_access",
+                "label": "Allow External Access",
+                "type": "bool",
+                "default": False,
+                "help":"On: Other computers on your network can access PixelWeb. Off: Local access only."
             },{
                 "id": "port",
                 "label": "Server Port",
@@ -26,7 +26,7 @@ BASE_SERVER_CONFIG = d({
                 "label": "Load Last Config on Start",
                 "type": "bool",
                 "default": False,
-                "help":"Load default configuration on application start."
+                "help":"Load last driver/controller configuration on application start."
             },
             {
                 "id": "show_debug",

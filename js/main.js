@@ -404,7 +404,13 @@ function loadAnimQueue() {
     };
 
     $("#queueList").empty();
-    var html = buildQueueFeed(_curQueue);
+    _enable("#startQ", false);
+    var html = "No animations! Go to the Animation pane and add some.";
+    if(_curQueue.length > 0){
+        html = buildQueueFeed(_curQueue);
+        _enable("#startQ", true);
+    }
+
     $("#queueList").html(html);
     $("#queueList").sortable({
         update: q_sort
@@ -590,6 +596,13 @@ $(document)
             });
         });
 
+        $("#queueCombo")._dropdown({
+            label: "Saved Queues",
+            placeholder: "Select Queue...",
+            default: null,
+            data: null,
+            // help: "params.help"
+        });
 
         $("#btnSettings").click(showServerConfig);
         $("#saveServerConfig").click(doSaveServerConfig);
@@ -605,6 +618,6 @@ $(document)
         $("#saveQueueEdit").click(showAddQueueModal);
 
         setTimeout(function() {
-            activatePane("Anim");
+            activatePane("Queue");
         }, 1000);
     });

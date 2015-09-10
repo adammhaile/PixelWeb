@@ -11,7 +11,7 @@ import bibliopixel.log as log
 
 @route('/')
 def home():
-	return static_file("gui.html", root='')
+	return static_file("index.html", root='')
 
 @route('/js/<filename:path>')
 def send_js(filename):
@@ -74,4 +74,7 @@ log.setLogLevel(level)
 
 initBPM(cfg)
 status.pushStatus("BiblioPixel Init Complete")
-run(host=server.host, port=server.port, reloader=False)
+host = "127.0.0.1"
+if server.external_access:
+	host = "0.0.0.0"
+run(host=host, port=server.port, reloader=False)

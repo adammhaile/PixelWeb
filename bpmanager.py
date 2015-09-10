@@ -75,6 +75,9 @@ class BPManager:
 
 	def __addToAnims(self, config, c):
 		cont = config.controller
+		for p in c.presets:
+			p.type = cont
+			p.locked = True
 		if not cont in self.anims:
 			self.anims[cont] = {}
 		self.anims[cont][config.id] = c

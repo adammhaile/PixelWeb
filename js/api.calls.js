@@ -27,18 +27,27 @@ function saveServerConfig(config, callback) {
     });
 }
 
-//var _statusList = [];
-function getStatus(callback) {_get("getStatus", callback);}//function(data){
-//     $.each(data, function(i,v){
-//         pushMaxQ(_statusList, v, 100);
-//     });
-//     if(callback) callback(_statusList);
-// });}
+function getStatus(callback) {_get("getStatus", callback);}
+function getErrors(callback) {_get("getErrors",  callback);}
 
-//var _errorList = [];
-function getErrors(callback) {_get("getErrors",  callback);}//function(data){
-//     $.each(data, function(i,v){
-//         pushMaxQ(_errorList, v, 100);
-//     });
-//     if(callback) callback(_errorList);
-// });}
+function savePreset(type, name, desc, data, callback) {
+    data.desc = desc;
+    callAPI({
+        action: "savePreset",
+        name: name,
+        data: data,
+        type: type
+    }, function(result) {
+        if (callback) callback();
+    });
+}
+
+function deletePreset(type, name, callback) {
+    callAPI({
+        action: "deletePreset",
+        name: name,
+        type: type
+    }, function(result) {
+        if (callback) callback();
+    });
+}

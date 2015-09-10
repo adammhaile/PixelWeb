@@ -99,6 +99,13 @@ def savePreset(req):
 	config.writeConfig("presets", cfg, key=req.type)
 	return success()
 
+def deletePreset(req):
+	cfg = config.readConfig("presets", key=req.type)
+	if req.name in cfg:
+		del cfg[req.name]
+		config.writeConfig("presets", cfg, key=req.type)
+	return success()
+
 def getPresets(req):
 	if "type" not in req:
 		req.type = None
@@ -124,5 +131,6 @@ actions = {
 	'getStatus': [getStatus, []],
 	'getErrors': [getErrors, []],
 	'savePreset': [savePreset, ['type', 'name', 'data']],
+	'deletePreset': [deletePreset, ['type', 'name']],
 	'getPresets': [getPresets, []]
 }

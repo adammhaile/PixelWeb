@@ -72,6 +72,7 @@ $.fn.param_loader = function(config) {
     var $node = $(this);
     var id = $node.attr('id');
     var _onChanged = null;
+    var options = {};
 
     $node._onSaveClick = null;
 
@@ -248,9 +249,9 @@ $.fn.param_loader = function(config) {
                 desc: v.desc
             };
             if ("presets" in v) {
-                config.presets[k] = [];
+                cfg.presets[k] = [];
                 $.each(v.presets, function(i, v) {
-                    config.presets[k].push({
+                    cfg.presets[k].push({
                         name: v.display,
                         desc: v.desc,
                         data: v
@@ -283,7 +284,6 @@ $.fn.param_loader = function(config) {
         //<button class="ui icon button presetLoadBtn" id="' + id + '_param_open"><i class="Folder Open Outline icon"></i></button>\
 
         $node.children("#" + id + "_desc").hide();
-        var options = {};
         config.presets = {};
         if (!config.data) config.data = {};
 
@@ -310,7 +310,13 @@ $.fn.param_loader = function(config) {
         })
 
         $node.find("#" + id + "_param_delete").click(function() {
-            if ($node._onDeleteClick) $node._onDeleteClick($node, config.presetCombi.val());
+            var val = config.presetCombo.val();
+            var cfg = $node.data().config;
+            var cur = $node.val();
+            if (cur.id in cfg.presets && cfg.presets[cur.id][val]) {
+                if ($node._onDeleteClick) $node._onDeleteClick($node, cfg.presets[cur.id][val]);
+            }
+
         })
 
         $node.find("#" + id + "_param_delete").addClass('disabled');

@@ -97,6 +97,9 @@ function addDriverChooser(params) {
         placeholder: "Select Driver...",
         onSaveClick: function($node) {
                 showPresetSaveModal("driver", $node);
+            },
+        onDeleteClick: function($node, preset) {
+                showPresetDeleteModal("driver", preset, $node);
             }
             // default: "visualizer"
     });
@@ -131,6 +134,9 @@ function loadAnimOptions(data, run) {
         placeholder: "Select Animation...",
         onSaveClick: function($node) {
             showPresetSaveModal("anim", $node);
+        },
+        onDeleteClick: function($node, preset) {
+            showPresetDeleteModal("anim", preset, $node);
         },
         onChange: function() {
             var c = getAnimConfig();
@@ -241,6 +247,35 @@ function showPresetSaveModal(type, $node) {
     }).modal('show');
 }
 
+function showPresetDeleteModal(type, preset, $node){
+    var id = $node.val().id;
+    var p = findPreset(type, preset, id);
+    if(p){
+        if(!p[1][p[0]].locked){
+            var msg = "Are you sure you want to delete the following preset? <b>" + preset.name + "</b>";
+            $("#deletePresetMsg").html(msg);
+            $("#deletePresetModal").modal({
+                blurring: true,
+                closable: false,
+                onApprove: function() {
+                    deletePreset(type, preset.name, function() {
+                        p[1].splice(p[0], 1);
+                        reloadPresets();
+                        $("#deletePresetModal").modal('hide');
+                    });
+                },
+                onDeny: function() {}
+            }).modal('show');
+        }
+        else{
+            $("#noDeleteModal").modal({
+                blurring: true,
+                closable: true,
+            }).modal('show');
+        }
+    }
+}
+
 function showAddQueueModal() {
     if(_animEditMode){
         $("#addQueueHeader").html("Edit Queue Item");
@@ -274,17 +309,27 @@ function showAddQueueModal() {
     }).modal('show');
 }
 
-function savePreset(type, name, desc, data, callback) {
-    data.desc = desc;
-    callAPI({
-        action: "savePreset",
-        name: name,
-        data: data,
-        type: type
-    }, function(result) {
-        console.log(result);
-        if (callback) callback();
-    });
+function findPreset(t, p, id){
+    var c = _configs[t];
+    if (t == "anim") {
+        c = c[p.data.type];
+    }
+
+    if (c != undefined && id in c) {
+        if (("presets") in c[id]){
+            $.each(c[id].presets, function(i, v){
+                if(v.display == p.data.display){
+                    index = i;
+                    return false;
+                }
+            })
+            if(index >= 0){
+                return [index, c[id].presets]
+            }
+        }
+    }
+
+    return null;
 }
 
 function pushPreset(t, v) {
@@ -298,6 +343,8 @@ function pushPreset(t, v) {
         c[v.id].presets.push(v);
     }
 }
+
+
 
 function reloadPresets() {
     $controller.reloadPresets(_configs.controller);
@@ -487,6 +534,9 @@ $(document)
                         onChange: filterAnims,
                         onSaveClick: function($node) {
                             showPresetSaveModal("controller", $node);
+                        },
+                        onDeleteClick: function($node, preset) {
+                            showPresetDeleteModal("controller", preset, $node);
                         },
                         onLoadClick: function($node) {
                             showPresetLoadModal("controller", $node);

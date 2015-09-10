@@ -12,7 +12,7 @@ $.fn.addToolTip = function(text){
     $node.attr("data-content",text);
     $node.attr("data-variation","wide inverted large");
     $node.attr("data-position", "top left");
-    $node.popup({delay:{show:200, hide:0}, duration:100});
+    $node.popup({delay:{show:500, hide:0}, duration:100});
 }
 
 $.fn._numeric = function(){

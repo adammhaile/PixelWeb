@@ -487,7 +487,6 @@ function _startAnim(anim) {
         action: "startAnim",
         config: anim
     }, function(result) {
-        console.log(result);
         if (result.status) {
 
         } else {
@@ -508,7 +507,6 @@ function stopAnim() {
     callAPI({
         action: "stopAnim"
     }, function(result) {
-        console.log(result);
         if (result.status) {
 
         } else {

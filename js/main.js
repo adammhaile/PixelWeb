@@ -20,33 +20,33 @@ var $queueCombo = null;
 var _curQueue = [];
 var _queues = {};
 
-_curQueue = [{
-    "id": "GameOfLifeRGB",
-    "config": {
-        "toroidal": false
-    },
-    "run": {
-        "amt": 1,
-        "fps": 30,
-        "max_steps": 120,
-        "untilComplete": false,
-        "max_cycles": 1
-    },
-    "desc": "RGB Life"
-}, {
-    "id": "Bloom",
-    "config": {
-        "dir": true
-    },
-    "run": {
-        "amt": 1,
-        "fps": 30,
-        "max_steps": 120,
-        "untilComplete": false,
-        "max_cycles": 1
-    },
-    "desc": "Flower"
-}]
+// _curQueue = [{
+//     "id": "GameOfLifeRGB",
+//     "config": {
+//         "toroidal": false
+//     },
+//     "run": {
+//         "amt": 1,
+//         "fps": 30,
+//         "max_steps": 120,
+//         "untilComplete": false,
+//         "max_cycles": 1
+//     },
+//     "desc": "RGB Life"
+// }, {
+//     "id": "Bloom",
+//     "config": {
+//         "dir": true
+//     },
+//     "run": {
+//         "amt": 1,
+//         "fps": 30,
+//         "max_steps": 120,
+//         "untilComplete": false,
+//         "max_cycles": 1
+//     },
+//     "desc": "Flower"
+// }]
 
 function clearDriverChoosers() {
     $("#driver").empty();
@@ -605,22 +605,28 @@ function _loadQueues(callback){
     })
 }
 
+function _loadEgg(callback){
+    setTimeout(callback, 250);
+}
+
 var _loadFuncs = [
     [_loadDrivers, "Drivers"],
     [_loadControllers, "Controllers"],
     [_loadServerConfig, "Server Config"],
     [_loadAnims, "Animations"],
+    [_loadEgg, "Additional Pylons"],
     [_loadQueues, "Queues"],
     [_loadPresets, "Presets"],
-    [_loadConfig, "Current Setup"]
+    [_loadConfig, "Current Setup"],
+    [_loadEgg, "Death Ray"],
 ]
 var _loadIndex = 0;
 function loadInitData() {
-    showLoader();
     var nextLoad = function(){
         _loadIndex += 1;
         if(_loadIndex >= _loadFuncs.length){
-            hideLoader();
+            activatePane("Anim");
+            setTimeout(hideLoader, 250);
         }
         else{
             incLoad(_loadFuncs[_loadIndex][1]);
@@ -633,10 +639,9 @@ function loadInitData() {
 }
 
 function showLoader(){
+    $("#progLabel").html("Loading...");
     $("#loadProg").progress({
         percent: 0,
-        label: "percent",
-        total: _loadFuncs.length
     });
     $("#load_modal").modal({
         closable: false,
@@ -653,18 +658,17 @@ function hideLoader(){
 function incLoad(msg){
     msg = "Loading " + msg + "...";
     // $("#loadProg").progress('increment');
+    $("#progLabel").html(msg);
     $("#loadProg").progress({
         percent: ((_loadIndex+1)/_loadFuncs.length)* 100,
-        text: {
-          active  : msg,
-        }
     });
 }
 
 $(document)
     .ready(function() {
-
-        loadInitData();
+        showLoader();
+        setTimeout(loadInitData, 500);
+        // loadInitData();
 
         $("#startDriver").click(function() {
 

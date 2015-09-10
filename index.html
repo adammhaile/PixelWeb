@@ -22,22 +22,24 @@
     <script src="js/main.js"></script>
     <script>
         setLogAll();
+        $("#load_modal").modal('show');
     </script>
 </head>
 
 <body>
-    <!-- <div class="ui dimmer" id="loadDimmer">
-        <div class="ui large text loader">Loading</div>
-    </div> -->
-
-    <!-- <div class="ui top sidebar inverted vertical menu" id="serverConfig">
-        <div id="server_config"></div>
-        <div class="ui segment inverted right floated" id="serverConfigBtns">
-            <div class="ui green button" id="saveServerConfig">Save</div>
-            <div class="ui red button" id="cancelServerConfig">Cancel</div>
+    <div class="ui basic modal inverted" id="load_modal">
+        <div class="ui center aligned header">Initializing PixelWeb</div>
+        <div class="content">
+            <div class="ui inverted active green progress" id="loadProg">
+                <div class="bar" style="transition-duration: 300ms;">
+                    <div class="progress"></div>
+                </div>
+                <div class="label"></div>
+            </div>
         </div>
-    </div> -->
-    <div class="ui top attached segment pushable">
+    </div>
+
+    <div class="ui top attached segment pushable" id="main_window">
         <div class="ui visible left vertical inverted thin sidebar labeled icon menu" id="sideMenu">
             <a class="side_menu item" id="mnuAnim">
                 <i class="film icon"></i> Animations

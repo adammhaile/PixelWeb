@@ -187,6 +187,21 @@ function setLoading(id, state) {
     }
 }
 
+function reloadPresets() {
+    $controller.reloadPresets(_configs.controller);
+    $.each(driverPickers, function(i, $d) {
+        $d.reloadPresets(_configs.driver);
+    });
+    var data = $controller.data('config').data;
+    var val = $controller.val().id;
+    var anims = [];
+    if (val in data) {
+        anims = _configs.anim[data[val].control_type];
+        $anims.reloadPresets(anims);
+    }
+
+}
+
 function showPresetSaveModal(type, $node) {
     $("#presetSaveBtn").removeClass('loading');
     $("#savePresetName").val('');
@@ -352,42 +367,6 @@ function pushPreset(t, v) {
     }
 }
 
-function reloadPresets() {
-    $controller.reloadPresets(_configs.controller);
-    $.each(driverPickers, function(i, $d) {
-        $d.reloadPresets(_configs.driver);
-    });
-    var data = $controller.data('config').data;
-    var val = $controller.val().id;
-    var anims = [];
-    if (val in data) {
-        anims = _configs.anim[data[val].control_type];
-        $anims.reloadPresets(anims);
-    }
-
-}
-
-function loadPresets() {
-    callAPI({
-        action: "getPresets"
-    }, function(result) {
-        if (result.status) {
-            $.each(result.data, function(t, v) {
-                if (t in _configs) {
-                    var cfg = _configs[t];
-                    $.each(v, function(p, val) {
-                        pushPreset(t, val);
-                    });
-                }
-            });
-
-            reloadPresets();
-        } else {
-            showBPError(result.msg);
-        }
-    });
-}
-
 function loadConsoleStatus() {
     setLoading("#paneConsole", true);
     getStatus(function(result) {
@@ -528,72 +507,80 @@ function startQ() {
     });
 }
 
-function _loadDrivers(){
-
-}
-
-function _loadAnims(){
-
-}
-
-function _loadControllers(){
-
-}
-
-function _loadConfig(){
-
-}
-
-function loadInitData() {
-    $("#loadDimmer").dimmer('show');
-    setLoading("body");
+function _loadDrivers(callback){
     getDrivers(function(drivers) {
         _configs.driver = drivers.drivers;
         _names.driver = drivers.names;
         clearDriverChoosers();
         addDriverChooser();
-        getAnims(function(anims) {
-            _configs.anim = anims.anims;
-            _names.anim = anims.names;
-            _animRun = anims.run;
-            loadAnimOptions(null);
-            getControllers(function(controllers) {
-                _configs.controller = controllers.controllers;
-                _names.controller = controllers.names;
-                $controller = $("#controller").param_loader({
-                    data: _configs.controller,
-                    label: "Controller",
-                    placeholder: "Select Controller...",
-                    default: null,
-                    onChange: filterAnims,
-                    onSaveClick: function($node) {
-                        showPresetSaveModal("controller", $node);
-                    },
-                    onDeleteClick: function($node, preset) {
-                        showPresetDeleteModal("controller", preset, $node);
-                    },
-                    onLoadClick: function($node) {
-                        showPresetLoadModal("controller", $node);
-                    }
-                });
-                loadPresets();
-                getConfig(function(config) {
-                    _curConfig = config;
-                    setLoading("body", false);
-
-                    setTimeout(function() {
-                        $("#loadDimmer").dimmer('hide');
-                    }, 1000);
-                    displayCurConfig();
-                });
-            });
-        });
+        callback();
     });
+}
 
-    getQueues(function(q){
-        _queues = q;
-    })
+function _loadControllers(callback){
+    getControllers(function(controllers) {
+        _configs.controller = controllers.controllers;
+        _names.controller = controllers.names;
+        $controller = $("#controller").param_loader({
+            data: _configs.controller,
+            label: "Controller",
+            placeholder: "Select Controller...",
+            default: null,
+            onChange: filterAnims,
+            onSaveClick: function($node) {
+                showPresetSaveModal("controller", $node);
+            },
+            onDeleteClick: function($node, preset) {
+                showPresetDeleteModal("controller", preset, $node);
+            },
+            onLoadClick: function($node) {
+                showPresetLoadModal("controller", $node);
+            }
+        });
+        callback();
+    });
+}
 
+function _loadAnims(callback){
+    getAnims(function(anims) {
+        _configs.anim = anims.anims;
+        _names.anim = anims.names;
+        _animRun = anims.run;
+        loadAnimOptions(null);
+        callback();
+    });
+}
+
+function _loadPresets(callback) {
+    callAPI({
+        action: "getPresets"
+    }, function(result) {
+        if (result.status) {
+            $.each(result.data, function(t, v) {
+                if (t in _configs) {
+                    var cfg = _configs[t];
+                    $.each(v, function(p, val) {
+                        pushPreset(t, val);
+                    });
+                }
+            });
+            reloadPresets();
+            callback();
+        } else {
+            showBPError(result.msg);
+        }
+    });
+}
+
+function _loadConfig(callback){
+    getConfig(function(config) {
+        _curConfig = config;
+        displayCurConfig();
+        callback();
+    });
+}
+
+function _loadServerConfig(callback){
     getServerConfig(function(srv) {
         $server_config = $("#server_config").param_loader({
             data: [srv.setup],
@@ -606,8 +593,72 @@ function loadInitData() {
         setTimeout(function() {
             $server_config.val(srv.config);
         }, 5);
-    });
 
+        callback();
+    });
+}
+
+function _loadQueues(callback){
+    getQueues(function(q){
+        _queues = q;
+        callback();
+    })
+}
+
+var _loadFuncs = [
+    [_loadDrivers, "Drivers"],
+    [_loadControllers, "Controllers"],
+    [_loadServerConfig, "Server Config"],
+    [_loadAnims, "Animations"],
+    [_loadQueues, "Queues"],
+    [_loadPresets, "Presets"],
+    [_loadConfig, "Current Setup"]
+]
+var _loadIndex = 0;
+function loadInitData() {
+    showLoader();
+    var nextLoad = function(){
+        _loadIndex += 1;
+        if(_loadIndex >= _loadFuncs.length){
+            hideLoader();
+        }
+        else{
+            incLoad(_loadFuncs[_loadIndex][1]);
+            _loadFuncs[_loadIndex][0](nextLoad);
+        }
+    }
+
+    incLoad(_loadFuncs[_loadIndex][1]);
+    _loadFuncs[_loadIndex][0](nextLoad);
+}
+
+function showLoader(){
+    $("#loadProg").progress({
+        percent: 0,
+        label: "percent",
+        total: _loadFuncs.length
+    });
+    $("#load_modal").modal({
+        closable: false,
+        dimmerSettings: {
+            opacity: 1
+        }
+    }).modal('show');
+}
+
+function hideLoader(){
+    $("#load_modal").modal('hide');
+}
+
+function incLoad(msg){
+    msg = "Loading " + msg + "...";
+    // $("#loadProg").progress('increment');
+    $("#loadProg").progress({
+        percent: ((_loadIndex+1)/_loadFuncs.length)* 100,
+        text: {
+          active  : msg,
+        }
+    });
 }
 
 $(document)
@@ -653,7 +704,7 @@ $(document)
         $("#saveQueueEdit").click(showAddQueueModal);
         $("#queue_save").click(showSaveQueueModal);
 
-        setTimeout(function() {
-            activatePane("Queue");
-        }, 250);
+        // setTimeout(function() {
+        //     activatePane("Queue");
+        // }, 250);
     });

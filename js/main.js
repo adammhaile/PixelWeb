@@ -20,34 +20,6 @@ var $queueCombo = null;
 var _curQueue = [];
 var _queues = {};
 
-// _curQueue = [{
-//     "id": "GameOfLifeRGB",
-//     "config": {
-//         "toroidal": false
-//     },
-//     "run": {
-//         "amt": 1,
-//         "fps": 30,
-//         "max_steps": 120,
-//         "untilComplete": false,
-//         "max_cycles": 1
-//     },
-//     "desc": "RGB Life"
-// }, {
-//     "id": "Bloom",
-//     "config": {
-//         "dir": true
-//     },
-//     "run": {
-//         "amt": 1,
-//         "fps": 30,
-//         "max_steps": 120,
-//         "untilComplete": false,
-//         "max_cycles": 1
-//     },
-//     "desc": "Flower"
-// }]
-
 function clearDriverChoosers() {
     $("#driver").empty();
     driverPickers = [];
@@ -230,6 +202,8 @@ function showPresetSaveModal(type, $node) {
 
 function showSaveQueueModal() {
     var pre = $queueCombo.val();
+    var type = _configs.controller[$controller.val().id].control_type;
+
     $("#queueSaveBtn").removeClass('loading');
     $("#saveQueueName").val('');
     $("#saveQueueDesc").val('');
@@ -248,7 +222,8 @@ function showSaveQueueModal() {
             var q = {
                 "name": name,
                 "desc": desc,
-                "data": _curQueue
+                "data": _curQueue,
+                "type": type
             }
 
             saveQueue(name, q, function() {

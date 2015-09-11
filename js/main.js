@@ -21,60 +21,7 @@ var _curQueue = [];
 var _queues = {};
 
 var _curQS = [];
-_curQS = [{
-    'qs_type': 'queue',
-    'type': 'matrix',
-    'data': [{
-        'run': {
-            'untilComplete': false,
-            'max_cycles': 1,
-            'max_steps': 100,
-            'amt': 1,
-            'fps': 30
-        },
-        'config': {
-            'bgcolor': [0, 0, 0],
-            'xPos': 0,
-            'color': [255, 255, 255],
-            'text': '',
-            'yPos': 0,
-            'size': 1
-        },
-        'id': 'ScrollText',
-        'desc': ''
-    }, {
-        'run': {
-            'untilComplete': false,
-            'max_cycles': 1,
-            'max_steps': 60,
-            'amt': 1,
-            'fps': 30
-        },
-        'config': {
-            'dir': true
-        },
-        'id': 'Bloom',
-        'desc': ''
-    }],
-    'name': 'Test',
-    'desc': 'asdasdasd'
-}, {
-    'id': 'GameOfLifeRGB',
-    'config': {
-        'toroidal': false
-    },
-    'run': {
-        'amt': 1,
-        'fps': 30,
-        'max_steps': 0,
-        'untilComplete': false,
-        'max_cycles': 1
-    },
-    'qs_type': 'anim',
-    'type': 'matrix',
-    'name': 'Hello',
-    'desc': 'Testing'
-}];
+var _qselects = {};
 
 function clearDriverChoosers() {
     $("#driver").empty();
@@ -258,6 +205,40 @@ function showPresetSaveModal(type, $node) {
     }).modal('show');
 }
 
+function showSaveQSModal() {
+    var pre = $qsCombo.val();
+    var type = _configs.controller[$controller.val().id].control_type;
+
+    $("#saveQSName").val('');
+    $("#saveQSDesc").val('');
+    if(pre){
+        $("#saveQSName").val(_qselects[pre].name);
+        $("#saveQSDesc").val(_qselects[pre].desc);
+    }
+    $("#saveQSModal").modal({
+        blurring: true,
+        closable: false,
+        onApprove: function() {
+            var name = $("#saveQSName").val();
+            var desc = $("#saveQSDesc").val();
+
+            var qs = {
+                "name": name,
+                "desc": desc,
+                "data": _curQS,
+                "type": type
+            }
+            saveQS(name, qs, function() {
+                _qselects[name] = qs;
+                reloadQS();
+                $qsCombo.val(name);
+                $("#saveQSModal").modal('hide');
+            });
+        },
+        onDeny: function() {}
+    }).modal('show');
+}
+
 function showSaveQueueModal() {
     var pre = $queueCombo.val();
     var type = _configs.controller[$controller.val().id].control_type;
@@ -308,6 +289,25 @@ function showQueueDeleteModal() {
                 delete _queues[name];
                 reloadQueues();
                 $("#deleteQueueModal").modal('hide');
+            });
+        },
+        onDeny: function() {}
+    }).modal('show');
+}
+
+function showQSDeleteModal() {
+    var name = $qsCombo.val();
+    if(!name) return;
+    var msg = "Are you sure you want to delete the following Quick Select? <b>" + name + "</b>";
+    $("#deleteQSMsg").html(msg);
+    $("#deleteQSModal").modal({
+        blurring: true,
+        closable: false,
+        onApprove: function() {
+            deleteQS(name, function() {
+                delete _qselects[name];
+                reloadQS();
+                $("#deleteQSModal").modal('hide');
             });
         },
         onDeny: function() {}
@@ -669,6 +669,14 @@ function _loadQueues(callback){
     })
 }
 
+function _loadQS(callback){
+    getQS(function(q){
+        _qselects = q;
+        reloadQS();
+        callback();
+    })
+}
+
 function _loadEgg(callback){
     setTimeout(callback, 250);
 }
@@ -680,6 +688,7 @@ var _loadFuncs = [
     [_loadAnims, "Animations"],
     [_loadEgg, "Additional Pylons"],
     [_loadQueues, "Queues"],
+    [_loadQS, "Quick Selects"],
     [_loadPresets, "Presets"],
     [_loadConfig, "Current Setup"],
     [_loadEgg, "Death Ray"],
@@ -733,6 +742,18 @@ function onQueueChange(val){
         _curQueue = _clone(_queues[val].data);
         loadAnimQueue();
         $("#queue_delete").removeClass('disabled');
+    }
+}
+
+function onQSChange(val){
+    if(val in _qselects){
+        _curQS = _clone(_qselects[val].data);
+        loadQSPane();
+        $("#qs_delete").removeClass('disabled');
+        $("#launchQS").removeClass("disabled");
+    }
+    else {
+        $("#launchQS").addClass("disabled");
     }
 }
 
@@ -922,7 +943,7 @@ function loadQSPane() {
         $("#qsList .q_remove").click(function() {
             var n = $(this).closest('.item').attr('num');
             _curQS.splice(n, 1);
-            updateQSCount();
+            loadQSPane();
         });
     }
 
@@ -931,22 +952,8 @@ function loadQSPane() {
 
 
 function reloadQS(){
-
-}
-function addToQS(){
-
-}
-
-function addQSAnim(){
-    var a = getAnimConfig();
-    _curQS.push(a);
-    reloadQS();
-}
-
-function addQSQueue(){
-    var q = _clone(_curQueue);
-    _curQS.push(q);
-    reloadQS();
+    $qsCombo.load(_qselects);
+    $("#qs_delete").addClass('disabled');
 }
 
 $(document)
@@ -984,7 +991,7 @@ $(document)
             placeholder: "Select QS...",
             default: null,
             data: null,
-            // onChange: onQueueChange
+            onChange: onQSChange
         });
 
         $("#btnSettings").click(showServerConfig);
@@ -1006,8 +1013,8 @@ $(document)
         $("#saveQSAnimEdit").click(function(){showAddQSModal("anim")});
         $("#saveQSQueueEdit").click(function(){showAddQSModal("queue")});
 
-        $("#qs_save").click(showSaveQueueModal);
-        $("#qs_delete").click(showQueueDeleteModal);
+        $("#qs_save").click(showSaveQSModal);
+        $("#qs_delete").click(showQSDeleteModal);
 
 
         // setTimeout(function() {

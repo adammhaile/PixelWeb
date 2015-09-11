@@ -129,6 +129,27 @@ def getQueues(req):
 	cfg = config.readConfig("queues")
 	return success(data=cfg)
 
+def saveQS(req):
+	cfg = config.readConfig("quick_select")
+	cfg[req.name] = req.data
+	print config.writeConfig("quick_select", cfg)
+	return success()
+
+def getQS(req):
+	name = None
+	if "name" in req:
+		name = req.name
+	cfg = config.readConfig("quick_select", key=name)
+	if("name" in req and "name" not in cfg): cfg = None
+	return success(data=cfg)
+
+def deleteQS(req):
+	cfg = config.readConfig("quick_select")
+	if req.name in cfg:
+		del cfg[req.name]
+		config.writeConfig("quick_select", cfg)
+	return success()
+
 actions = {
 	'setColor' : [setColor, ['color']],
 	'setBrightness' : [setBrightness, ['level']],
@@ -149,4 +170,7 @@ actions = {
 	'saveQueue': [saveQueue, ['name', 'data']],
 	'deleteQueue': [deleteQueue, ['name']],
 	'getQueues': [getQueues, []],
+	'saveQS': [saveQS, ['name', 'data']],
+	'getQS': [getQS, []],
+	'deleteQS': [deleteQS, ['name']],
 }

@@ -118,7 +118,10 @@
                 <div class="ui list" id="qsList">
                 </div>
 
-                <button class="ui button" id="launchQS">Launch QS Page</button>
+                <button class="ui disabled labeled icon button" id="launchQS">
+                    <i class="rocket icon"></i>
+                    Launch QS Page
+                </button>
 
             </div>
 
@@ -200,6 +203,24 @@
         </div>
     </div>
 
+    <div class="ui basic small modal" id="saveQSModal">
+        <div class="header">Save Quick Select</div>
+        <div class="ui content">
+            <div class="ui fluid labeled input ui_input">
+                <div class="ui label">Name</div>
+                <input type="text" id="saveQSName">
+            </div>
+            <div class="ui fluid labeled input">
+                <div class="ui label">Description</div>
+                <input type="text" id="saveQSDesc">
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui approve green button">Save</div>
+            <div class="ui deny red button">Cancel</div>
+        </div>
+    </div>
+
     <div class="ui basic small modal" id="deletePresetModal">
         <div class="header">Delete Preset</div>
         <div class="ui content" id="deletePresetMsg">
@@ -214,6 +235,17 @@
     <div class="ui basic small modal" id="deleteQueueModal">
         <div class="header">Delete Queue</div>
         <div class="ui content" id="deleteQueueMsg">
+
+        </div>
+        <div class="actions">
+            <div class="ui approve green button">Yes</div>
+            <div class="ui deny red button">No</div>
+        </div>
+    </div>
+
+    <div class="ui basic small modal" id="deleteQSModal">
+        <div class="header">Delete Quick Select</div>
+        <div class="ui content" id="deleteQSMsg">
 
         </div>
         <div class="actions">

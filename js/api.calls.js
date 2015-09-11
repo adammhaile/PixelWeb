@@ -33,6 +33,7 @@ function getStatus(callback) {_get("getStatus", callback);}
 function getErrors(callback) {_get("getErrors",  callback);}
 
 function savePreset(type, name, desc, data, callback) {
+    name = name.toString();
     data.desc = desc;
     callAPI({
         action: "savePreset",
@@ -45,6 +46,7 @@ function savePreset(type, name, desc, data, callback) {
 }
 
 function deletePreset(type, name, callback) {
+    name = name.toString();
     callAPI({
         action: "deletePreset",
         name: name,
@@ -55,6 +57,7 @@ function deletePreset(type, name, callback) {
 }
 
 function saveQueue(name, q, callback) {
+    name = name.toString();
     callAPI({
         action: "saveQueue",
         name: name,
@@ -65,8 +68,46 @@ function saveQueue(name, q, callback) {
 }
 
 function deleteQueue(name, callback) {
+    name = name.toString();
     callAPI({
         action: "deleteQueue",
+        name: name
+    }, function(result) {
+        if (callback) callback();
+    });
+}
+
+function saveQS(name, qs, callback) {
+    name = name.toString();
+    callAPI({
+        action: "saveQS",
+        name: name,
+        data: qs
+    }, function(result) {
+        if (callback) callback();
+    });
+}
+
+function getQS(callback, name) {
+    if(name) name = name.toString();
+    var data = {
+        action: "getQS"
+    };
+    if(name) data.name = name;
+    callAPI(data, function(result) {
+        if (result.status) {
+            if (callback) callback(result.data);
+        }
+        else {
+            showBPError(result.msg);
+        }
+    });
+}
+
+function deleteQS(name, callback) {
+    name = name.toString();
+    callAPI({
+        action: "deleteQS",
         name: name
     }, function(result) {
         if (callback) callback();

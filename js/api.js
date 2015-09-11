@@ -25,7 +25,7 @@ function callAPI(data, success, error, complete) {
 
   $.ajax({
     type: 'POST',
-    url: "api",
+    url: "/api",
     contentType: 'application/json; charset=utf-8',
     dataType: 'json',
     data: JSON.stringify(data),

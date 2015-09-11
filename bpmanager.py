@@ -169,7 +169,10 @@ class BPManager:
 		self.stopConfig();
 		self._driverCfg = driverConfig
 		self._ledCfg = d(ledConfig)
-
+		ctype = ""
+		if self._ledCfg.id in self.controllers:
+			ctype = self.controllers[self._ledCfg.id].control_type
+		self._ledCfg.control_type = ctype
 		config.writeConfig("current_setup", self._driverCfg, "driver")
 		config.writeConfig("current_setup", self._ledCfg, "controller")
 

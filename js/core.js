@@ -22,6 +22,15 @@ function setLogNone() {
     log.disableAll();
 }
 
+function strReplace(str, find, replace) {
+    return str.replace(new RegExp(find, 'g'), replace);
+}
+
+function isNU(val){
+    return val === undefined || val === null;
+}
+
+
 function showHideByID(id, state) {
   $('#' + id).css('display', state ? 'block' : 'none');
 }

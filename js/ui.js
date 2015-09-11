@@ -1,12 +1,3 @@
-function strReplace(str, find, replace) {
-    return str.replace(new RegExp(find, 'g'), replace);
-}
-
-function isNU(val){
-    return val === undefined || val === null;
-}
-
-
 $.fn.addToolTip = function(text){
     var $node = $(this);
     $node.attr("data-content",text);

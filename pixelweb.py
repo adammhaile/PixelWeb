@@ -13,6 +13,10 @@ import bibliopixel.log as log
 def home():
 	return static_file("index.html", root='')
 
+@route('/qs/<name>')
+def qs(name):
+	return static_file("qs.html", root='')
+
 @route('/js/<filename:path>')
 def send_js(filename):
     return static_file(filename, root='js')

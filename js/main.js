@@ -13,12 +13,68 @@ var $anims = null;
 
 var $server_config = null;
 
-var _animEditMode = false;
+var _animEditMode = null;
 _animEditConfig = null;
 
 var $queueCombo = null;
 var _curQueue = [];
 var _queues = {};
+
+var _curQS = [];
+_curQS = [{
+    'qs_type': 'queue',
+    'type': 'matrix',
+    'data': [{
+        'run': {
+            'untilComplete': false,
+            'max_cycles': 1,
+            'max_steps': 100,
+            'amt': 1,
+            'fps': 30
+        },
+        'config': {
+            'bgcolor': [0, 0, 0],
+            'xPos': 0,
+            'color': [255, 255, 255],
+            'text': '',
+            'yPos': 0,
+            'size': 1
+        },
+        'id': 'ScrollText',
+        'desc': ''
+    }, {
+        'run': {
+            'untilComplete': false,
+            'max_cycles': 1,
+            'max_steps': 60,
+            'amt': 1,
+            'fps': 30
+        },
+        'config': {
+            'dir': true
+        },
+        'id': 'Bloom',
+        'desc': ''
+    }],
+    'name': 'Test',
+    'desc': 'asdasdasd'
+}, {
+    'id': 'GameOfLifeRGB',
+    'config': {
+        'toroidal': false
+    },
+    'run': {
+        'amt': 1,
+        'fps': 30,
+        'max_steps': 0,
+        'untilComplete': false,
+        'max_cycles': 1
+    },
+    'qs_type': 'anim',
+    'type': 'matrix',
+    'name': 'Hello',
+    'desc': 'Testing'
+}];
 
 function clearDriverChoosers() {
     $("#driver").empty();
@@ -65,6 +121,7 @@ function removeDriverChooser() {
 
 function loadAnimOptions(data, run) {
     _enable("#addQueue", false);
+    _enable("#addQSAnim", false);
     _enable("#startAnim", false);
     $anims = $("#anims").param_loader({
         data: data,
@@ -80,6 +137,7 @@ function loadAnimOptions(data, run) {
         onChange: function() {
             var c = getAnimConfig();
             _enable("#addQueue", (c != null));
+            _enable("#addQSAnim", (c != null));
             _enable("#startAnim", (c != null));
         }
     });
@@ -295,46 +353,6 @@ function showWarning(header, msg) {
     }).modal('show');
 }
 
-function showAddQueueModal() {
-    var params = getAnimConfig();
-    if (!params.run.untilComplete && params.run.max_steps == 0) {
-        showWarning("Add to Queue Warning",
-            'Queued animations require a stop condition, otherwise the animation will run forever.<br/>\
-             Please either set Max Frames or Until Complete and Max Cycles.<br \>\
-             Note: Not all animations support Until Complete but Max Frames will always work.')
-    } else {
-        if (_animEditMode) {
-            $("#addQueueHeader").html("Edit Queue Item");
-            $("#addQueueBtn").html("Save");
-            $("#addQueueDesc").val(_animEditConfig.config.desc);
-        } else {
-            $("#addQueueHeader").html("Add to Queue");
-            $("#addQueueBtn").html("Add");
-            $("#addQueueDesc").val('');
-        }
-
-        $("#addQueueModal").modal({
-            blurring: true,
-            closable: false,
-            onApprove: function() {
-                var desc = $("#addQueueDesc").val();
-
-                params.desc = desc;
-                if (_animEditMode) {
-                    _curQueue[_animEditConfig.index] = params;
-                    activatePane("Queue");
-                } else {
-                    _curQueue.push(params);
-                }
-                $("#addQueueModal").modal('hide');
-
-                updateQueueCount();
-            },
-            onDeny: function() {}
-        }).modal('show');
-    }
-}
-
 function findPreset(t, p, id) {
     var c = _configs[t];
     if (t == "anim") {
@@ -388,7 +406,25 @@ function updateQueueCount(){
         $("#queueCount").addClass("hidden");
     }
 }
-function loadAnimQueue() {
+
+function loadAnimQueue(config) {
+    var isEdit = config != undefined;
+    if(config)
+        _animEditMode = config.type;
+    else
+        _animEditMode = null;
+
+    _show("#saveQSQueueEdit", _animEditMode == "qs");
+    _show("#startQ", !isEdit);
+    _show("#stopQ", !isEdit);
+    _show("#addQSQueue", !isEdit);
+
+    _animEditConfig = config;
+    if (_animEditMode) {
+        _curQueue = config.config.data;
+        $queueCombo.setDefault();
+    }
+
     var q_sort = function(event, ui) {
         var num = 0;
         var temp = [];
@@ -398,7 +434,8 @@ function loadAnimQueue() {
         });
 
         _curQueue = temp;
-        loadAnimQueue();
+        if(_animEditConfig){_animEditConfig.config.data = _curQueue;}
+        loadAnimQueue(_animEditConfig);
     };
 
     $("#queueList").empty();
@@ -407,27 +444,29 @@ function loadAnimQueue() {
     if (_curQueue.length > 0) {
         html = buildQueueFeed(_curQueue);
         _enable("#startQ", true);
+        _enable("#addQSQueue", true);
         _enable("#queue_save", true);
     } else {
         _enable("#startQ", false);
+        _enable("#addQSQueue", false);
         _enable("#queue_save", false);
     }
 
     $("#queueList").html(html);
-    // if(!preset){
-    //     reloadQueues();
-    // }
 
     if (_curQueue.length > 0) {
         $("#queueList").sortable({
-            update: q_sort
+            update: q_sort,
+            placeholder: "sort_placeholder"
         });
 
         $("#queueList .q_edit").click(function() {
             var n = $(this).closest('.item').attr('num');
             activatePane("Anim", {
                 "config": _curQueue[n],
-                "index": n
+                "index": n,
+                "type": "queue",
+                "sub": _animEditConfig
             });
         });
 
@@ -443,11 +482,18 @@ function loadAnimQueue() {
 
 function loadAnim(config) {
     var isEdit = config != undefined;
-    _show("#saveQueueEdit", isEdit);
+    if(config)
+        _animEditMode = config.type;
+    else
+        _animEditMode = null;
+
+    _show("#saveQSAnimEdit", _animEditMode == "qs");
+    _show("#saveQueueEdit", _animEditMode == "queue");
     _show("#addQueue", !isEdit);
+    _show("#addQSAnim", !isEdit);
     _show("#startAnim", !isEdit);
     _show("#stopAnim", !isEdit);
-    _animEditMode = isEdit;
+
     _animEditConfig = config;
     if (_animEditMode) {
         $anims.val(config.config);
@@ -457,7 +503,8 @@ function loadAnim(config) {
 var _paneLoadFuncs = {
     "Console": loadConsoleStatus,
     "Queue": loadAnimQueue,
-    "Anim": loadAnim
+    "Anim": loadAnim,
+    "QS": loadQSPane,
 }
 
 function activatePane(id, option) {
@@ -683,9 +730,49 @@ function incLoad(msg){
 
 function onQueueChange(val){
     if(val in _queues){
-        _curQueue = JSON.parse(JSON.stringify(_queues[val].data));
+        _curQueue = _clone(_queues[val].data);
         loadAnimQueue();
         $("#queue_delete").removeClass('disabled');
+    }
+}
+
+function showAddQueueModal() {
+    var params = getAnimConfig();
+    if (!params.run.untilComplete && params.run.max_steps == 0) {
+        showWarning("Add to Queue Warning",
+            'Queued animations require a stop condition, otherwise the animation will run forever.<br/>\
+             Please either set Max Frames or Until Complete and Max Cycles.<br \>\
+             Note: Not all animations support Until Complete but Max Frames will always work.')
+    } else {
+        if (_animEditMode) {
+            $("#addQueueHeader").html("Edit Queue Item");
+            $("#addQueueBtn").html("Save");
+            $("#addQueueDesc").val(_animEditConfig.config.desc);
+        } else {
+            $("#addQueueHeader").html("Add to Queue");
+            $("#addQueueBtn").html("Add");
+            $("#addQueueDesc").val('');
+        }
+
+        $("#addQueueModal").modal({
+            blurring: true,
+            closable: false,
+            onApprove: function() {
+                var desc = $("#addQueueDesc").val();
+
+                params.desc = desc;
+                if (_animEditMode) {
+                    _curQueue[_animEditConfig.index] = params;
+                    activatePane("Queue", _animEditConfig.sub);
+                } else {
+                    _curQueue.push(params);
+                }
+                $("#addQueueModal").modal('hide');
+
+                updateQueueCount();
+            },
+            onDeny: function() {}
+        }).modal('show');
     }
 }
 
@@ -712,6 +799,154 @@ function getQSOptions(){
         queue: q,
         anim: a
     }
+}
+
+function showAddQSModal(type) {
+    var qs = null;
+    var header = "";
+    if(type=="anim"){
+        header = "Add Animation to Quick Select";
+        qs = getAnimConfig();
+        qs.qs_type = "anim";
+        qs.type = _animType;
+    }
+    else if(type=="queue"){
+        header = "Add Queue to Quick Select";
+        var type = _configs.controller[$controller.val().id].control_type;
+        var data = _clone(_curQueue);
+        qs = {
+            qs_type: "queue",
+            type: type,
+            data: data
+        };
+    }
+
+    if(!qs) return; //TODO: Error here
+
+    if (_animEditMode == "qs") {
+        $("#addQSHeader").html("Edit Quick Select Item");
+        $("#addQSBtn").html("Save");
+        $("#addQSDesc").val(_animEditConfig.config.desc);
+        $("#addQSName").val(_animEditConfig.config.name);
+    } else {
+        $("#addQSHeader").html(header);
+        $("#addQSBtn").html("Add");
+        $("#addQSDesc").val('');
+        $("#addQSName").val('');
+    }
+
+    $("#addQSModal").modal({
+        blurring: true,
+        closable: false,
+        onApprove: function() {
+            var name = $("#addQSName").val();
+            var desc = $("#addQSDesc").val();
+
+            qs.name = name;
+            qs.desc = desc;
+
+            if (_animEditMode == "qs") {
+                _curQS[_animEditConfig.index] = qs;
+                activatePane("QS");
+            } else {
+                _curQS.push(qs);
+            }
+            $("#addQSModal").modal('hide');
+
+            updateQSCount();
+        },
+        onDeny: function() {}
+    }).modal('show');
+}
+
+function updateQSCount(){
+    if(_curQS.length > 0){
+        $("#qsCount").html(_curQS.length);
+        $("#qsCount").removeClass("hidden");
+    }
+    else {
+        $("#qsCount").addClass("hidden");
+    }
+}
+
+function loadQSPane() {
+    var q_sort = function(event, ui) {
+        var num = 0;
+        var temp = [];
+        $.each($("#qsList").children(), function(i, v) {
+            num = $(v).attr('num');
+            temp.push(_curQS[num]);
+        });
+
+        _curQS = temp;
+        loadQSPane();
+    };
+
+    $("#qsList").empty();
+
+    var html = "No Quick Selects! Go to the Animation or Queue pane and add some.";
+    if (_curQS.length > 0) {
+        html = buildQSFeed(_curQS);
+        _enable("#qs_save", true);
+    } else {
+        _enable("#qs_save", false);
+    }
+
+    $("#qsList").html(html);
+
+    if (_curQS.length > 0) {
+        $("#qsList").sortable({
+            update: q_sort,
+            placeholder: "sort_placeholder"
+        });
+
+        $("#qsList .q_edit").click(function() {
+            var n = $(this).closest('.item').attr('num');
+            var qs = _curQS[n];
+            if(qs.qs_type == "anim"){
+                activatePane("Anim", {
+                    "config": qs,
+                    "index": n,
+                    "type": "qs"
+                });
+            }
+            else if(qs.qs_type == "queue"){
+                activatePane("Queue", {
+                    "config": qs,
+                    "index": n,
+                    "type": "qs"
+                });
+            }
+        });
+
+        $("#qsList .q_remove").click(function() {
+            var n = $(this).closest('.item').attr('num');
+            _curQS.splice(n, 1);
+            updateQSCount();
+        });
+    }
+
+    updateQSCount();
+}
+
+
+function reloadQS(){
+
+}
+function addToQS(){
+
+}
+
+function addQSAnim(){
+    var a = getAnimConfig();
+    _curQS.push(a);
+    reloadQS();
+}
+
+function addQSQueue(){
+    var q = _clone(_curQueue);
+    _curQS.push(q);
+    reloadQS();
 }
 
 $(document)
@@ -742,7 +977,14 @@ $(document)
             default: null,
             data: null,
             onChange: onQueueChange
-            // help: "params.help"
+        });
+
+        $qsCombo = $("#qsCombo")._dropdown({
+            label: "Saved QS",
+            placeholder: "Select QS...",
+            default: null,
+            data: null,
+            // onChange: onQueueChange
         });
 
         $("#btnSettings").click(showServerConfig);
@@ -759,6 +1001,14 @@ $(document)
         $("#saveQueueEdit").click(showAddQueueModal);
         $("#queue_save").click(showSaveQueueModal);
         $("#queue_delete").click(showQueueDeleteModal);
+        $("#addQSAnim").click(function(){showAddQSModal("anim")});
+        $("#addQSQueue").click(function(){showAddQSModal("queue")});
+        $("#saveQSAnimEdit").click(function(){showAddQSModal("anim")});
+        $("#saveQSQueueEdit").click(function(){showAddQSModal("queue")});
+
+        $("#qs_save").click(showSaveQueueModal);
+        $("#qs_delete").click(showQueueDeleteModal);
+
 
         // setTimeout(function() {
         //     activatePane("Queue");

@@ -390,44 +390,38 @@ function buildFeed(items) {
     return html;
 }
 
-function genPresetItem(item, name, type) {
-    html = '\
-    <div class="item">\
-        <div class="right floated content">\
-            <div class="ui button presetLoadBtn" name="@loadID">Load</div>\
+
+function genQSFeedItem(item, num) {
+
+    var html = "\
+    <div class='item grabber' num='@num'>\
+        <div class='right floated content'>\
+            <button class='ui button q_edit'><i class='pencil icon'></i>Edit</button>\
+            <button class='ui red button q_remove'><i class='remove icon'></i>Remove</button>\
         </div>\
-        <div class="content">\
-            <div class="header">@presetName</div>\
-            @help\
+        <i class='@type icon'></i>\
+        <div class='content'>\
+            <div class='header'>@name</div>\
+            <div class='description'>@desc</div>\
         </div>\
     </div>\
-    ';
+    ";
 
-    html = strReplace(html, "@presetName", name);
-    html = strReplace(html, "@help", item.help);
-    html = strReplace(html, "@loadID", name);
+    var type = "";
+    if(item.qs_type == "queue") type = "film";
+    else if(item.qs_type == "anim") type = "play"
+    html = strReplace(html, "@type", type);
+    html = strReplace(html, "@num", num);
+
+    html = strReplace(html, "@name", item.name);
+    html = strReplace(html, "@desc", item.desc);
     return html;
 }
 
-function buildPresetList(items, type) {
-    if (type == "anim") {
-        var temp = {};
-        $.each(items, function(k, v) {
-            if (v.type == _animType)
-                temp[k] = v;
-        });
-        items = temp;
-    }
+function buildQSFeed(items) {
     var html = '';
     $.each(items, function(i, v) {
-        var typeName = null;
-        if (type in _configs) {
-            if (v.id in _configs[type]) {
-                typeName = _configs[type][v.id].display;
-            }
-        }
-        if (typeName) i = typeName + ": " + i;
-        html += genPresetItem(v, i, type);
+        html += genQSFeedItem(v, i);
     })
     return html;
 }

@@ -21,6 +21,7 @@ function startAnim(){
     }
 
     if(config){
+        $b.addClass('loading');
         callAPI({
             action: "startAnim",
             config: config
@@ -30,7 +31,7 @@ function startAnim(){
             } else {
 
             }
-            // setLoading("#startAnim", false);
+            $b.removeClass('loading');
         });
     }
 }
@@ -61,6 +62,7 @@ function loadQS(){
 }
 
 function stopAnim(){
+    $("#btnStop").addClass('loading');
     callAPI({
         action: "stopAnim"
     }, function(result) {
@@ -69,9 +71,9 @@ function stopAnim(){
         } else {
 
         }
+        $("#btnStop").removeClass('loading');
     });
 }
-
 
 $(document).ready(function(){
     var name = window.location.pathname.replace('/qs/', '');

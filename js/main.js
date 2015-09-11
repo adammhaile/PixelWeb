@@ -997,6 +997,10 @@ function resetOnStart(){
     _curQueue = {};
     updateQueueCount();
 }
+function launchQS(){
+    var name = $qsCombo.val();
+    window.open(window.location.href + "qs/" + name, "QS");
+}
 
 $(document)
     .ready(function() {
@@ -1060,8 +1064,6 @@ $(document)
         $("#qs_save").click(showSaveQSModal);
         $("#qs_delete").click(showQSDeleteModal);
 
+        $("#launchQS").click(launchQS);
 
-        // setTimeout(function() {
-        //     activatePane("Queue");
-        // }, 250);
     });

@@ -1,4 +1,8 @@
 html {
+    background-color: #000000;
+}
+
+.loaded_style {
     background-color: #FF4800;
 }
 
@@ -23,6 +27,7 @@ body {
     margin-top: 0px !important;
     border-radius: 0px;
     border: 0px solid transparent;
+    display: none;
 }
 
 #progLabel {

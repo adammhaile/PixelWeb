@@ -23,6 +23,10 @@ var _queues = {};
 var _curQS = [];
 var _qselects = {};
 
+_dimSettings = {
+    opacity: 0.4
+};
+
 function getContType(){
     return _configs.controller[$controller.val().id].control_type;
 }
@@ -140,7 +144,8 @@ function displayCurConfig() {
 function showBPError(msg) {
     $("#bpErrorMsg").html(msg);
     $("#BPError").modal({
-        blurring: true
+        blurring: true,
+        dimmerSettings: _dimSettings
     }).modal('show');
 }
 
@@ -190,6 +195,7 @@ function showPresetSaveModal(type, $node) {
     $("#savePresetModal").modal({
         blurring: true,
         closable: false,
+        dimmerSettings: _dimSettings,
         onApprove: function() {
             $("#presetSaveBtn").addClass('loading');
             var name = $("#savePresetName").val();
@@ -222,6 +228,7 @@ function showSaveQSModal() {
     $("#saveQSModal").modal({
         blurring: true,
         closable: false,
+        dimmerSettings: _dimSettings,
         onApprove: function() {
             var name = $("#saveQSName").val();
             var desc = $("#saveQSDesc").val();
@@ -257,6 +264,7 @@ function showSaveQueueModal() {
     $("#saveQueueModal").modal({
         blurring: true,
         closable: false,
+        dimmerSettings: _dimSettings,
         onApprove: function() {
             $("#queueSaveBtn").addClass('loading');
             var name = $("#saveQueueName").val();
@@ -288,6 +296,7 @@ function showQueueDeleteModal() {
     $("#deleteQueueModal").modal({
         blurring: true,
         closable: false,
+        dimmerSettings: _dimSettings,
         onApprove: function() {
             deleteQueue(name, function() {
                 delete _queues[name];
@@ -307,6 +316,7 @@ function showQSDeleteModal() {
     $("#deleteQSModal").modal({
         blurring: true,
         closable: false,
+        dimmerSettings: _dimSettings,
         onApprove: function() {
             deleteQS(name, function() {
                 delete _qselects[name];
@@ -338,6 +348,7 @@ function showPresetDeleteModal(type, preset, $node) {
             $("#deletePresetModal").modal({
                 blurring: true,
                 closable: false,
+                dimmerSettings: _dimSettings,
                 onApprove: function() {
                     deletePreset(type, preset.name, function() {
                         p[1].splice(p[0], 1);
@@ -359,6 +370,7 @@ function showWarning(header, msg) {
     $("#genericWarning").modal({
         blurring: true,
         closable: true,
+        dimmerSettings: _dimSettings,
     }).modal('show');
 }
 
@@ -424,6 +436,7 @@ function loadAnimQueue(config) {
         _animEditMode = null;
 
     _show("#saveQSQueueEdit", _animEditMode == "qs");
+    _show("#cancelQSQueueEdit", _animEditMode == "qs");
     _show("#startQ", !isEdit);
     _show("#stopQ", !isEdit);
     _show("#addQSQueue", !isEdit);
@@ -498,6 +511,7 @@ function loadAnim(config) {
 
     _show("#saveQSAnimEdit", _animEditMode == "qs");
     _show("#saveQueueEdit", _animEditMode == "queue");
+    _show("#cancelAnimEdit", _animEditMode == "qs" || _animEditMode == "queue");
     _show("#addQueue", !isEdit);
     _show("#addQSAnim", !isEdit);
     _show("#startAnim", !isEdit);
@@ -704,6 +718,8 @@ var _loadFuncs = [
 
 
 function _finalLoad(){
+    $('html').addClass('loaded_style');
+    $('#main_window').show();
     reloadQueues();
     reloadQS();
     activatePane("Queue");
@@ -736,12 +752,19 @@ function showLoader(){
         closable: false,
         dimmerSettings: {
             opacity: 1
-        }
+        },
+        // transition: null,
+        duration: 0
     }).modal('show');
 }
 
 function hideLoader(){
-    $("#load_modal").modal('hide');
+    $("#load_modal")
+        .modal({
+            duration:400,
+            transition: 'fade',
+        })
+        .modal('hide');
 }
 
 function incLoad(msg){
@@ -794,6 +817,7 @@ function showAddQueueModal() {
         $("#addQueueModal").modal({
             blurring: true,
             closable: false,
+            dimmerSettings: _dimSettings,
             onApprove: function() {
                 var desc = $("#addQueueDesc").val();
 
@@ -810,6 +834,18 @@ function showAddQueueModal() {
             },
             onDeny: function() {}
         }).modal('show');
+    }
+}
+function cancelQSQueueEdit(){
+    activatePane("QS");
+}
+
+function cancelAnimEdit(){
+    if(_animEditMode == "qs"){
+        activatePane("QS");
+    }
+    else if(_animEditMode == "queue"){
+        activatePane("Queue", _animEditConfig.sub);
     }
 }
 
@@ -850,6 +886,7 @@ function showAddQSModal(type) {
     $("#addQSModal").modal({
         blurring: true,
         closable: false,
+        dimmerSettings: _dimSettings,
         onApprove: function() {
             var name = $("#addQSName").val();
             var desc = $("#addQSDesc").val();
@@ -1016,7 +1053,9 @@ $(document)
         $("#addQSAnim").click(function(){showAddQSModal("anim")});
         $("#addQSQueue").click(function(){showAddQSModal("queue")});
         $("#saveQSAnimEdit").click(function(){showAddQSModal("anim")});
+        $("#cancelAnimEdit").click(cancelAnimEdit);
         $("#saveQSQueueEdit").click(function(){showAddQSModal("queue")});
+        $("#cancelQSQueueEdit").click(cancelQSQueueEdit);
 
         $("#qs_save").click(showSaveQSModal);
         $("#qs_delete").click(showQSDeleteModal);

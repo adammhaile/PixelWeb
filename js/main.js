@@ -23,6 +23,10 @@ var _queues = {};
 var _curQS = [];
 var _qselects = {};
 
+function getContType(){
+    return _configs.controller[$controller.val().id].control_type;
+}
+
 function clearDriverChoosers() {
     $("#driver").empty();
     driverPickers = [];
@@ -207,7 +211,7 @@ function showPresetSaveModal(type, $node) {
 
 function showSaveQSModal() {
     var pre = $qsCombo.val();
-    var type = _configs.controller[$controller.val().id].control_type;
+    var type = getContType();
 
     $("#saveQSName").val('');
     $("#saveQSDesc").val('');
@@ -241,7 +245,7 @@ function showSaveQSModal() {
 
 function showSaveQueueModal() {
     var pre = $queueCombo.val();
-    var type = _configs.controller[$controller.val().id].control_type;
+    var type = getContType();
 
     $("#queueSaveBtn").removeClass('loading');
     $("#saveQueueName").val('');
@@ -315,7 +319,12 @@ function showQSDeleteModal() {
 }
 
 function reloadQueues(){
-    $queueCombo.load(_queues);
+    var temp = {};
+    var type = getContType();
+    $.each(_queues, function(k,v){
+        if(v.type == type) temp[k] = v;
+    });
+    $queueCombo.load(temp);
     $("#queue_delete").addClass('disabled');
 }
 
@@ -664,7 +673,6 @@ function _loadServerConfig(callback){
 function _loadQueues(callback){
     getQueues(function(q){
         _queues = q;
-        reloadQueues();
         callback();
     })
 }
@@ -672,7 +680,6 @@ function _loadQueues(callback){
 function _loadQS(callback){
     getQS(function(q){
         _qselects = q;
-        reloadQS();
         callback();
     })
 }
@@ -693,13 +700,22 @@ var _loadFuncs = [
     [_loadConfig, "Current Setup"],
     [_loadEgg, "Death Ray"],
 ]
+
+
+
+function _finalLoad(){
+    reloadQueues();
+    reloadQS();
+    activatePane("Queue");
+    setTimeout(hideLoader, 250);
+}
+
 var _loadIndex = 0;
 function loadInitData() {
     var nextLoad = function(){
         _loadIndex += 1;
         if(_loadIndex >= _loadFuncs.length){
-            activatePane("Queue");
-            setTimeout(hideLoader, 250);
+            _finalLoad()
         }
         else{
             incLoad(_loadFuncs[_loadIndex][1]);
@@ -797,31 +813,6 @@ function showAddQueueModal() {
     }
 }
 
-function getQSOptions(){
-    var type = _configs.controller[$controller.val().id].control_type;
-    var q = [];
-    $.each(_queues, function(k,v){
-        if(v.type == type){
-            q.push(v);
-        }
-    })
-    var a = [];
-    if(type in _configs.anim){
-        $.each(_configs.anim[type], function(k,v){
-            if("presets" in v){
-                $.each(v.presets, function(i,p){
-                    a.push(p);
-                })
-            }
-        });
-    }
-
-    return {
-        queue: q,
-        anim: a
-    }
-}
-
 function showAddQSModal(type) {
     var qs = null;
     var header = "";
@@ -833,7 +824,7 @@ function showAddQSModal(type) {
     }
     else if(type=="queue"){
         header = "Add Queue to Quick Select";
-        var type = _configs.controller[$controller.val().id].control_type;
+        var type = getContType();
         var data = _clone(_curQueue);
         qs = {
             qs_type: "queue",
@@ -952,8 +943,22 @@ function loadQSPane() {
 
 
 function reloadQS(){
-    $qsCombo.load(_qselects);
+    var temp = {};
+    var type = getContType();
+    $.each(_qselects, function(k,v){
+        if(v.type == type) temp[k] = v;
+    });
+    $qsCombo.load(temp);
     $("#qs_delete").addClass('disabled');
+}
+
+function resetOnStart(){
+    reloadQS();
+    reloadQueues();
+    _curQS = {};
+    updateQSCount();
+    _curQueue = {};
+    updateQueueCount();
 }
 
 $(document)
@@ -970,7 +975,7 @@ $(document)
             callAPI(config, function(result) {
                 console.log(result);
                 if (result.status) {
-
+                    resetOnStart();
                 } else {
                     showBPError(result.msg);
                 }

@@ -116,6 +116,7 @@ class BPManager:
 		else:
 			return
 
+	#TODO: Add check for required fields for better errors
 	def loadModules(self, mods):
 		for m in mods:
 			if hasattr(m, 'MANIFEST'):
@@ -123,7 +124,10 @@ class BPManager:
 				for ref in m.MANIFEST:
 					ref = d(ref)
 					if ref.type in self.__loadFuncs:
-						self.__loadFuncs[ref.type](ref)
+						try:
+							self.__loadFuncs[ref.type](ref)
+						except:
+							status.pushStatus("Load module failure: {} - {}".format(m.__file__, traceback.format_exc()))
 
 	def loadBaseMods(self):
 		self.loadModules(moduleList)

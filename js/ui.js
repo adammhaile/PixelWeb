@@ -354,7 +354,9 @@ $.fn._input = function(config) {
         if (value != undefined) {
             return $input.val(value);
         } else {
-            return $input.val();
+            var val = $input.val();
+            if(val == "") val = null;
+            return val;
         }
     };
 

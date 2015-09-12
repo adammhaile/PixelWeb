@@ -996,9 +996,9 @@ function reloadQS(){
 function resetOnStart(){
     reloadQS();
     reloadQueues();
-    _curQS = {};
+    _curQS = [];
     updateQSCount();
-    _curQueue = {};
+    _curQueue = [];
     updateQueueCount();
 }
 function launchQS(){

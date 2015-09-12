@@ -51,6 +51,7 @@ def loadParams(cls):
             }
             result.append(i)
         count += 1
+        result = result[::-1]
     return result
 
 def getControllerType(cls):

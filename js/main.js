@@ -28,7 +28,11 @@ _dimSettings = {
 };
 
 function getContType(){
-    return _configs.controller[$controller.val().id].control_type;
+    if(_configs.controller[$controller.val().id])
+        return _configs.controller[$controller.val().id].control_type;
+    else {
+        return null;
+    }
 }
 
 function clearDriverChoosers() {

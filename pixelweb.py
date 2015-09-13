@@ -8,6 +8,8 @@ import config
 import status
 
 import bibliopixel.log as log
+import os
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 @route('/')
 def home():

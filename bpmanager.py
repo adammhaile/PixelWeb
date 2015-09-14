@@ -1,5 +1,5 @@
 from bibliopixel import *
-from bibliopixel.animation import BaseAnimation, AnimationQueue
+from bibliopixel.animation import BaseAnimation, AnimationQueue, OffAnim
 from util import *
 from static_objects import *
 import loader
@@ -8,7 +8,7 @@ import status
 import traceback
 
 class BPManager:
-	def __init__(self):
+	def __init__(self, off_timeout):
 		self.driver = []
 		self._driverCfg = None
 		self.led = None
@@ -33,12 +33,14 @@ class BPManager:
 
 		self.animRunParams = BaseAnimation.RUN_PARAMS
 
+		self._off_timeout = off_timeout
+		self._offAnim = None
+
 		self.__loadFuncs = {
 			"driver" : self.__loadDriverDef,
 			"controller" : self.__loadControllerDef,
 			"animation" : self.__loadAnimDef,
 			"preset": self.__loadPresetDef
-
 		}
 
 		config.initConfig()
@@ -169,6 +171,13 @@ class BPManager:
 
 		return (obj, params)
 
+	def _startOffAnim(self):
+		if self._off_timeout > 0:
+			if self._offAnim == None and self.led != None:
+				self._offAnim = OffAnim(self.led)
+			self.anim = OffAnim(self.led, timeout=self._off_timeout)
+			self.anim.run(threaded=True)
+
 	def startConfig(self, driverConfig, ledConfig):
 		self.stopConfig();
 		self._driverCfg = driverConfig
@@ -190,6 +199,7 @@ class BPManager:
 			obj, params = self.__getInstance(self._ledCfg, "controller")
 			params['driver'] = self.driver
 			self.led = obj(**(params))
+			self._startOffAnim()
 			status.pushStatus("Config start success!")
 			return success()
 		except:
@@ -213,12 +223,16 @@ class BPManager:
 			self.led.cleanup()
 			self.led = None
 			self._ledCfg = None
+		self._offAnim = None
 
-	def stopAnim(self):
+	def stopAnim(self, doOff = True):
+		print self.anim
 		if self.anim:
 			self.anim.cleanup()
 			self.anim = None
 			self._animCfg = None
+			if doOff:
+				self._startOffAnim()
 
 	def startAnim(self, config):
 		def getAnim(c):
@@ -232,7 +246,7 @@ class BPManager:
 			return anim, d(run)
 
 		try:
-			self.stopAnim()
+			self.stopAnim(doOff = False)
 			self._animCfg = config
 			if('queue' in config):
 				q = config['queue']

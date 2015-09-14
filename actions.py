@@ -9,7 +9,7 @@ bpm = None
 
 def initBPM(server_config):
 	global bpm
-	bpm = BPManager()
+	bpm = BPManager(server_config.off_anim_time)
 	bpm.loadBaseMods()
 	bpm.loadMods()
 	cfg = config.readConfig("current_setup")

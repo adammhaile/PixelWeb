@@ -41,8 +41,27 @@ BASE_SERVER_CONFIG = d({
                 "default": [],
                 "help":"Directories from which to load modules (animations, drivers, controllers, pre-configs).",
                 "replace": {"\\":"/"}
+            },
+            {
+                "id": "off_anim_time",
+                "label": "All Off Timeout",
+                "type": "str",
+                "default": 10,
+                "min": 0,
+                "max": 3600,
+                "help":"Keep display off when not running an animation by actively turning all pixels off every X seconds. Set to 0 to disable.",
+                "replace": {"\\":"/"}
             },]
         });
+
+def genDefaultConfig(params):
+    c = {}
+    for p in params:
+        p = d(p)
+        c[p.id] = p.default
+
+    return c
+
 
 def initConfig():
     try:
@@ -83,6 +102,7 @@ def paramsToDict(params):
         data[p.id] = p.default
     return data
 
+
 def readServerConfig():
     data = readConfig("config", path=__home)
     base = paramsToDict(BASE_SERVER_CONFIG.params)
@@ -94,3 +114,9 @@ def readServerConfig():
 
 def writeServerConfig(data):
     writeConfig("config", data)
+
+def upgradeServerConfig():
+    b = genDefaultConfig(BASE_SERVER_CONFIG.params)
+    cfg = readServerConfig()
+    cfg.upgrade(b)
+    writeServerConfig(cfg)

@@ -70,8 +70,10 @@ def api():
 
 config.initConfig()
 status.pushStatus("Reading server config")
+config.upgradeServerConfig()
 server = config.readServerConfig()
-config.writeServerConfig(server)
+# print server
+# config.writeServerConfig(server)
 
 cfg = d(server)
 level = log.INFO

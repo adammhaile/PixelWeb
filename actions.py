@@ -132,7 +132,7 @@ def getQueues(req):
 def saveQS(req):
 	cfg = config.readConfig("quick_select")
 	cfg[req.name] = req.data
-	print config.writeConfig("quick_select", cfg)
+	config.writeConfig("quick_select", cfg)
 	return success()
 
 def getQS(req):

@@ -45,7 +45,7 @@ BASE_SERVER_CONFIG = d({
             {
                 "id": "off_anim_time",
                 "label": "All Off Timeout",
-                "type": "str",
+                "type": "int",
                 "default": 10,
                 "min": 0,
                 "max": 3600,

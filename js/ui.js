@@ -355,7 +355,9 @@ $.fn._input = function(config) {
             return $input.val(value);
         } else {
             var val = $input.val();
-            if(val == "") val = null;
+            if(val == "" && cfg.default === null)
+                val = null;
+
             return val;
         }
     };

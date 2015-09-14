@@ -213,7 +213,7 @@ class BPManager:
 		return setup
 
 	def stopConfig(self):
-		self.stopAnim()
+		self.stopAnim(doOff = False)
 		if len(self.driver) > 0:
 			for drv in self.driver:
 				drv.cleanup()
@@ -226,7 +226,6 @@ class BPManager:
 		self._offAnim = None
 
 	def stopAnim(self, doOff = True):
-		print self.anim
 		if self.anim:
 			self.anim.cleanup()
 			self.anim = None

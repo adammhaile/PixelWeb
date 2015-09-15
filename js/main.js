@@ -1018,7 +1018,6 @@ $(document)
             var config = getCurrentConfig();
             config.action = "startConfig"
             callAPI(config, function(result) {
-                console.log(result);
                 if (result.status) {
                     resetOnStart();
                 } else {

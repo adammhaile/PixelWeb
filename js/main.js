@@ -499,7 +499,7 @@ function loadAnimQueue(config) {
         $("#queueList .q_remove").click(function() {
             var n = $(this).closest('.item').attr('num');
             _curQueue.splice(n, 1);
-            loadAnimQueue();
+            loadAnimQueue(_animEditConfig);
         });
     }
 
@@ -955,7 +955,7 @@ function loadQSPane() {
 
         $("#qsList .q_edit").click(function() {
             var n = $(this).closest('.item').attr('num');
-            var qs = _curQS[n];
+            var qs = _clone(_curQS[n]);
             if(qs.qs_type == "anim"){
                 activatePane("Anim", {
                     "config": qs,

@@ -189,9 +189,16 @@ function reloadPresets() {
 }
 
 function showPresetSaveModal(type, $node) {
+    var curVal = $node.presetVal();
+    var name = '';
+    var desc = '';
+    if(curVal){
+        name = curVal.name;
+        desc = curVal.desc;
+    }
     $("#presetSaveBtn").removeClass('loading');
-    $("#savePresetName").val('');
-    $("#savePresetDesc").val('');
+    $("#savePresetName").val(name);
+    $("#savePresetDesc").val(desc);
     $("#savePresetModal").modal({
         blurring: true,
         closable: false,
@@ -208,6 +215,7 @@ function showPresetSaveModal(type, $node) {
             savePreset(type, name, desc, data, function() {
                 pushPreset(type, data);
                 reloadPresets();
+                $node.presetVal(name);
                 $("#savePresetModal").modal('hide');
             });
         },
@@ -405,7 +413,21 @@ function pushPreset(t, v) {
     if (c != undefined && v.id in c) {
         if (!(("presets") in c[v.id]))
             c[v.id].presets = [];
-        c[v.id].presets.push(v);
+
+        var id = -1;
+        $.each(c[v.id].presets, function(i,p){
+            if(p.display == v.display){
+                id = i;
+                return false;
+            }
+        });
+        if(id >= 0){
+            c[v.id].presets[id] = v;
+        }
+        else{
+            c[v.id].presets.push(v);
+        }
+
     }
 }
 
@@ -438,7 +460,9 @@ function loadAnimQueue(config) {
     _show("#saveQSQueueEdit", _animEditMode == "qs");
     _show("#cancelQSQueueEdit", _animEditMode == "qs");
     _show("#startQ", !isEdit);
+    setLoading("#startQ", false);
     _show("#stopQ", !isEdit);
+    setLoading("#stopQ", false);
     _show("#addQSQueue", !isEdit);
 
     _animEditConfig = config;
@@ -515,7 +539,9 @@ function loadAnim(config) {
     _show("#addQueue", !isEdit);
     _show("#addQSAnim", !isEdit);
     _show("#startAnim", !isEdit);
+    setLoading("#startAnim", false);
     _show("#stopAnim", !isEdit);
+    setLoading("#stopAnim", false);
 
     _animEditConfig = config;
     if (_animEditMode) {
@@ -551,7 +577,7 @@ function handleSideMenu() {
 }
 
 function _startAnim(anim) {
-    // setLoading("#startAnim");
+    setLoading("#startAnim");
 
     callAPI({
         action: "startAnim",
@@ -562,7 +588,8 @@ function _startAnim(anim) {
         } else {
             showBPError(result.msg);
         }
-        // setLoading("#startAnim", false);
+        setLoading("#startAnim", false);
+        setLoading("#startQ", false);
     });
 }
 
@@ -573,6 +600,7 @@ function startAnim() {
 
 function stopAnim() {
     setLoading("#stopAnim");
+    setLoading("#stopQ");
     var params = getAnimConfig();
     callAPI({
         action: "stopAnim"
@@ -583,10 +611,12 @@ function stopAnim() {
             showBPError(result.msg);
         }
         setLoading("#stopAnim", false);
+        setLoading("#stopQ", false);
     });
 }
 
 function startQ() {
+    setLoading("#startQ", true);
     _startAnim({
         'queue': _curQueue,
         'run': {}

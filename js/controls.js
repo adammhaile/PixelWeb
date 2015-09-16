@@ -197,8 +197,36 @@ $.fn.param_loader = function(config) {
         }
     }
 
+    $node.presetVal = function(value){
+        var cfg = $node.data().config;
+        var cur = $node.val();
+        if(value === undefined){
+            var v = cfg.presetCombo.val();
+            if(v !== null){
+                return cfg.presets[cur.id][v];
+            }
+            else{
+                return null;
+            }
+        }
+        else{
+            var p = cfg.presets[cur.id];
+            var id = -1;
+            $.each(p, function(i,v){
+                if(value == v.name){
+                    id = i;
+                    return false;
+                }
+            });
+
+            if(id >= 0){
+                cfg.presetCombo.val(id);
+            }
+        }
+    }
+
     $node.val = function(value) {
-        if (value == null) {
+        if (value === undefined) {
             var cfg = $node.data().config;
             var config = {};
             $.each(cfg.control_map, function(k, v) {

@@ -377,7 +377,7 @@ $.fn._input = function(config) {
         var html = '\
             <div class="ui labeled @action input">\
                 <div class="ui label">@label</div>\
-                <input type="text" style="" id="@id_input" placeholder="@placeholder">\
+                <input type="text" class="str_input" style="" id="@id_input" placeholder="@placeholder">\
                 <button class="ui icon button" tabindex="-1" id="@id_undo"><i class="undo icon"></i></button>\
             </div>\
             ';

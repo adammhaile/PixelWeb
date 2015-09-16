@@ -38,6 +38,10 @@ body {
     margin-bottom: 0.5rem !important;
 }
 
+.str_input {
+    min-width: 280px;
+}
+
 .ui_pane {
 	display: none;
 }

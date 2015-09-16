@@ -228,7 +228,10 @@ class BPManager:
 
 	def stopAnim(self, doOff = True):
 		if self.anim:
-			self.anim.cleanup()
+			try:
+				self.anim.cleanup()
+			except Exception, e:
+				status.pushError(e)
 			self.anim = None
 			self._animCfg = None
 			if doOff:

@@ -161,10 +161,6 @@ function doSaveServerConfig() {
     });
 }
 
-function cancelServerConfig() {
-    $("#serverConfig").sidebar('toggle');
-}
-
 function showServerConfig() {
     $("#serverConfig").sidebar('toggle');
 }
@@ -1045,7 +1041,6 @@ $(document)
 
         $("#btnSettings").click(showServerConfig);
         $("#saveServerConfig").click(doSaveServerConfig);
-        $("#cancelServerConfig").click(cancelServerConfig);
         $("#btnAddDriver").click(addDriverChooser);
         $("#btnRemoveDriver").click(removeDriverChooser);
         $(".side_menu").click(handleSideMenu);

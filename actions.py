@@ -1,17 +1,25 @@
+import globals
 from util import *
 import traceback, sys
 import status
 
 import bibliopixel.log as log
 
+from threading import Timer
+
 from bpmanager import *
 bpm = None
 
-def initBPM(server_config):
+def initBPM():
+	server_config=globals._server_config
+
+	if globals._bpm:
+		globals._bpm.stopConfig()
+
 	global bpm
-	bpm = BPManager(server_config.off_anim_time)
-	bpm.loadBaseMods()
-	bpm.loadMods()
+	bpm = globals._bpm = BPManager(server_config.off_anim_time)
+	globals._bpm.loadBaseMods()
+	globals._bpm.loadMods()
 	cfg = config.readConfig("current_setup")
 	if "controller" in cfg and "driver" in cfg and server_config.load_defaults:
 		bpm.startConfig(cfg.driver, cfg.controller)
@@ -150,6 +158,21 @@ def deleteQS(req):
 		config.writeConfig("quick_select", cfg)
 	return success()
 
+def _shutdownServer():
+	status.pushStatus("Shutting down server")
+	globals._server_obj.shutdown()
+
+def shutdownServer(req):
+	t = Timer(0.5, _shutdownServer)
+	t.start()
+	return success(data=None)
+
+def restartServer(req):
+	globals._running = True
+	t = Timer(0.5, _shutdownServer)
+	t.start()
+	return success(data=None)
+
 actions = {
 	'setColor' : [setColor, ['color']],
 	'setBrightness' : [setBrightness, ['level']],
@@ -173,4 +196,6 @@ actions = {
 	'saveQS': [saveQS, ['name', 'data']],
 	'getQS': [getQS, []],
 	'deleteQS': [deleteQS, ['name']],
+	'shutdownServer': [shutdownServer, []],
+	'restartServer': [restartServer, []],
 }

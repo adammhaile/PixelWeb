@@ -213,6 +213,7 @@ class BPManager:
 		return setup
 
 	def stopConfig(self):
+		status.pushStatus("Stopping current config")
 		self.stopAnim(doOff = False)
 		if len(self.driver) > 0:
 			for drv in self.driver:

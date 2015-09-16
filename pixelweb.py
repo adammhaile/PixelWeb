@@ -62,6 +62,7 @@ def doAPI(req):
         if req and'action' in req:
             if req['action'] in actions:
                 action = actions[req['action']]
+                # status.pushStatus("API: " + req['action'])
                 params = action[1][:]
                 valid = True
                 missing = []
@@ -109,7 +110,7 @@ def startup():
     log.setLogLevel(level)
 
     initBPM()
-    status.pushStatus("BiblioPixel Init Complete")
+
 
 while globals._running:
     try:

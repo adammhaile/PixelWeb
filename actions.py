@@ -11,18 +11,22 @@ from bpmanager import *
 bpm = None
 
 def initBPM():
+	status.pushStatus("Initializing BiblioPixel")
 	server_config=globals._server_config
 
 	if globals._bpm:
+		status.pushStatus("Stopping current config")
 		globals._bpm.stopConfig()
 
 	global bpm
 	bpm = globals._bpm = BPManager(server_config.off_anim_time)
+	status.pushStatus("Loading modules")
 	globals._bpm.loadBaseMods()
 	globals._bpm.loadMods()
 	cfg = config.readConfig("current_setup")
 	if "controller" in cfg and "driver" in cfg and server_config.load_defaults:
 		bpm.startConfig(cfg.driver, cfg.controller)
+	status.pushStatus("BiblioPixel Init Complete")
 
 fillColor = (0,0,0)
 def setColor(req):
@@ -173,6 +177,10 @@ def restartServer(req):
 	t.start()
 	return success(data=None)
 
+def reloadBP(req):
+	initBPM()
+	return success(data=None)
+
 actions = {
 	'setColor' : [setColor, ['color']],
 	'setBrightness' : [setBrightness, ['level']],
@@ -196,6 +204,7 @@ actions = {
 	'saveQS': [saveQS, ['name', 'data']],
 	'getQS': [getQS, []],
 	'deleteQS': [deleteQS, ['name']],
-	'shutdownServer': [shutdownServer, []],
-	'restartServer': [restartServer, []],
+	# 'shutdownServer': [shutdownServer, []],
+	# 'restartServer': [restartServer, []],
+	'reloadBP': [reloadBP, []],
 }

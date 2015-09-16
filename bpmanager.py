@@ -199,7 +199,7 @@ class BPManager:
 			obj, params = self.__getInstance(self._ledCfg, "controller")
 			params['driver'] = self.driver
 			self.led = obj(**(params))
-			self._startOffAnim()
+			# self._startOffAnim()
 			status.pushStatus("Config start success!")
 			return success()
 		except:

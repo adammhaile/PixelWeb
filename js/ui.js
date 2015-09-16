@@ -36,24 +36,48 @@ $.fn._dropdown = function(config) {
     var $node = $(this);
     var id = $node.attr('id');
 
+    var getNameDesc = function(v){
+        var name = "";
+        var desc = null;
+        if(typeof(v) == "object"){
+            name = v.name;
+            desc = v.desc;
+        }
+        else{
+            name = v;
+        }
+
+        return [name, desc]
+    }
+
+    var display_sort = function(a, b){
+        if(a.display < b.display) return -1
+        else if(a.display > b.display) return 1;
+        else return 0;
+    }
+
     $node.load = function(data) {
         var cfg = $node.data().config;
         $node.children(".dropdown").dropdown("restore defaults");
         $node.children(".dropdown").children(".default").html(cfg.placeholder);
         $menu = $node.find(".menu");
         $menu.empty();
-        $.each(data, function(k, v) {
-            var name = "";
-            var desc = null;
-            if(typeof(v) == "object"){
-                name = v.name;
-                desc = v.desc;
-            }
-            else{
-                name = v;
-            }
 
-            $item = $('<div class="item" data-value="' + k + '">' + name + '</div>');
+        var id_list = [];
+        $.each(data, function(k, v) {
+            var name = getNameDesc(v)[0];
+            id_list.push({key: k, display: name});
+        });
+        
+        id_list.sort(display_sort);
+
+        $.each(id_list, function(i, v) {
+            v = v.key;
+            var nd = getNameDesc(data[v]);
+            var name = nd[0];
+            var desc = nd[1];
+
+            $item = $('<div class="item" data-value="' + v + '">' + name + '</div>');
             $menu.append($item);
             if(desc){
                 $item.addToolTip(desc);

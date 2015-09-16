@@ -41,19 +41,19 @@ class StoppableServer(WSGIRefServer):
         self.srv.shutdown()
         # self.server.server_close()
 
-@route('/')
+# @route('/')
 def home():
     return static_file("index.html", root='')
 
-@route('/qs/<name>')
+# @route('/qs/<name>')
 def qs(name):
     return static_file("qs.html", root='')
 
-@route('/<filename:path>')
-def send_root(filename):
+# @route('/<filename:path>')
+def getFiles(filename):
     return static_file(filename, root='')
 
-@route('/api')
+# @route('/api')
 def postonly():
     return "Please use POST JSON API calls only."
 
@@ -82,7 +82,7 @@ def doAPI(req):
     except Exception, e:
         return fail(traceback.format_exc(), error=ErrorCode.GENERAL_ERROR, data=None)
 
-@route('/api', method='POST')
+# @route('/api', method='POST')
 def api():
     req = d(request.json)
     result = doAPI(req)
@@ -90,6 +90,12 @@ def api():
         status.pushError(result.msg)
     return result
 
+def setupRouting(app):
+    app.route('/', 'GET', home)
+    app.route('/qs/<name>', 'GET', qs)
+    app.route('/<filename:path>', 'GET', getFiles)
+    app.route('/api', 'GET', postonly)
+    app.route('/api', 'POST', api)
 
 def startup():
     status.pushStatus("Starting PixelWeb Server")
@@ -113,9 +119,11 @@ while globals._running:
         if globals._server_config.external_access:
             host = "0.0.0.0"
 
+        app = bottle.default_app()
+        setupRouting(app)
         globals._server_obj = StoppableServer(host=host, port=globals._server_config.port)
         globals._running = False
-        run(server=globals._server_obj)
+        app.run(server=globals._server_obj)
     except Exception, e:
         print e
         globals._running = False

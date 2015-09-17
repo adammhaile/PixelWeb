@@ -68,7 +68,7 @@ $.fn._dropdown = function(config) {
             var name = getNameDesc(v)[0];
             id_list.push({key: k, display: name});
         });
-        
+
         id_list.sort(display_sort);
 
         $.each(id_list, function(i, v) {
@@ -392,8 +392,7 @@ $.fn._input = function(config) {
     };
 
     if (config) {
-        var def = 'default' in config && config.default != null;
-        if (!def) config.default = "";
+        if(config.default == undefined) config.default = null;
         if (!config.placeholder) config.placeholder = "";
 
         $node.data("config", config);
@@ -417,9 +416,7 @@ $.fn._input = function(config) {
         }
         $node.addToolTip(config.help);
 
-        if (def) {
-            $node.val(config.default);
-        }
+        $node.val(config.default);
     }
 
     return $node;

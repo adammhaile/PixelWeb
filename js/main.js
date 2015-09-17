@@ -459,9 +459,10 @@ function loadAnimQueue(config) {
 
     _show("#saveQSQueueEdit", _animEditMode == "qs");
     _show("#cancelQSQueueEdit", _animEditMode == "qs");
-    _show("#startQ", !isEdit);
+    _show("#startQ", true);
+    $("#startQ").html(isEdit ? "Test" : "Start");
     setLoading("#startQ", false);
-    _show("#stopQ", !isEdit);
+    _show("#stopQ", true);
     setLoading("#stopQ", false);
     _show("#addQSQueue", !isEdit);
 
@@ -538,9 +539,10 @@ function loadAnim(config) {
     _show("#cancelAnimEdit", _animEditMode == "qs" || _animEditMode == "queue");
     _show("#addQueue", !isEdit);
     _show("#addQSAnim", !isEdit);
-    _show("#startAnim", !isEdit);
+    _show("#startAnim", true);
+    $("#startAnim").html(isEdit ? "Test" : "Start");
     setLoading("#startAnim", false);
-    _show("#stopAnim", !isEdit);
+    _show("#stopAnim", true);
     setLoading("#stopAnim", false);
 
     _animEditConfig = config;

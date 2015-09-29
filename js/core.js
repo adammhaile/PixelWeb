@@ -69,6 +69,14 @@ function _show(id, state) {
         $(id).css('display', 'none');
 }
 
+function doBasicModal(id){
+    $(id).modal({
+        blurring: true,
+        closable: true,
+        dimmerSettings: _dimSettings,
+    }).modal('show');
+}
+
 function _inArray(array, val) {
   return array.indexOf(val) >= 0;
 }

@@ -81,7 +81,8 @@ def doAPI(req):
         else:
             return fail("Invalid request data.")
     except Exception, e:
-        return fail(traceback.format_exc(), error=ErrorCode.GENERAL_ERROR, data=None)
+        status.pushError(traceback.format_exc())
+        return fail(str(e), error=ErrorCode.GENERAL_ERROR, data=None)
 
 # @route('/api', method='POST')
 def api():

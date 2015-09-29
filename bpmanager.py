@@ -203,13 +203,19 @@ class BPManager:
 			status.pushStatus("Config start success!")
 			return success()
 		except:
+			self.stopConfig()
 			status.pushStatus("Config start failure! {}".format(traceback.format_exc()))
 			return fail(traceback.format_exc(), error=ErrorCode.BP_ERROR, data=None)
 
 	def getConfig(self):
 		setup = d(config.readConfig("current_setup"))
+		# setup = d({
+		# 	"driver": self._driverCfg,
+		# 	"controller": self._ledCfg
+		# })
 		if not ("driver" in setup): setup.driver = None
 		if not ("controller" in setup): setup.controller = None
+		setup.running = self.led != None and len(self.driver) > 0
 		return setup
 
 	def stopConfig(self):

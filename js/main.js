@@ -574,6 +574,7 @@ function activatePane(id, option) {
 
 function handleSideMenu() {
     var $m = $(this);
+    if($m.hasClass('disabled')) return;
     var id = $m.attr('id').replace("mnu", "");
     activatePane(id);
 }
@@ -747,15 +748,31 @@ var _loadFuncs = [
     [_loadEgg, "Death Ray"],
 ]
 
+function _checkRunning(){
+    var _requireRun = ['mnuAnim', 'mnuQueue', 'mnuQS'];
+    $.each(_requireRun, function(i,v){
+        _enable("#"+v, _curConfig.running);
+    });
+    return _curConfig.running;
+}
 
+function _doNeedConfig(){
+    doBasicModal("#needConfigModal");
+    activatePane("Config");
+}
 
 function _finalLoad(){
     $('html').addClass('loaded_style');
     $('#main_window').show();
     reloadQueues();
     reloadQS();
-    activatePane("Queue");
-    setTimeout(hideLoader, 250);
+    if(_checkRunning()){
+        activatePane("Anim");
+        setTimeout(hideLoader, 250);
+    }
+    else {
+        setTimeout(_doNeedConfig, 250);
+    }
 }
 
 var _loadIndex = 0;
@@ -1028,6 +1045,7 @@ function resetOnStart(){
     updateQSCount();
     _curQueue = [];
     updateQueueCount();
+    _checkRunning();
 }
 function launchQS(){
     var name = $qsCombo.val();
@@ -1047,6 +1065,7 @@ $(document)
             config.action = "startConfig"
             callAPI(config, function(result) {
                 if (result.status) {
+                    _curConfig.running = true;
                     resetOnStart();
                 } else {
                     showBPError(result.msg);

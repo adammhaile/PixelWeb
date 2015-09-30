@@ -90,7 +90,7 @@ $.fn.param_loader = function(config) {
             <div class="title" id="@id_@group_title">\
                 <i class="dropdown icon"></i> @group\
             </div>\
-            <div class="active content ui list" id="@id_@group_content"></div>\
+            <div class="content ui list" id="@id_@group_content"></div>\
         ';
 
         var paramMap = {
@@ -147,7 +147,7 @@ $.fn.param_loader = function(config) {
 
         $n.children('#' + id + "_view").accordion({
             exclusive: false
-        });
+        }).accordion("open", 0);
     }
 
     function reloadPresetCombo() {

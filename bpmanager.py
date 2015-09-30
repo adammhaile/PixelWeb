@@ -202,10 +202,10 @@ class BPManager:
 			self._startOffAnim()
 			status.pushStatus("Config start success!")
 			return success()
-		except:
+		except Exception, e:
 			self.stopConfig()
-			status.pushStatus("Config start failure! {}".format(traceback.format_exc()))
-			return fail(traceback.format_exc(), error=ErrorCode.BP_ERROR, data=None)
+			status.pushError("Config start failure! {}".format(traceback.format_exc()))
+			return fail(str(e), error=ErrorCode.BP_ERROR, data=None)
 
 	def getConfig(self):
 		setup = d(config.readConfig("current_setup"))
@@ -281,5 +281,6 @@ class BPManager:
 				self.anim.run(**(run))
 
 				return success()
-		except:
-			return fail(traceback.format_exc(), error=ErrorCode.BP_ERROR, data=None)
+		except Exception, e:
+			status.pushError(traceback.format_exc())
+			return fail("Failure starting animation: " + str(e), error=ErrorCode.BP_ERROR, data=None)

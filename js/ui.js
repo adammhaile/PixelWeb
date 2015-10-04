@@ -276,8 +276,8 @@ $.fn._nud = function(config) {
                     @default\
                 </div>\
                 <div class="ui icon buttons">\
-                <button class="ui compact icon button" id="@id_minus"><i class="minus icon"></i></button>\
-                <button class="ui compact icon button" id="@id_plus"><i class="plus icon"></i></button>\
+                <button class="ui compact icon button" id="@id_minus" tabindex="-1"><i class="minus icon"></i></button>\
+                <button class="ui compact icon button" id="@id_plus" tabindex="-1"><i class="plus icon"></i></button>\
                 </div>\
             </div>\
             ';

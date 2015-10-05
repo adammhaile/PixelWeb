@@ -4,8 +4,13 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 min_bp_ver = (2,0,0)
 
 import sys
-if sys.version_info[:3] < (2, 7, 9):
-    sys.exit('PixelWeb requires Python 2.7.9 or higher.')
+if sys.version_info[:3] < (2, 7):
+    sys.exit('PixelWeb requires Python 2.7 or higher.')
+
+try:
+    import pip
+except:
+    sys.exit("Please install pip: https://bootstrap.pypa.io/get-pip.py")
 
 import os
 from subprocess import Popen, PIPE

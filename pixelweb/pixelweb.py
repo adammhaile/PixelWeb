@@ -1,3 +1,6 @@
+from bootstrap import runBootstrap
+runBootstrap()
+
 import globals
 import bottle
 import json
@@ -129,3 +132,6 @@ def startServer():
         except Exception, e:
             print e
             globals._running = False
+
+if __name__ == '__main__':
+    startServer()

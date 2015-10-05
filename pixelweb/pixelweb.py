@@ -43,15 +43,15 @@ class StoppableServer(WSGIRefServer):
 
 # @route('/')
 def home():
-    return static_file("index.html", root='')
+    return static_file("index.html", root='../ui/')
 
 # @route('/qs/<name>')
 def qs(name):
-    return static_file("qs.html", root='')
+    return static_file("qs.html", root='../ui/')
 
 # @route('/<filename:path>')
 def getFiles(filename):
-    return static_file(filename, root='')
+    return static_file(filename, root='../ui/')
 
 # @route('/api')
 def postonly():
@@ -112,20 +112,20 @@ def startup():
 
     initBPM()
 
+def startServer():
+    while globals._running:
+        try:
+            startup()
 
-while globals._running:
-    try:
-        startup()
+            host = "127.0.0.1"
+            if globals._server_config.external_access:
+                host = "0.0.0.0"
 
-        host = "127.0.0.1"
-        if globals._server_config.external_access:
-            host = "0.0.0.0"
-
-        app = bottle.default_app()
-        setupRouting(app)
-        globals._server_obj = StoppableServer(host=host, port=globals._server_config.port)
-        globals._running = False
-        app.run(server=globals._server_obj)
-    except Exception, e:
-        print e
-        globals._running = False
+            app = bottle.default_app()
+            setupRouting(app)
+            globals._server_obj = StoppableServer(host=host, port=globals._server_config.port)
+            globals._running = False
+            app.run(server=globals._server_obj)
+        except Exception, e:
+            print e
+            globals._running = False

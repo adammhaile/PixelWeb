@@ -1,3 +1,6 @@
+import os
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 min_bp_ver = (2,0,0)
 
 import sys
@@ -16,7 +19,7 @@ def runCommand(cmd):
 
 _bootstrap_installs = {
     "BiblioPixel": "pip install git+https://github.com/ManiacalLabs/BiblioPixel.git@dev --upgrade",
-    "BiblioPixelAnimations": "pip install git+https://github.com/ManiacalLabs/BiblioPixelAnimations.git --upgrade",
+    "BiblioPixelAnimations": "pip install git+https://github.com/ManiacalLabs/BiblioPixelAnimations.git@dev --upgrade",
     "pyserial": "pip install pyserial --upgrade"
 }
 

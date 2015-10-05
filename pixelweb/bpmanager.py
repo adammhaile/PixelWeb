@@ -6,6 +6,7 @@ import loader
 import config
 import status
 import traceback
+import globals
 
 class BPManager:
 	def __init__(self, off_timeout):
@@ -136,7 +137,7 @@ class BPManager:
 
 	def loadMods(self):
 		mods = []
-		mod_dirs = config.readServerConfig().mod_dirs
+		mod_dirs = globals._server_config.mod_dirs
 		for dir in mod_dirs:
 			self.loadModules(loader.load_folder(dir))
 

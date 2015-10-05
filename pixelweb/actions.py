@@ -87,7 +87,7 @@ def getServerConfig(req):
 		"setup":config.BASE_SERVER_CONFIG,
 		"config":{
 			"id": "server_config",
-			"config": config.readServerConfig()
+			"config": globals._server_config
 			}
 		})
 
@@ -97,6 +97,7 @@ def saveServerConfig(req):
 	level = log.INFO
 	if cfg.show_debug: level = log.DEBUG
 	log.setLogLevel(level)
+	globals._server_config = cfg
 	return success()
 
 def getStatus(req):

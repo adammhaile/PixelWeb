@@ -1,19 +1,15 @@
 from bootstrap import runBootstrap
 runBootstrap()
 
-import globals
-import bottle
-import json
+import json, os
+import globals, config, status
 
 from bottle import *
 from actions import *
 
-import config
-import status
-
 import bibliopixel.log as log
-import os
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+import BiblioPixelAnimations
 
 class StoppableServer(WSGIRefServer):
     def run(self, app): # pragma: no cover
@@ -103,11 +99,17 @@ def setupRouting(app):
     app.route('/api', 'POST', api)
 
 def startup():
+    bpa_path = os.path.dirname(os.path.abspath(BiblioPixelAnimations.__file__)).replace("\\", "/")
+    bpa_matrix = bpa_path + "/matrix/"
+    bpa_strip = bpa_path + "/strip/"
+
     status.pushStatus("Starting PixelWeb Server")
     config.initConfig()
     status.pushStatus("Reading server config")
     config.upgradeServerConfig()
     cfg = globals._server_config = config.readServerConfig()
+    if(bpa_matrix not in cfg.mod_dirs): cfg.mod_dirs.append(bpa_matrix)
+    if(bpa_strip not in cfg.mod_dirs): cfg.mod_dirs.append(bpa_strip)
 
     level = log.INFO
     if cfg.show_debug: level = log.DEBUG
@@ -124,7 +126,7 @@ def startServer():
             if globals._server_config.external_access:
                 host = "0.0.0.0"
 
-            app = bottle.default_app()
+            app = default_app()
             setupRouting(app)
             globals._server_obj = StoppableServer(host=host, port=globals._server_config.port)
             globals._running = False

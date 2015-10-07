@@ -13,8 +13,8 @@ BASE_SERVER_CONFIG = d({
                 "id": "external_access",
                 "label": "Allow External Access",
                 "type": "bool",
-                "default": False,
-                "help":"On: Other computers on your network can access PixelWeb. Off: Local access only."
+                "default": True,
+                "help":"On: Other computers on your network can access PixelWeb. Off: LocalHost access only."
             },{
                 "id": "port",
                 "label": "Server Port",

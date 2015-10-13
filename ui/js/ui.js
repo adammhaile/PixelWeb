@@ -6,19 +6,34 @@ $.fn.addToolTip = function(text){
     $node.popup({delay:{show:500, hide:0}, duration:100});
 }
 
-$.fn._numeric = function(){
+$.fn._numeric = function(type){
+    if(type===undefined) type = 'int'
+
     var $node = $(this);
     $node.data("last", $node.val());
     $node.data("selected", false);
     var _selected = false;
+    var reg = "^-?\d$";
+    if(type=="float") reg = "^-?\d+(.\d)$";
+
     function replace(event) {
         if(!$node.data("selected")){
             var val = $node.val();
-            if(!val.match("^-?[0-9]*$")){
-                $node.val($node.data("last"))
+            if(type=="float"){
+                if(val.match("^-?[0-9]*$"))
+                    $node.val(val + ".0");
+                else if(val.match("^-?[0-9]+(.)$"))
+                    $node.val(val + "0");
+                else if(!val.match("^-?[0-9]+(.[0-9]*)$"))
+                    $node.val($node.data("last"))
+                else
+                    $node.data("last", $node.val());
             }
-            else{
-                $node.data("last", $node.val());
+            else {
+                if(!val.match("^-?[0-9]*$"))
+                    $node.val($node.data("last"))
+                else
+                    $node.data("last", $node.val());
             }
         }
         $node.data("selected", false);
@@ -27,7 +42,7 @@ $.fn._numeric = function(){
     //     $node.data("selected", true);
     //     console.log("select");
     // });
-    $node.keypress(replace);
+    $node.on('input', function(){setTimeout(replace, 10)});
 
     // $node.focusout(replace);
 }
@@ -214,20 +229,24 @@ $.fn._nud = function(config) {
 
         if (value != undefined) {
             rangeError(false);
-            if (value != "") value = Math.floor(value);
+            // if (value != "") value = Math.floor(value);
             if(!isNU(cfg.max) && value > cfg.max) {
                 value = cfg.max;
                 rangeError(true);
             }
             else if(!isNU(cfg.min) && value < cfg.min) {
-                console.log("range!");
                 value = cfg.min;
                 rangeError(true);
             }
+            if(cfg.type == "float") value = value.toFixed(2);
             return $input.val(value);
         } else {
             var v = $input.val();
-            return v == "" ? null : parseInt(v);
+            var val = null;
+            if (v=="") val = null;
+            else if (cfg.type = "float") val = parseFloat(v);
+            else val = parseInt(v);
+            return val;
         }
     };
 
@@ -307,7 +326,7 @@ $.fn._nud = function(config) {
             $node.val(config.default);
         }
 
-        $node.find("#" + id + "_input")._numeric();
+        $node.find("#" + id + "_input")._numeric(config.type);
         //$node.find("#" + id + "_input").keyup(onKey);
     }
 

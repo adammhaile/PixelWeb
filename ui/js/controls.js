@@ -6,7 +6,21 @@ function insert_int($node, params) {
         min: params.min,
         max: params.max,
         step: params.step,
-        help: params.help
+        help: params.help,
+        type: "int"
+    });
+}
+
+function insert_float($node, params) {
+    return $node._nud({
+        label: params.label,
+        placeholder: params.msg,
+        default: params.default,
+        min: params.min,
+        max: params.max,
+        step: params.step,
+        help: params.help,
+        type: "float"
     });
 }
 
@@ -59,6 +73,7 @@ function insert_color($node, params) {
 
 var insertFuncs = {
     "int": insert_int,
+    "float": insert_float,
     "str": insert_str,
     "combo": insert_combo,
     "bool": insert_bool,

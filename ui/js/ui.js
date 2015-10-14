@@ -244,7 +244,7 @@ $.fn._nud = function(config) {
             var v = $input.val();
             var val = null;
             if (v=="") val = null;
-            else if (cfg.type = "float") val = parseFloat(v);
+            else if (cfg.type == "float") val = parseFloat(v);
             else val = parseInt(v);
             return val;
         }

@@ -83,6 +83,121 @@ var insertFuncs = {
 
 var _divider = '<div class="ui hidden divider short"></div>';
 
+$.fn._multi = function(config) {
+    var $node = $(this);
+    var id = $node.attr('id');
+
+    // $node.val = function(value) {
+    //     var $input = $node.find("#" + id + "_input");
+    //     var cfg = $node.data().config;
+    //
+    //     function rangeError(state) {
+    //         var dir = "";
+    //         $error = $node.find("#" + id + "_error");
+    //         if(state){
+    //             //$($node.children(".ui.input")).addClass("error");
+    //             var msg = "Value must be in range: " + cfg.min + " to " + cfg.max;
+    //             if(isNU(cfg.max)) msg = "Value must be >= " + (cfg.min);
+    //             if(isNU(cfg.min)) msg = "Value must be <= " + (cfg.max);
+    //             $node.find("#" + id + "_err_msg").text(msg);
+    //             dir = "in";
+    //         }
+    //         else
+    //         {
+    //             //$($node.children(".ui.input")).removeClass("error");
+    //             if(!$error.hasClass("hidden")) dir = "out";
+    //         }
+    //
+    //         if(dir != "") $error.transition('scale ' + dir);
+    //     }
+    //
+    //     if (value != undefined) {
+    //         rangeError(false);
+    //         // if (value != "") value = Math.floor(value);
+    //         if(!isNU(cfg.max) && value > cfg.max) {
+    //             value = cfg.max;
+    //             rangeError(true);
+    //         }
+    //         else if(!isNU(cfg.min) && value < cfg.min) {
+    //             value = cfg.min;
+    //             rangeError(true);
+    //         }
+    //         if(cfg.type == "float") value = value.toFixed(2);
+    //         return $input.val(value);
+    //     } else {
+    //         var v = $input.val();
+    //         var val = null;
+    //         if (v=="") val = null;
+    //         else if (cfg.type = "float") val = parseFloat(v);
+    //         else val = parseInt(v);
+    //         return val;
+    //     }
+    // };
+    //
+    // $node.undo = function() {
+    //     var cfg = $node.data().config;
+    //     $node.val(cfg.default);
+    // };
+
+    $node.val = function(value){
+        var cfg = $node.data().config;
+        if(value===undefined){
+            var res = [];
+            $.each(cfg._controls, function(i,v){
+                res.push(v.val());
+            });
+            return res;
+        }
+        else {
+            $.each(value, function(i,v){
+                if(i < cfg._controls.length){
+                    cfg._controls[i].val(v);
+                }
+                else{
+                    return false;
+                }
+            });
+        }
+    }
+
+    if (config) {
+        var def = 'default' in config && config.default != null;
+        if (!def) config.default = [];
+
+        $node.data("config", config);
+
+        var html = '\
+            <div class="ui" id="@id_grid">\
+                <div class="ui huge label">@label</div>\
+                <div class="ui list" id="@id_list" style="margin-left: 2rem;">\
+                </div>\
+            </div>\
+            ';
+        // html = strReplace(html, "@action", "action");
+        // html = strReplace(html, "@default", '<button class="ui icon button" tabindex="-1" id="@id_undo"><i class="undo icon"></i></button>');
+
+        html = strReplace(html, "@label", config.label + ":");
+        html = strReplace(html, "@id", $node.attr('id'));
+
+        $node.html(html);
+        $node.addToolTip(config.help);
+        config._controls = [];
+
+        $.each(config.controls, function(i,v){
+            var $n = insertFuncs[v.type]($('<div class="item" style="margin-bottom: 0.5em;"/>'), v);
+            $node.find("#" + id + "_list").append($n);
+            config._controls.push($n);
+        });
+
+        if (def) {
+            $node.val(config.default);
+        }
+    }
+
+    return $node;
+};
+
+
 $.fn.param_loader = function(config) {
     var $node = $(this);
     var id = $node.attr('id');
@@ -432,7 +547,6 @@ function buildFeed(items) {
     })
     return html;
 }
-
 
 function genQSFeedItem(item, num) {
 

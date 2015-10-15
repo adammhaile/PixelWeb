@@ -27,6 +27,7 @@ class BPManager:
 
 		self.anims = {}
 		self._animClasses = {}
+		self._animParams = {}
 		self._animNames = {}
 
 		self._preConfigs = {}
@@ -88,6 +89,10 @@ class BPManager:
 			self.anims[cont] = {}
 		self.anims[cont][config.id] = c
 		self._animNames[config.id] = config.display;
+		params = {}
+		for p in config.params:
+			params[p.id] = p
+		self._animParams[config.id] = params
 
 	def __loadAnimDef(self, config):
 		config = d(config)
@@ -251,11 +256,34 @@ class BPManager:
 
 			cfg.led = self.led
 			c['config'] = cfg
+			p = self._animParams[c.id]
+			for k in cfg:
+				if k in p:
+					pd = p[k]
+					if pd.type == "color":
+						cfg[k] = tuple(cfg[k])
+					elif pd.type == "multi_tuple" or pd.type == "multi":
+						if isinstance(pd.controls, list):
+							for i in range(len(pd.controls)):
+								if pd.controls[i].type == "color":
+									cfg[k][i] == tuple(cfg[k][i])
+						elif isinstance(pd.controls, dict):
+							if pd.controls.type == "color":
+								temp = []
+								for x in cfg[k]:
+									temp.append(tuple(x))
+								cfg[k] = temp
+						if pd.type == "multi_tuple":
+							cfg[k] = tuple(cfg[k])
+
 			obj, params = self.__getInstance(c, "animation")
 			anim = obj(**(params))
 			return anim, d(run)
 
 		try:
+			if not(self.led != None and len(self.driver) > 0):
+				return fail(msg="Output config not started! Please start first.")
+
 			self.stopAnim(doOff = False)
 			self._animCfg = config
 			if('queue' in config):

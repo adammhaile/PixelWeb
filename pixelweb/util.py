@@ -14,6 +14,18 @@ class d(dict):
             if not k in self or overwrite:
                 self[k] = v
 
+def listToTuple(v):
+    if isinstance(v, list):
+        temp = []
+        for i in v:
+            if isinstance(i, list):
+                i = tuple(i)
+            temp.append(i)
+        temp = tuple(temp)
+        return temp
+    else:
+        return v
+
 class ErrorCode:
     SUCCESS = 0
     GENERAL_ERROR = 1

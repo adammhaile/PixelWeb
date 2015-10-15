@@ -71,6 +71,15 @@ function insert_color($node, params) {
     });
 }
 
+function insert_multi($node, params) {
+    return $node._multi({
+        label: params.label,
+        default: params.default,
+        controls: params.controls,
+        help: params.help
+    });
+}
+
 var insertFuncs = {
     "int": insert_int,
     "float": insert_float,
@@ -78,7 +87,9 @@ var insertFuncs = {
     "combo": insert_combo,
     "bool": insert_bool,
     "color": insert_color,
-    "str_multi": insert_str_multi
+    "str_multi": insert_str_multi,
+    "multi": insert_multi,
+    "multi_tuple": insert_multi
 }
 
 var _divider = '<div class="ui hidden divider short"></div>';

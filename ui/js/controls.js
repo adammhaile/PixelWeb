@@ -87,58 +87,6 @@ $.fn._multi = function(config) {
     var $node = $(this);
     var id = $node.attr('id');
 
-    // $node.val = function(value) {
-    //     var $input = $node.find("#" + id + "_input");
-    //     var cfg = $node.data().config;
-    //
-    //     function rangeError(state) {
-    //         var dir = "";
-    //         $error = $node.find("#" + id + "_error");
-    //         if(state){
-    //             //$($node.children(".ui.input")).addClass("error");
-    //             var msg = "Value must be in range: " + cfg.min + " to " + cfg.max;
-    //             if(isNU(cfg.max)) msg = "Value must be >= " + (cfg.min);
-    //             if(isNU(cfg.min)) msg = "Value must be <= " + (cfg.max);
-    //             $node.find("#" + id + "_err_msg").text(msg);
-    //             dir = "in";
-    //         }
-    //         else
-    //         {
-    //             //$($node.children(".ui.input")).removeClass("error");
-    //             if(!$error.hasClass("hidden")) dir = "out";
-    //         }
-    //
-    //         if(dir != "") $error.transition('scale ' + dir);
-    //     }
-    //
-    //     if (value != undefined) {
-    //         rangeError(false);
-    //         // if (value != "") value = Math.floor(value);
-    //         if(!isNU(cfg.max) && value > cfg.max) {
-    //             value = cfg.max;
-    //             rangeError(true);
-    //         }
-    //         else if(!isNU(cfg.min) && value < cfg.min) {
-    //             value = cfg.min;
-    //             rangeError(true);
-    //         }
-    //         if(cfg.type == "float") value = value.toFixed(2);
-    //         return $input.val(value);
-    //     } else {
-    //         var v = $input.val();
-    //         var val = null;
-    //         if (v=="") val = null;
-    //         else if (cfg.type = "float") val = parseFloat(v);
-    //         else val = parseInt(v);
-    //         return val;
-    //     }
-    // };
-    //
-    // $node.undo = function() {
-    //     var cfg = $node.data().config;
-    //     $node.val(cfg.default);
-    // };
-
     $node.val = function(value){
         var cfg = $node.data().config;
         if(value===undefined){
@@ -149,14 +97,48 @@ $.fn._multi = function(config) {
             return res;
         }
         else {
-            $.each(value, function(i,v){
-                if(i < cfg._controls.length){
-                    cfg._controls[i].val(v);
-                }
-                else{
-                    return false;
-                }
-            });
+            if(cfg.dyn){
+                $.each(cfg._controls, function(i,v){
+                    v.remove();
+                });
+                cfg._controls = [];
+                $.each(value, function(i,v){
+                    var $n = $node.add();
+                    $n.val(v);
+                });
+            }
+            else{
+                $.each(value, function(i,v){
+                    if(i < cfg._controls.length){
+                        cfg._controls[i].val(v);
+                    }
+                    else{
+                        return false;
+                    }
+                });
+            }
+        }
+    }
+
+    $node.__insertItem = function(v,i){
+        if(i===undefined) i = config._controls.length;
+        v.id = id + "_" + i;
+        var $n = insertFuncs[v.type]($('<div class="item" style="margin-bottom: 0.5em;" id="' + id + '_' + i + '"/>'), v);
+        $node.find("#" + id + "_list").append($n);
+        config._controls.push($n);
+        return $n;
+    }
+
+    $node.add = function(){
+        var cfg = $node.data().config;
+        return $node.__insertItem(cfg.controls);
+    }
+
+    $node.remove = function(){
+        var cfg = $node.data().config;
+        if(cfg._controls.length > 1){
+            var $n = cfg._controls.pop();
+            $n.remove();
         }
     }
 
@@ -166,28 +148,47 @@ $.fn._multi = function(config) {
 
         $node.data("config", config);
 
+        config.dyn = !$.isArray(config.controls);
+
         var html = '\
             <div class="ui" id="@id_grid">\
-                <div class="ui huge label">@label</div>\
+                <div class="ui input">\
+                    <div class="ui label large">@label</div>\
+                    @addbtn\
+                </div>\
                 <div class="ui list" id="@id_list" style="margin-left: 2rem;">\
                 </div>\
             </div>\
             ';
-        // html = strReplace(html, "@action", "action");
-        // html = strReplace(html, "@default", '<button class="ui icon button" tabindex="-1" id="@id_undo"><i class="undo icon"></i></button>');
 
+        var addbtn = '\
+        <div class="ui icon buttons">\
+            <button class="ui compact icon button" id="@id_minus" tabindex="-1"><i class="minus icon"></i></button>\
+            <button class="ui compact icon button" id="@id_plus" tabindex="-1"><i class="plus icon"></i></button>\
+        </div>\
+        '
+
+        html = strReplace(html, "@addbtn", config.dyn ? addbtn : "");
         html = strReplace(html, "@label", config.label + ":");
         html = strReplace(html, "@id", $node.attr('id'));
+
 
         $node.html(html);
         $node.addToolTip(config.help);
         config._controls = [];
 
-        $.each(config.controls, function(i,v){
-            var $n = insertFuncs[v.type]($('<div class="item" style="margin-bottom: 0.5em;"/>'), v);
-            $node.find("#" + id + "_list").append($n);
-            config._controls.push($n);
-        });
+
+        if(config.dyn){
+            $node.__insertItem(config.controls);
+            $node.find("#" + id + "_plus").click(function(){$node.add();});
+            $node.find("#" + id + "_minus").click(function(){$node.remove();});
+        }
+        else{
+            $.each(config.controls, function(i,v){
+                $node.__insertItem(v, i);
+            });
+        }
+
 
         if (def) {
             $node.val(config.default);

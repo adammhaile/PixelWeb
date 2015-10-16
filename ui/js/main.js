@@ -156,8 +156,7 @@ function showBPError(msg) {
 function doSaveServerConfig() {
     var config = $server_config.val();
     saveServerConfig(config.config, function(result) {
-        alert("Save Complete! Please restart server.");
-        $("#serverConfig").sidebar('toggle');
+        doBasicModal("#restartServerModal");
     });
 }
 

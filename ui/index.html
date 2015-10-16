@@ -8,8 +8,6 @@
     <link rel="stylesheet" href="/css/ui.css">
     <link rel="stylesheet" href="/css/jquery-ui.min.css">
     <script src="/js/jquery.min.js"></script>
-    <script src="/js/jquery-ui.min.js"></script>
-    <script src="/js/jquery.numeric.min.js"></script>
     <script src="/semantic/dist/semantic.min.js"></script>
     <script src="/js/spectrum.js"></script>
     <script src="/js/loglevel.min.js"></script>
@@ -270,6 +268,17 @@
         <div class="image content">
             <img class="image"><i class="huge yellow warning circle icon"></i></img>
             <p>Please configure and run the output before continuing.</p>
+        </div>
+        <div class="actions">
+            <div class="ui approve green button">OK</div>
+        </div>
+    </div>
+
+    <div class="ui basic small modal" id="restartServerModal">
+        <div class="header">Server Restart Required</div>
+        <div class="image content">
+            <img class="image"><i class="huge yellow warning circle icon"></i></img>
+            <p>Please restart the server to ensure all changes take effect!</p>
         </div>
         <div class="actions">
             <div class="ui approve green button">OK</div>

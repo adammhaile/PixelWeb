@@ -108,8 +108,10 @@ def startup():
     status.pushStatus("Reading server config")
     config.upgradeServerConfig()
     cfg = globals._server_config = config.readServerConfig()
-    if(bpa_matrix not in cfg.mod_dirs): cfg.mod_dirs.append(bpa_matrix)
-    if(bpa_strip not in cfg.mod_dirs): cfg.mod_dirs.append(bpa_strip)
+    # if(bpa_matrix not in cfg.mod_dirs): cfg.mod_dirs.append(bpa_matrix)
+    # if(bpa_strip not in cfg.mod_dirs): cfg.mod_dirs.append(bpa_strip)
+
+    globals._bpa_dirs = [bpa_matrix, bpa_strip]
 
     level = log.INFO
     if cfg.show_debug: level = log.DEBUG

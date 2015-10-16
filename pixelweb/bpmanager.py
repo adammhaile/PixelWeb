@@ -141,9 +141,8 @@ class BPManager:
 		self.loadModules(moduleList)
 
 	def loadMods(self):
-		mods = []
 		mod_dirs = globals._server_config.mod_dirs
-		for dir in mod_dirs:
+		for dir in (mod_dirs + globals._bpa_dirs):
 			self.loadModules(loader.load_folder(dir))
 
 	def __getInstance(self, config, inst_type):

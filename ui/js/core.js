@@ -69,6 +69,10 @@ function _show(id, state) {
         $(id).css('display', 'none');
 }
 
+var _dimSettings = {
+    opacity: 0.4
+};
+
 function doBasicModal(id){
     $(id).modal({
         blurring: true,

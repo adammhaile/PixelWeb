@@ -23,10 +23,6 @@ var _queues = {};
 var _curQS = [];
 var _qselects = {};
 
-_dimSettings = {
-    opacity: 0.4
-};
-
 function getContType(){
     if(_configs.controller[$controller.val().id])
         return _configs.controller[$controller.val().id].control_type;
@@ -147,10 +143,7 @@ function displayCurConfig() {
 
 function showBPError(msg) {
     $("#bpErrorMsg").html(msg);
-    $("#BPError").modal({
-        blurring: true,
-        dimmerSettings: _dimSettings
-    }).modal('show');
+    doBasicModal("#BPError");
 }
 
 function doSaveServerConfig() {

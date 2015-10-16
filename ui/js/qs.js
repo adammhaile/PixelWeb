@@ -29,7 +29,8 @@ function startAnim(){
             if (result.status) {
 
             } else {
-
+                $("#bpErrorMsg").html(result.msg);
+                doBasicModal("#BPError");
             }
             $b.removeClass('loading');
         });
@@ -69,7 +70,8 @@ function stopAnim(){
         if (result.status) {
 
         } else {
-
+            $("#bpErrorMsg").html(result.msg);
+            doBasicModal("#BPError");
         }
         $("#btnStop").removeClass('loading');
     });
@@ -90,7 +92,8 @@ $(document).ready(function(){
             log.debug(_qs);
             getConfig(function(cfg){
                 if(cfg.controller.control_type != _qs.type){
-                    alert("Wrong Type!");
+                    $("#bpErrorMsg").html("The requested QuickSelect is for a different control type than that which is loaded!");
+                    doBasicModal("#BPError");
                 }
                 else {
                     loadQS();

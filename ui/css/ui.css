@@ -125,3 +125,7 @@ body {
 	margin-top: 0 !important;
 	margin-bottom: 0 !important;
 }
+
+.largeFont {
+    font-size: 1.8em;
+}

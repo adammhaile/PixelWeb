@@ -13,6 +13,10 @@ body {
     margin-left: auto;
     margin-right: auto;
 }
+
+a {
+    color: #f36926;
+}
 #sideMenu {
     /*width: 200px !important;*/
 }

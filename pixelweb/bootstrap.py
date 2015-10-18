@@ -41,7 +41,7 @@ def checkBPVersion(ver):
     return ver >= min_bp_ver
 
 def runBootstrap(upgrade = False):
-    upgrade = (len(sys.argv) > 1 and sys.argv[1] == "--upgrade")
+    upgrade = ("--update-depends" in sys.argv)
     if upgrade:
         doInstall("BiblioPixel")
         doInstall("BiblioPixelAnimations")
@@ -50,7 +50,6 @@ def runBootstrap(upgrade = False):
         try:
             import bibliopixel
             if not checkBPVersion(bibliopixel.VERSION):
-                print "ver fail"
                 doInstall("BiblioPixel")
         except:
             doInstall("BiblioPixel")

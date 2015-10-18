@@ -42,15 +42,15 @@ class StoppableServer(WSGIRefServer):
 
 # @route('/')
 def home():
-    return static_file("index.html", root='../ui/')
+    return static_file("index.html", root='./ui/')
 
 # @route('/qs/<name>')
 def qs(name):
-    return static_file("qs.html", root='../ui/')
+    return static_file("qs.html", root='./ui/')
 
 # @route('/<filename:path>')
 def getFiles(filename):
-    return static_file(filename, root='../ui/')
+    return static_file(filename, root='./ui/')
 
 # @route('/api')
 def postonly():

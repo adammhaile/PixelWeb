@@ -479,7 +479,7 @@ function loadAnimQueue(config) {
 
     $("#queueList").empty();
 
-    var html = "No animations! Go to the Animation pane and add some.";
+    var html = "No animations! Go to the Animation pane and add some";
     if (_curQueue.length > 0) {
         html = buildQueueFeed(_curQueue);
         _enable("#startQ", true);
@@ -974,7 +974,7 @@ function loadQSPane() {
 
     $("#qsList").empty();
 
-    var html = "No Quick Selects! Go to the Animation or Queue pane and add some.";
+    var html = "No Quick Selects! Go to the Animation or Queue pane and add some, or choose a saved Quick Select menu from above.";
     if (_curQS.length > 0) {
         html = buildQSFeed(_curQS);
         _enable("#qs_save", true);

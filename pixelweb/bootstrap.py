@@ -42,10 +42,13 @@ def checkBPVersion(ver):
 
 def runBootstrap(upgrade = False):
     upgrade = ("--update-depends" in sys.argv)
+    up_bpa = ("--update-bpa" in sys.argv)
     if upgrade:
         doInstall("BiblioPixel")
         doInstall("BiblioPixelAnimations")
         doInstall("pyserial")
+    elif up_bpa:
+        doInstall("BiblioPixelAnimations")
     else:
         try:
             import bibliopixel

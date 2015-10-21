@@ -513,7 +513,7 @@ function genQueueFeedItem(item, num) {
             <button class='ui button q_edit'><i class='pencil icon'></i>Edit</button>\
             <button class='ui red button q_remove'><i class='remove icon'></i>Remove</button>\
         </div>\
-        <i class='film icon'></i>\
+        <i class='play icon'></i>\
         <div class='content'>\
             <div class='header'>@name</div>\
             <div class='description'>@desc</div>\

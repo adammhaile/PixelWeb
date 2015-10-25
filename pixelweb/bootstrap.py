@@ -23,8 +23,8 @@ def runCommand(cmd):
     return (err, exit_code, output)
 
 _bootstrap_installs = {
-    "BiblioPixel": "pip install https://github.com/ManiacalLabs/BiblioPixel/archive/dev.zip --upgrade",
-    "BiblioPixelAnimations": "pip install https://github.com/ManiacalLabs/BiblioPixelAnimations/archive/dev.zip --upgrade",
+    "BiblioPixel": "pip install BiblioPixel --upgrade",
+    "BiblioPixelAnimations": "pip install https://github.com/ManiacalLabs/BiblioPixelAnimations/archive/master.zip --upgrade",
     "pyserial": "pip install pyserial --upgrade"
 }
 
